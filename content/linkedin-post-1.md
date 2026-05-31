@@ -34,7 +34,7 @@ Why WhatsApp first, not an app: my target user has a ₹10,000 phone, intermitte
 
 Why free forever: career counseling shouldn't be a paywall for the people who need it most. Eventually funded by YouTube ad revenue, college partnerships, and CSR — not student wallets.
 
-Try it (very early — be kind): skillkite.pages.dev
+Try it (very early — be kind): skillkite.in
 Code: github.com/akkyyakhilesh/SkillKite (open source, built in public)
 
 If you know a BCA / MCA / B.Tech / M.Tech student stuck on "what do I do after graduation?" — please share this with them. Their feedback will shape week 2.
@@ -55,7 +55,7 @@ Stack: .NET 8 + Claude Sonnet + WhatsApp Cloud API + PostgreSQL + QuestPDF.
 
 Why I'm building this: I grew up in a small town in Bihar. Every BCA/MCA student I knew there had the same problem — no idea what jobs exist beyond the local IT center or a govt exam. Metro students get LinkedIn and mentors. We got cousin's advice.
 
-Try it: skillkite.pages.dev
+Try it: skillkite.in
 Code: github.com/akkyyakhilesh/SkillKite (open source)
 
 Share it with a small-city student you know. Week 2 will be shaped by their feedback. 🪁
