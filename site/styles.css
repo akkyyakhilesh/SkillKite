@@ -236,14 +236,15 @@ h2 {
 .audience {
   list-style: none;
   padding: 0;
-  margin: 0;
-  max-width: 720px;
+  margin: 0 auto;          /* centers the block within the section */
+  max-width: 640px;
 }
 .audience li {
   padding: 16px 0 16px 36px;
   border-bottom: 1px solid var(--rule);
   position: relative;
   font-size: 16px;
+  text-align: left;        /* readable copy stays left, the BLOCK is centered */
 }
 .audience li::before {
   content: "🪁";
@@ -282,6 +283,24 @@ h2 {
 
 /* Privacy + Terms pages */
 .policy { max-width: 760px; }
+.back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rule);
+  background: var(--paper);
+}
+.back-home:hover {
+  border-color: var(--saffron);
+  color: var(--saffron);
+  text-decoration: none;
+}
 .policy h1 {
   font-size: clamp(28px, 4vw, 38px);
   font-weight: 800;
