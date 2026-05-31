@@ -34,6 +34,10 @@ public static class AssessmentQuestions
         new("device",          "Do you have a laptop, or only a phone?",
                                "आपके पास लैपटॉप है या सिर्फ़ फ़ोन?"),
         new("salaryGoal",      "What monthly salary would make you and your family feel successful?",
-                               "कितनी monthly सैलरी आपको और घरवालों को satisfied लगेगी?")
+                               "कितनी monthly सैलरी आपको और घरवालों को satisfied लगेगी?"),
+        // ASKED LAST — right before the roadmap is generated. This determines
+        // the language of the PDF roadmap (not the chat conversation itself).
+        new("roadmapLanguage", "Last cheez Akkyy — roadmap kis language mein bheju? Hindi ya English?",
+                               "एक आख़िरी बात — रोडमैप किस language में भेजूँ? Hindi ya English?")
     };
 }

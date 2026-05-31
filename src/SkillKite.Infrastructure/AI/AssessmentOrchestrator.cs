@@ -173,5 +173,16 @@ public class AssessmentOrchestrator
         if (data.TryGetValue("name", out var n) && string.IsNullOrWhiteSpace(student.Name)) student.Name = n;
         if (data.TryGetValue("city", out var c) && string.IsNullOrWhiteSpace(student.City)) student.City = c;
         if (data.TryGetValue("education", out var e) && string.IsNullOrWhiteSpace(student.EducationLevel)) student.EducationLevel = e;
+
+        // Roadmap language preference — drives the PDF render language.
+        // Claude is instructed to normalize to "hindi" or "english"; we tolerate variants defensively.
+        if (data.TryGetValue("roadmapLanguage", out var lang) && !string.IsNullOrWhiteSpace(lang))
+        {
+            student.PreferredLanguage = lang.Trim().ToLowerInvariant() switch
+            {
+                "english" or "en" or "eng" => PreferredLanguage.English,
+                _                          => PreferredLanguage.Hindi,
+            };
+        }
     }
 }

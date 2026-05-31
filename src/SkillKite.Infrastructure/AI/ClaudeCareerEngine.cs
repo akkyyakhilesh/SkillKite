@@ -71,7 +71,7 @@ public class ClaudeCareerEngine : ICareerEngine
         ChatSession session,
         CancellationToken ct = default)
     {
-        var system = BuildRoadmapSystemPrompt();
+        var system = BuildRoadmapSystemPrompt(student.PreferredLanguage);
         var user = $$"""
             Student profile (extracted during assessment):
             {{session.AssessmentDataJson}}
@@ -123,7 +123,10 @@ public class ClaudeCareerEngine : ICareerEngine
         - Ask ONE question per turn. Keep replies short — 1-3 sentences max.
         - Acknowledge what the student just said before asking the next question.
         - If the student volunteers info that answers a later question, skip that question.
-        - When you have answers to ALL keys above, mark the assessment complete.
+        - Always save the [roadmapLanguage] question for LAST — it should be the final question,
+          asked only after every other anchor field is collected. Frame it as: roadmap is ready,
+          just pick the language for the PDF.
+        - When you have answers to ALL keys above (including roadmapLanguage), mark the assessment complete.
         - Never give career advice yet — just gather info warmly.
 
         OUTPUT FORMAT — you must reply with a single JSON object, nothing else:
@@ -136,6 +139,11 @@ public class ClaudeCareerEngine : ICareerEngine
         - "extracted" contains ONLY fields you newly learned this turn (can be empty {}).
         - Normalize: city names in Title Case, dailyHours as "1h" / "2-3h" / "fulltime",
           device as "laptop" / "phone", booleans as "yes" / "no".
+        - For [roadmapLanguage], normalize the student's answer to EXACTLY one of: "hindi" or "english".
+          Treat "hi", "हिंदी", "hindi mein", "Hindi please" → "hindi".
+          Treat "en", "english", "English please", "angrezi" → "english".
+          If ambiguous (e.g. "hinglish", "mixed", "both", "dono") → "hindi" (Hindi reads naturally with
+          English loanwords for tech terms, so it's the safer default).
         - "complete": true only when every anchor key has been collected.
 
         Current question index hint: {{session.CurrentQuestionIndex}} of {{AssessmentQuestions.All.Count}}.
@@ -143,17 +151,30 @@ public class ClaudeCareerEngine : ICareerEngine
         """;
     }
 
-    private static string BuildRoadmapSystemPrompt()
+    private static string BuildRoadmapSystemPrompt(PreferredLanguage lang)
     {
-        return """
+        // We always emit both EN and HI fields in the JSON schema (storage + future-proofing
+        // for a PWA dashboard that could let the user flip languages), but only one set is
+        // *written naturally*. The other set is left as an empty string — the PDF generator
+        // renders only the preferred language so the student gets a clean monolingual document.
+        var (primary, secondary) = lang == PreferredLanguage.English
+            ? ("English", "Hindi")
+            : ("Hindi (Devanagari script; English loanwords are fine for tech terms like 'developer', 'internship', 'YouTube')",
+               "English");
+
+        var (primaryFields, secondaryFields) = lang == PreferredLanguage.English
+            ? ("careerTitle, summary, theme",  "careerTitleHi, summaryHi, themeHi — leave as \"\"")
+            : ("careerTitleHi, summaryHi, themeHi", "careerTitle, summary, theme — leave as \"\"");
+
+        return $$"""
         You are SkillKite's roadmap generator. Given a student's assessment data, output a
         personalized, realistic career roadmap as STRICT JSON matching this schema:
 
         {
           "careerTitle": "string",
           "careerTitleHi": "string",
-          "summary": "string (2-3 sentences in English)",
-          "summaryHi": "string (2-3 sentences in Hindi)",
+          "summary": "string",
+          "summaryHi": "string",
           "totalWeeks": <int, 12-24>,
           "expectedSalaryMin": <int, INR/month entry-level>,
           "expectedSalaryMax": <int, INR/month after 1 year>,
@@ -168,6 +189,14 @@ public class ClaudeCareerEngine : ICareerEngine
             }
           ]
         }
+
+        LANGUAGE RULES (critical):
+        - The student chose {{primary}} as their preferred language.
+        - Write {{primaryFields}}, and EVERY string in "goals" and "practice", in {{primary}} only.
+        - For {{secondaryFields}} — leave them as empty strings ("").
+        - "resources[].title" stays in the resource's native language (most YouTube/NPTEL titles are
+          English or already-Hindi; do NOT translate them).
+        - "resources[].url" and "platform" are always plain ASCII.
 
         Hard rules:
         - Pick the SINGLE best-fit career given device, location, family constraints, daily hours.

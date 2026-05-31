@@ -4,6 +4,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SkillKite.Core.Dtos;
+using SkillKite.Core.Enums;
 using SkillKite.Core.Interfaces;
 using SkillKite.Core.Models;
 using SkillKite.Infrastructure.Configuration;
@@ -63,6 +64,17 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 // Devanagari characters render with matching weight/style.
                 p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
 
+                // Render in ONE language, chosen during the assessment.
+                // The PDF is a long-form artifact people read at their own pace; mixing two
+                // languages on every line adds clutter. Brand wordmarks ("SkillKite",
+                // "WhatsApp") stay in Latin script in both modes because they're proper nouns.
+                var hi = student.PreferredLanguage == PreferredLanguage.Hindi;
+
+                // Pick the right field for each piece. The schema keeps both EN and HI fields
+                // for future-proofing (a Phase 2 PWA could let the user flip languages without
+                // re-running Claude) — here we just choose one.
+                string PickLang(string en, string h) => hi && !string.IsNullOrWhiteSpace(h) ? h : en;
+
                 p.Header().Column(col =>
                 {
                     col.Item().Text("SkillKite").FontSize(24).Bold().FontColor(Colors.Orange.Darken2);
@@ -74,37 +86,42 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 {
                     col.Spacing(10);
 
-                    col.Item().Text($"Personal Roadmap for {student.Name ?? "Student"}").FontSize(16).Bold();
-                    col.Item().Text($"Career path: {roadmap.CareerTitle}  ({roadmap.CareerTitleHi})").Bold();
-                    col.Item().Text(roadmap.Summary);
-                    // Devanagari renders cleanly upright; italicizing it looks broken,
-                    // so keep the Hindi summary in regular weight, just slightly dimmer.
-                    col.Item().Text(roadmap.SummaryHi).FontColor(Colors.Grey.Darken2);
-                    col.Item().Text($"Duration: {roadmap.TotalWeeks} weeks  •  Expected salary: ₹{roadmap.ExpectedSalaryMin:N0}–₹{roadmap.ExpectedSalaryMax:N0}/month");
+                    var headlineLabel  = hi ? "रोडमैप — "                 : "Personal Roadmap for ";
+                    var careerLabel    = hi ? "करियर: "                    : "Career path: ";
+                    var durationLabel  = hi ? "अवधि: {0} हफ़्ते  •  अपेक्षित सैलरी: ₹{1:N0}–₹{2:N0}/महीना"
+                                            : "Duration: {0} weeks  •  Expected salary: ₹{1:N0}–₹{2:N0}/month";
+                    var weeksHeading   = hi ? "हफ़्ते-दर-हफ़्ते plan"          : "Week-by-week plan";
+                    var weekPrefix     = hi ? "हफ़्ता "                     : "Week ";
+                    var goalsLabel     = hi ? "लक्ष्य:"                     : "Goals:";
+                    var resourcesLabel = hi ? "Resources:"                 : "Resources:";
+                    var practiceLabel  = hi ? "अभ्यास: "                    : "Practice: ";
 
-                    col.Item().PaddingTop(10).Text("Week-by-week plan").FontSize(14).Bold();
+                    col.Item().Text($"{headlineLabel}{student.Name ?? (hi ? "Student" : "Student")}").FontSize(16).Bold();
+                    col.Item().Text($"{careerLabel}{PickLang(roadmap.CareerTitle, roadmap.CareerTitleHi)}").Bold();
+                    col.Item().Text(PickLang(roadmap.Summary, roadmap.SummaryHi));
+                    col.Item().Text(string.Format(durationLabel, roadmap.TotalWeeks, roadmap.ExpectedSalaryMin, roadmap.ExpectedSalaryMax));
+
+                    col.Item().PaddingTop(10).Text(weeksHeading).FontSize(14).Bold();
 
                     foreach (var w in roadmap.Weeks)
                     {
                         col.Item().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(wc =>
                         {
-                            wc.Item().Text($"Week {w.WeekNumber}: {w.Theme}").Bold();
-                            if (!string.IsNullOrWhiteSpace(w.ThemeHi))
-                                wc.Item().Text(w.ThemeHi).FontColor(Colors.Grey.Darken2);
+                            wc.Item().Text($"{weekPrefix}{w.WeekNumber}: {PickLang(w.Theme, w.ThemeHi)}").Bold();
 
-                            wc.Item().PaddingTop(4).Text("Goals:").SemiBold();
+                            wc.Item().PaddingTop(4).Text(goalsLabel).SemiBold();
                             foreach (var g in w.Goals)
                                 wc.Item().Text($"• {g}");
 
                             if (w.Resources.Count > 0)
                             {
-                                wc.Item().PaddingTop(4).Text("Resources:").SemiBold();
+                                wc.Item().PaddingTop(4).Text(resourcesLabel).SemiBold();
                                 foreach (var r in w.Resources)
                                     wc.Item().Text($"→ {r.Title} ({r.Platform}) — {r.Url}").FontSize(9);
                             }
 
                             if (!string.IsNullOrWhiteSpace(w.Practice))
-                                wc.Item().PaddingTop(4).Text($"Practice: {w.Practice}");
+                                wc.Item().PaddingTop(4).Text($"{practiceLabel}{w.Practice}");
                         });
                     }
                 });
