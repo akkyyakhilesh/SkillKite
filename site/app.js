@@ -5,10 +5,15 @@
   'use strict';
 
   // -------- Config --------
-  // Replace BOT_PHONE with the Meta WhatsApp test number (or your prod number)
-  // once you have it. International format, digits only, no '+' or spaces.
-  // Example: '15550123456' for the US test number.
+  // The bot's WhatsApp number — only whitelisted recipients can chat it
+  // during the Meta sandbox phase. Used for the SECONDARY CTA shown to
+  // users already on the early-access list.
   var BOT_PHONE = '15556472099'; // Meta WhatsApp test number
+
+  // Founder's WhatsApp — used for the PRIMARY 'Get early access' CTA.
+  // Visitors send a whitelist request here; founder adds their number to
+  // Meta's allowed-recipients list, then they can chat the bot.
+  var FOUNDER_PHONE = '919492040362';
 
   // -------- Language toggle --------
   var html = document.documentElement;
@@ -33,30 +38,27 @@
     }
   }
 
-  // -------- WhatsApp CTA --------
-  // Deep-link format: https://wa.me/<number>?text=<prefilled message>
-  // On phones this opens WhatsApp directly. On desktop it opens web.whatsapp.com.
-  var ctaText = encodeURIComponent('Hi SkillKite!');
-  var waUrl = BOT_PHONE
-    ? 'https://wa.me/' + BOT_PHONE + '?text=' + ctaText
-    : '#bot-not-configured';
+  // -------- WhatsApp CTAs --------
+  // Two flavors:
+  //   PRIMARY  ('cta-access')     → founder, asking to be whitelisted
+  //   DIRECT   ('cta-bot-direct') → bot test number, for users already whitelisted
 
-  // Wire only WhatsApp CTAs — leave other .cta-button instances (e.g. the
-  // sample-PDF download) alone with their existing href.
+  var accessText = encodeURIComponent(
+    "Hi Akkyy! I'd like to try SkillKite — please add me to the early-access list. 🪁"
+  );
+  var botText = encodeURIComponent('Hi SkillKite!');
+
+  var accessUrl = 'https://wa.me/' + FOUNDER_PHONE + '?text=' + accessText;
+  var botUrl    = 'https://wa.me/' + BOT_PHONE     + '?text=' + botText;
+
+  // Wire the two flavors. Anything else (e.g. sample-PDF download with
+  // .cta-secondary) is left untouched.
   Array.prototype.forEach.call(
-    document.querySelectorAll('.cta-button:not(.cta-secondary)'),
-    function (a) {
-      a.href = waUrl;
-      a.target = '_blank';
-      if (!BOT_PHONE) {
-        a.addEventListener('click', function (e) {
-          e.preventDefault();
-          alert(
-            'Bot phone number is not configured yet. ' +
-            'Edit site/app.js and set BOT_PHONE to your WhatsApp Cloud API test number.'
-          );
-        });
-      }
-    }
+    document.querySelectorAll('.cta-access'),
+    function (a) { a.href = accessUrl; a.target = '_blank'; a.rel = 'noopener'; }
+  );
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.cta-bot-direct'),
+    function (a) { a.href = botUrl; a.target = '_blank'; a.rel = 'noopener'; }
   );
 })();
