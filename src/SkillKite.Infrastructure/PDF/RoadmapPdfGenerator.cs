@@ -86,42 +86,35 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 {
                     col.Spacing(10);
 
-                    var headlineLabel  = hi ? "रोडमैप — "                 : "Personal Roadmap for ";
-                    var careerLabel    = hi ? "करियर: "                    : "Career path: ";
-                    var durationLabel  = hi ? "अवधि: {0} हफ़्ते  •  अपेक्षित सैलरी: ₹{1:N0}–₹{2:N0}/महीना"
-                                            : "Duration: {0} weeks  •  Expected salary: ₹{1:N0}–₹{2:N0}/month";
-                    var weeksHeading   = hi ? "हफ़्ते-दर-हफ़्ते plan"          : "Week-by-week plan";
-                    var weekPrefix     = hi ? "हफ़्ता "                     : "Week ";
-                    var goalsLabel     = hi ? "लक्ष्य:"                     : "Goals:";
-                    var resourcesLabel = hi ? "Resources:"                 : "Resources:";
-                    var practiceLabel  = hi ? "अभ्यास: "                    : "Practice: ";
-
-                    col.Item().Text($"{headlineLabel}{student.Name ?? (hi ? "Student" : "Student")}").FontSize(16).Bold();
-                    col.Item().Text($"{careerLabel}{PickLang(roadmap.CareerTitle, roadmap.CareerTitleHi)}").Bold();
+                    // Structural chrome stays in English — short, recognizable, doesn't compete
+                    // with the substantive content. Same pattern as BHIM / Tally / Paytm:
+                    // English navigation, Hindi body.
+                    col.Item().Text($"Personal Roadmap for {student.Name ?? "Student"}").FontSize(16).Bold();
+                    col.Item().Text($"Career path: {PickLang(roadmap.CareerTitle, roadmap.CareerTitleHi)}").Bold();
                     col.Item().Text(PickLang(roadmap.Summary, roadmap.SummaryHi));
-                    col.Item().Text(string.Format(durationLabel, roadmap.TotalWeeks, roadmap.ExpectedSalaryMin, roadmap.ExpectedSalaryMax));
+                    col.Item().Text($"Duration: {roadmap.TotalWeeks} weeks  •  Expected salary: ₹{roadmap.ExpectedSalaryMin:N0}–₹{roadmap.ExpectedSalaryMax:N0}/month");
 
-                    col.Item().PaddingTop(10).Text(weeksHeading).FontSize(14).Bold();
+                    col.Item().PaddingTop(10).Text("Week-by-week plan").FontSize(14).Bold();
 
                     foreach (var w in roadmap.Weeks)
                     {
                         col.Item().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(wc =>
                         {
-                            wc.Item().Text($"{weekPrefix}{w.WeekNumber}: {PickLang(w.Theme, w.ThemeHi)}").Bold();
+                            wc.Item().Text($"Week {w.WeekNumber}: {PickLang(w.Theme, w.ThemeHi)}").Bold();
 
-                            wc.Item().PaddingTop(4).Text(goalsLabel).SemiBold();
+                            wc.Item().PaddingTop(4).Text("Goals:").SemiBold();
                             foreach (var g in w.Goals)
                                 wc.Item().Text($"• {g}");
 
                             if (w.Resources.Count > 0)
                             {
-                                wc.Item().PaddingTop(4).Text(resourcesLabel).SemiBold();
+                                wc.Item().PaddingTop(4).Text("Resources:").SemiBold();
                                 foreach (var r in w.Resources)
                                     wc.Item().Text($"→ {r.Title} ({r.Platform}) — {r.Url}").FontSize(9);
                             }
 
                             if (!string.IsNullOrWhiteSpace(w.Practice))
-                                wc.Item().PaddingTop(4).Text($"{practiceLabel}{w.Practice}");
+                                wc.Item().PaddingTop(4).Text($"Practice: {w.Practice}");
                         });
                     }
                 });
