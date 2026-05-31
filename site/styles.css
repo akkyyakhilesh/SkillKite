@@ -280,6 +280,52 @@ h2 {
 }
 .cta-section h2 { margin-bottom: 24px; }
 
+/* Privacy + Terms pages */
+.policy { max-width: 760px; }
+.policy h1 {
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 800;
+  margin: 0 0 8px;
+  text-align: left;
+}
+.policy h2 {
+  font-size: clamp(18px, 2.4vw, 22px);
+  margin: 36px 0 12px;
+  text-align: left;
+  font-weight: 700;
+}
+.policy p, .policy ul {
+  font-size: 16px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.policy ul {
+  padding-left: 22px;
+}
+.policy ul li {
+  margin-bottom: 8px;
+}
+.policy a {
+  color: var(--sky-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.policy-meta {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.policy-tldr {
+  background: var(--paper-warm);
+  border-left: 4px solid var(--saffron);
+  padding: 18px 22px;
+  border-radius: 6px;
+  font-size: 16px;
+  margin: 24px 0 36px;
+  color: var(--ink);
+}
+
 /* Footer */
 footer {
   background: var(--ink);
