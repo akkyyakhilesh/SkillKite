@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Saffron → sky-blue diagonal gradient, matching the landing-page hero -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#FFE7D1"/>
+      <stop offset="55%" stop-color="#FFEED9"/>
+      <stop offset="100%" stop-color="#E8F4FF"/>
+    </linearGradient>
+    <!-- Soft kite glow -->
+    <radialGradient id="glow" cx="78%" cy="50%" r="40%">
+      <stop offset="0%"  stop-color="#FF7A00" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FF7A00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <ellipse cx="940" cy="315" rx="320" ry="320" fill="url(#glow)"/>
+
+  <!-- Decorative tail trailing from the kite -->
+  <path d="M 930 480
+           Q 880 530 940 565
+           Q 880 600 930 630
+           Q 880 660 930 690"
+        stroke="#FF7A00" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Diamond kite -->
+  <g transform="translate(940 290) rotate(8)">
+    <polygon points="0,-180 180,0 0,180 -180,0"
+             fill="#FF7A00" stroke="#FFFFFF" stroke-width="6"/>
+    <line x1="0" y1="-180" x2="0" y2="180" stroke="#FFFFFF" stroke-width="3"/>
+    <line x1="-180" y1="0" x2="180" y2="0" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Inner accent triangles for the classic Indian-kite look -->
+    <polygon points="0,-180 90,0 0,0" fill="#FFFFFF" opacity="0.18"/>
+    <polygon points="0,180 -90,0 0,0" fill="#000000" opacity="0.06"/>
+  </g>
+
+  <!-- Text block (left side) -->
+  <g font-family="'Noto Sans', system-ui, -apple-system, Segoe UI, sans-serif" fill="#1a1a2e">
+    <!-- Wordmark -->
+    <text x="80" y="160" font-size="76" font-weight="800" fill="#FF7A00">SkillKite</text>
+
+    <!-- Tagline -->
+    <text x="80" y="260" font-size="46" font-weight="800">Apne hunar ki</text>
+    <text x="80" y="320" font-size="46" font-weight="800">patang udao 🪁</text>
+
+    <!-- Subline -->
+    <text x="80" y="400" font-size="28" font-weight="400" fill="#4a4a5e">
+      Free AI career coach on WhatsApp.
+    </text>
+    <text x="80" y="440" font-size="28" font-weight="400" fill="#4a4a5e">
+      Built for BCA, MCA, B.Tech, M.Tech students.
+    </text>
+
+    <!-- URL pill -->
+    <rect x="78" y="510" width="320" height="60" rx="30" fill="#1a1a2e"/>
+    <text x="238" y="551" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">skillkite.in</text>
+  </g>
+</svg>
