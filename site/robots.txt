@@ -1,0 +1,6 @@
+# SkillKite — public landing site
+# Everything here is intentionally public. No private routes.
+User-agent: *
+Allow: /
+
+Sitemap: https://skillkite.in/sitemap.xml
