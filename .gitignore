@@ -2,11 +2,12 @@
 bin/
 obj/
 
-# IDE
+# IDE / tool config
 *.user
 .vs/
 .vscode/
 .idea/
+.claude/
 
 # Generated artifacts (kept locally, regenerated at runtime)
 **/wwwroot/roadmaps/*.pdf

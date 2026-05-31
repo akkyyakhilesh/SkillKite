@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FF7A00" />
+
+  <title>SkillKite — AI Career Coach for Indian Students</title>
+  <meta name="description" content="Free AI career coach in Hindi + English. Get a personalized career roadmap on WhatsApp in 5 minutes. Built for BCA, MCA, and Tier 2/3 students." />
+
+  <!-- Open Graph / social previews -->
+  <meta property="og:title" content="SkillKite — Apne hunar ki patang udao" />
+  <meta property="og:description" content="Free AI career coach for Indian students. Personalized roadmap on WhatsApp in 5 minutes." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://skillkite.in" />
+  <meta property="og:image" content="https://skillkite.in/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts: Noto Sans (Latin) + Noto Sans Devanagari (Hindi) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800&family=Noto+Sans+Devanagari:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <a href="/" class="logo">
+      <svg class="logo-kite" viewBox="0 0 32 32" aria-hidden="true">
+        <polygon points="16,2 30,16 16,30 2,16" fill="#FF7A00" stroke="#fff" stroke-width="1.5"/>
+        <line x1="16" y1="2" x2="16" y2="30" stroke="#fff" stroke-width="1"/>
+        <line x1="2" y1="16" x2="30" y2="16" stroke="#fff" stroke-width="1"/>
+        <path d="M16 30 Q14 34 18 36 Q14 38 16 42" stroke="#FF7A00" stroke-width="1.5" fill="none"/>
+      </svg>
+      <span>SkillKite</span>
+    </a>
+    <button id="lang-toggle" class="lang-toggle" aria-label="Switch language">
+      <span data-en>हिंदी</span><span data-hi>English</span>
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>
+        <span data-en>Apne hunar ki patang udao 🪁</span>
+        <span data-hi>अपने हुनर की पतंग उड़ाओ 🪁</span>
+      </h1>
+      <p class="lede">
+        <span data-en>Free AI career coach on WhatsApp. Built for BCA, MCA, and small-city students. Get a personalized career roadmap in 5 minutes.</span>
+        <span data-hi>WhatsApp पर मुफ़्त AI करियर कोच। BCA, MCA और छोटे शहरों के स्टूडेंट्स के लिए। 5 मिनट में पाओ अपना personalized career roadmap।</span>
+      </p>
+      <a id="whatsapp-cta" class="cta-button" href="#" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+        </svg>
+        <span data-en>Chat on WhatsApp</span>
+        <span data-hi>WhatsApp पर चैट करो</span>
+      </a>
+      <p class="trust">
+        <span data-en>Free forever &middot; No signup &middot; In Hindi &amp; English</span>
+        <span data-hi>हमेशा मुफ़्त &middot; कोई signup नहीं &middot; Hindi और English में</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <h2>
+      <span data-en>How it works</span>
+      <span data-hi>कैसे काम करता है</span>
+    </h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>
+          <span data-en>Say "Hi" on WhatsApp</span>
+          <span data-hi>WhatsApp पर "Hi" भेजो</span>
+        </h3>
+        <p>
+          <span data-en>Tap the button above. WhatsApp opens with our bot. No app to install, no form to fill.</span>
+          <span data-hi>ऊपर button दबाओ। WhatsApp में हमारा bot खुलेगा। न कोई app install करना, न कोई form भरना।</span>
+        </p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>
+          <span data-en>Chat for 5 minutes</span>
+          <span data-hi>5 मिनट बात करो</span>
+        </h3>
+        <p>
+          <span data-en>The AI asks about your education, skills, interests, and what you can spend time on. Reply in Hindi, English, or both.</span>
+          <span data-hi>AI पूछेगा आपकी पढ़ाई, skills, interests, और कितना time दे सकते हैं। Hindi, English, या Hinglish में जवाब दो।</span>
+        </p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>
+          <span data-en>Get your roadmap</span>
+          <span data-hi>अपना roadmap लो</span>
+        </h3>
+        <p>
+          <span data-en>A week-by-week career plan, with free YouTube + NPTEL resources, delivered as a PDF on WhatsApp.</span>
+          <span data-hi>हफ़्ते-दर-हफ़्ते का career plan, free YouTube + NPTEL resources के साथ, WhatsApp पर PDF में।</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who it's for -->
+  <section class="section section-alt">
+    <h2>
+      <span data-en>Built for you if&hellip;</span>
+      <span data-hi>आपके लिए है अगर&hellip;</span>
+    </h2>
+    <ul class="audience">
+      <li><span data-en>You're in BCA, MCA, B.Sc, B.Com, or 12th and unsure what to do next</span><span data-hi>आप BCA, MCA, B.Sc, B.Com, या 12th में हैं और समझ नहीं आ रहा आगे क्या करें</span></li>
+      <li><span data-en>You're from a Tier 2/3 city where career counselors charge ₹5,000+</span><span data-hi>आप Tier 2/3 शहर से हैं जहाँ career counselor ₹5,000+ लेते हैं</span></li>
+      <li><span data-en>You only have a phone, not a laptop — and we'll match careers to that reality</span><span data-hi>आपके पास सिर्फ़ फ़ोन है, laptop नहीं — और हम उसी हिसाब से career match करेंगे</span></li>
+      <li><span data-en>Your family wants you to start earning soon, but you're not sure what's realistic</span><span data-hi>घरवाले चाहते हैं जल्दी कमाई शुरू हो, पर आपको पता नहीं क्या realistic है</span></li>
+    </ul>
+  </section>
+
+  <!-- What we won't do -->
+  <section class="section">
+    <h2>
+      <span data-en>What we don't do</span>
+      <span data-hi>हम क्या नहीं करते</span>
+    </h2>
+    <p class="dontdo">
+      <span data-en>We don't sell courses. We don't take placement fees from you. We don't ask for your money to "unlock" anything. SkillKite stays free for students forever.</span>
+      <span data-hi>हम courses नहीं बेचते। आपसे placement fee नहीं लेते। कुछ "unlock" करने के लिए पैसे नहीं माँगते। SkillKite students के लिए हमेशा free रहेगा।</span>
+    </p>
+  </section>
+
+  <!-- Founder note -->
+  <section class="section section-alt">
+    <div class="founder">
+      <h2>
+        <span data-en>Why I'm building this</span>
+        <span data-hi>मैं यह क्यों बना रहा हूँ</span>
+      </h2>
+      <p>
+        <span data-en>I'm Akhilesh — a developer who grew up in a small town in UP. Every year I see BCA students from places like Jaunpur, Azamgarh, Gorakhpur graduate with no clue about what jobs exist beyond the local IT center or government exam coaching. Metro students get LinkedIn, mentors, and bootcamps. Tier 2/3 students get cousin's advice. SkillKite is my attempt to close that gap.</span>
+        <span data-hi>मैं अखिलेश हूँ — UP के एक छोटे शहर का developer। हर साल मैं देखता हूँ BCA students Jaunpur, आज़मगढ़, गोरखपुर जैसी जगहों से पढ़कर निकलते हैं और उन्हें पता ही नहीं होता local IT center या सरकारी coaching के अलावा कौन से jobs हैं। Metro वालों को LinkedIn, mentors, bootcamps मिलते हैं। Tier 2/3 वालों को सिर्फ़ cousin की राय। SkillKite इसी gap को भरने की कोशिश है।</span>
+      </p>
+      <p class="signature">
+        <span data-en>— Akkyy</span>
+        <span data-hi>— अक्की</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA repeat -->
+  <section class="section cta-section">
+    <h2>
+      <span data-en>Ready in 5 minutes</span>
+      <span data-hi>5 मिनट में तैयार</span>
+    </h2>
+    <a class="cta-button" href="#" id="whatsapp-cta-bottom" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+      </svg>
+      <span data-en>Chat on WhatsApp</span>
+      <span data-hi>WhatsApp पर चैट करो</span>
+    </a>
+  </section>
+
+  <footer>
+    <p>
+      <span data-en>SkillKite &middot; A mission-driven project &middot; Made in India 🇮🇳</span>
+      <span data-hi>SkillKite &middot; एक mission-driven project &middot; भारत में बना 🇮🇳</span>
+    </p>
+    <p class="footer-meta">
+      <a href="https://github.com/akkyyakhilesh/SkillKite">GitHub</a> &middot;
+      <a href="mailto:skillkite.in@gmail.com">skillkite.in@gmail.com</a>
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
