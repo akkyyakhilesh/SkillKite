@@ -8,7 +8,7 @@
   // Replace BOT_PHONE with the Meta WhatsApp test number (or your prod number)
   // once you have it. International format, digits only, no '+' or spaces.
   // Example: '15550123456' for the US test number.
-  var BOT_PHONE = ''; // <-- set me
+  var BOT_PHONE = '15556472099'; // Meta WhatsApp test number
 
   // -------- Language toggle --------
   var html = document.documentElement;
