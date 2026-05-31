@@ -7,6 +7,7 @@
 **A free AI career coach on WhatsApp for Tier 2/3 India.**
 *Apne hunar ki patang udao* 🪁
 
+[![CI](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/site-skillkite.in-FF7A00?style=flat-square)](https://skillkite.pages.dev)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Claude](https://img.shields.io/badge/Claude-Sonnet-D4A373?style=flat-square)](https://www.anthropic.com/)
