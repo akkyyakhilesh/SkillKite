@@ -42,8 +42,8 @@
     <text x="80" y="160" font-size="76" font-weight="800" fill="#FF7A00">SkillKite</text>
 
     <!-- Tagline -->
-    <text x="80" y="260" font-size="46" font-weight="800">Apne hunar ki</text>
-    <text x="80" y="320" font-size="46" font-weight="800">patang udao 🪁</text>
+    <text x="80" y="260" font-size="56" font-weight="800">Right skills.</text>
+    <text x="80" y="328" font-size="56" font-weight="800">Higher reach. 🪁</text>
 
     <!-- Subline -->
     <text x="80" y="400" font-size="28" font-weight="400" fill="#4a4a5e">

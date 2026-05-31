@@ -39,7 +39,7 @@ Code: github.com/akkyyakhilesh/SkillKite (open source, built in public)
 
 If you know a BCA / MCA / B.Tech / M.Tech student stuck on "what do I do after graduation?" — please share this with them. Their feedback will shape week 2.
 
-🪁 Apne hunar ki patang udao.
+🪁 Right skills. Higher reach.
 
 #buildinpublic #aiforindia #careerguidance #edtech #bihar
 

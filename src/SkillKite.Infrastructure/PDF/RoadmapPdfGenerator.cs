@@ -78,7 +78,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 p.Header().Column(col =>
                 {
                     col.Item().Text("SkillKite").FontSize(24).Bold().FontColor(Colors.Orange.Darken2);
-                    col.Item().Text("Apne hunar ki patang udao").Italic().FontColor(Colors.Grey.Darken1);
+                    col.Item().Text("Right skills. Higher reach.").Italic().FontColor(Colors.Grey.Darken1);
                     col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Orange.Lighten2);
                 });
 

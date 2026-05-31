@@ -4,8 +4,8 @@
 
 # SkillKite
 
-**A free AI career coach on WhatsApp for Tier 2/3 India.**
-*Apne hunar ki patang udao* 🪁
+**Right skills. Higher reach.** 🪁
+*A free AI career coach on WhatsApp for Tier 2/3 India.*
 
 [![CI](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/site-skillkite.in-FF7A00?style=flat-square)](https://skillkite.pages.dev)
@@ -167,4 +167,4 @@ MIT — see [`LICENSE`](LICENSE).
 
 If this resonates and you know a small-city student who's stuck on *"what do I do after my degree?"* — please share the link with them. That's the entire point.
 
-🪁 *Apne hunar ki patang udao.*
+🪁 *Right skills. Higher reach.*
