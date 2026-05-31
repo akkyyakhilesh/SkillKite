@@ -208,6 +208,30 @@ h2 {
 }
 .step p { margin: 0; color: var(--ink-soft); font-size: 15px; }
 
+/* Sample preview section */
+.sample { text-align: center; }
+.sample-lede {
+  max-width: 640px;
+  margin: 0 auto 28px;
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+.sample-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.cta-secondary {
+  background: var(--saffron);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.25);
+}
+.cta-secondary:hover {
+  background: var(--saffron-dark);
+  box-shadow: 0 8px 24px rgba(255, 122, 0, 0.35);
+}
+
 /* Audience list */
 .audience {
   list-style: none;

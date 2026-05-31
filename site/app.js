@@ -24,6 +24,13 @@
     html.setAttribute('data-lang', lang);
     html.setAttribute('lang', lang);
     localStorage.setItem('lang', lang);
+
+    // Sample PDF download is language-aware — show the student the variant
+    // matching their current reading preference.
+    var samplePdf = document.getElementById('sample-pdf');
+    if (samplePdf) {
+      samplePdf.href = lang === 'hi' ? 'sample-roadmap-hi.pdf' : 'sample-roadmap-en.pdf';
+    }
   }
 
   // -------- WhatsApp CTA --------
@@ -34,17 +41,22 @@
     ? 'https://wa.me/' + BOT_PHONE + '?text=' + ctaText
     : '#bot-not-configured';
 
-  Array.prototype.forEach.call(document.querySelectorAll('.cta-button'), function (a) {
-    a.href = waUrl;
-    a.target = '_blank';
-    if (!BOT_PHONE) {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        alert(
-          'Bot phone number is not configured yet. ' +
-          'Edit site/app.js and set BOT_PHONE to your WhatsApp Cloud API test number.'
-        );
-      });
+  // Wire only WhatsApp CTAs — leave other .cta-button instances (e.g. the
+  // sample-PDF download) alone with their existing href.
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.cta-button:not(.cta-secondary)'),
+    function (a) {
+      a.href = waUrl;
+      a.target = '_blank';
+      if (!BOT_PHONE) {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          alert(
+            'Bot phone number is not configured yet. ' +
+            'Edit site/app.js and set BOT_PHONE to your WhatsApp Cloud API test number.'
+          );
+        });
+      }
     }
-  });
+  );
 })();
