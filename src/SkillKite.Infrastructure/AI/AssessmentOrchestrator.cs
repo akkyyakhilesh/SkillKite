@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,7 +43,32 @@ public class AssessmentOrchestrator
     // explicit confirmation — the bug we're fixing is "any message restarts everything".
     private static readonly TimeSpan PostRoadmapWindow = TimeSpan.FromHours(24);
 
+    // Per-phone serialization so two messages from the same student never
+    // process concurrently. Without this, rapid double-replies (e.g. "Hindi"
+    // then "English"), Meta webhook retry bursts after a network blip, and
+    // multi-line WhatsApp splits all cause Claude to fire 2-3× in parallel
+    // and produce duplicate replies / duplicate roadmaps.
+    //
+    // The dictionary grows monotonically with unique phones — fine at our
+    // scale (~80 bytes per SemaphoreSlim, ~800 KB at 10k users). Add LRU
+    // eviction later if we ever scale past that.
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> _phoneLocks = new();
+
     public async Task HandleIncomingAsync(string phone, string text, string? profileName, CancellationToken ct = default)
+    {
+        var sem = _phoneLocks.GetOrAdd(phone, _ => new SemaphoreSlim(1, 1));
+        await sem.WaitAsync(ct);
+        try
+        {
+            await HandleIncomingInternalAsync(phone, text, profileName, ct);
+        }
+        finally
+        {
+            sem.Release();
+        }
+    }
+
+    private async Task HandleIncomingInternalAsync(string phone, string text, string? profileName, CancellationToken ct)
     {
         var student = await _db.Students.FirstOrDefaultAsync(s => s.Phone == phone, ct);
         if (student is null)
