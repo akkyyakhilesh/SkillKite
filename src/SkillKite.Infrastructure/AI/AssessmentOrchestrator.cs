@@ -340,10 +340,16 @@ public class AssessmentOrchestrator
 
         session.AssessmentDataJson = JsonSerializer.Serialize(data);
 
-        // Mirror well-known fields onto Student for easy querying.
-        if (data.TryGetValue("name", out var n) && string.IsNullOrWhiteSpace(student.Name)) student.Name = n;
-        if (data.TryGetValue("city", out var c) && string.IsNullOrWhiteSpace(student.City)) student.City = c;
-        if (data.TryGetValue("education", out var e) && string.IsNullOrWhiteSpace(student.EducationLevel)) student.EducationLevel = e;
+        // Mirror well-known fields onto Student so the latest assessment is the
+        // source of truth. We used to guard with IsNullOrWhiteSpace, but that
+        // froze student.City / EducationLevel to the FIRST session's values
+        // forever — meaning a returning student who moved cities or finished
+        // their degree would get roadmaps generated against stale data
+        // (e.g. recommending content writing for "10th pass in Bhagalpur" even
+        // after the student says "B.Sc Zoology, Patna"). Always overwrite.
+        if (data.TryGetValue("name",      out var n)) student.Name           = n;
+        if (data.TryGetValue("city",      out var c)) student.City           = c;
+        if (data.TryGetValue("education", out var e)) student.EducationLevel = e;
 
         // Roadmap language preference — drives the PDF render language.
         // Claude is instructed to normalize to "hindi" or "english"; we tolerate variants defensively.
