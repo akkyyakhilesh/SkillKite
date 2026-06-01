@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SkillKite.Core.Dtos;
 using SkillKite.Core.Enums;
 using SkillKite.Core.Interfaces;
 using SkillKite.Core.Models;
@@ -35,6 +36,12 @@ public class AssessmentOrchestrator
         _log = log;
     }
 
+    // If the student finished an assessment within this window, new messages
+    // are treated as post-roadmap chat rather than triggering a fresh assessment.
+    // After the window we default back to offering a new assessment, but only on
+    // explicit confirmation — the bug we're fixing is "any message restarts everything".
+    private static readonly TimeSpan PostRoadmapWindow = TimeSpan.FromHours(24);
+
     public async Task HandleIncomingAsync(string phone, string text, string? profileName, CancellationToken ct = default)
     {
         var student = await _db.Students.FirstOrDefaultAsync(s => s.Phone == phone, ct);
@@ -52,8 +59,24 @@ public class AssessmentOrchestrator
             .OrderByDescending(s => s.CreatedAt)
             .FirstOrDefaultAsync(ct);
 
+        // If no active session exists, check whether the student JUST completed
+        // an assessment. If yes, route through post-roadmap chat instead of
+        // creating a brand-new assessment session.
         if (session is null)
         {
+            var recentCompleted = await _db.ChatSessions
+                .Include(s => s.Messages)
+                .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.Completed)
+                .OrderByDescending(s => s.CompletedAt)
+                .FirstOrDefaultAsync(ct);
+
+            if (recentCompleted?.CompletedAt is { } completedAt &&
+                DateTime.UtcNow - completedAt < PostRoadmapWindow)
+            {
+                await HandlePostRoadmapAsync(student, recentCompleted, text, ct);
+                return;
+            }
+
             session = new ChatSession { StudentId = student.Id };
             _db.ChatSessions.Add(session);
             await _db.SaveChangesAsync(ct);
@@ -143,6 +166,128 @@ public class AssessmentOrchestrator
         {
             await _db.SaveChangesAsync(ct);
         }
+    }
+
+    private async Task HandlePostRoadmapAsync(
+        Student student,
+        ChatSession completedSession,
+        string text,
+        CancellationToken ct)
+    {
+        // Load the student's most recent generated roadmap to pass into the engine
+        // so it can answer questions like "what's in week 5?" or "is this realistic?".
+        var roadmapRow = await _db.Roadmaps
+            .Where(r => r.StudentId == student.Id)
+            .OrderByDescending(r => r.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (roadmapRow is null)
+        {
+            // Edge case: completed session but no roadmap saved (generation failed).
+            // Fall through to a fresh assessment so the student isn't stuck.
+            var fresh = new ChatSession { StudentId = student.Id };
+            _db.ChatSessions.Add(fresh);
+            await _db.SaveChangesAsync(ct);
+            await ContinueAssessmentAsync(student, fresh, text, ct);
+            return;
+        }
+
+        GeneratedRoadmap? roadmap;
+        try
+        {
+            roadmap = JsonSerializer.Deserialize<GeneratedRoadmap>(roadmapRow.WeeksPlanJson);
+        }
+        catch (JsonException ex)
+        {
+            _log.LogError(ex, "Could not deserialize roadmap {Id}; falling back to fresh assessment.", roadmapRow.Id);
+            roadmap = null;
+        }
+
+        if (roadmap is null)
+        {
+            var fresh = new ChatSession { StudentId = student.Id };
+            _db.ChatSessions.Add(fresh);
+            await _db.SaveChangesAsync(ct);
+            await ContinueAssessmentAsync(student, fresh, text, ct);
+            return;
+        }
+
+        // Persist the incoming user message to the completed session — we keep
+        // post-roadmap chat in the same session for full conversation continuity.
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = completedSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        // Only the messages AFTER assessment completion are relevant context
+        // for the post-roadmap turn — earlier turns were the assessment itself.
+        var cutoff = completedSession.CompletedAt ?? DateTime.UtcNow;
+        var postHistory = completedSession.Messages
+            .Where(m => m.CreatedAt > cutoff)
+            .OrderBy(m => m.CreatedAt)
+            .ToList();
+
+        var turn = await _engine.PostRoadmapTurnAsync(student, roadmap!, postHistory, text, ct);
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = completedSession.Id,
+            Role = MessageRole.Assistant,
+            Content = turn.ReplyText
+        });
+        await _db.SaveChangesAsync(ct);
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, turn.ReplyText, ct));
+
+        if (turn.ShouldRestart)
+        {
+            // Student explicitly confirmed they want a fresh assessment.
+            // Start a brand-new session and prime it with a fresh greeting.
+            var fresh = new ChatSession { StudentId = student.Id };
+            _db.ChatSessions.Add(fresh);
+            await _db.SaveChangesAsync(ct);
+
+            await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+        }
+    }
+
+    /// <summary>
+    /// Drive one assessment turn for an existing (possibly new) session — used
+    /// when post-roadmap chat decides to restart, and as a fallback if a
+    /// completed session has no recoverable roadmap.
+    /// </summary>
+    private async Task ContinueAssessmentAsync(
+        Student student,
+        ChatSession session,
+        string? latestUserMessage,
+        CancellationToken ct)
+    {
+        if (!string.IsNullOrWhiteSpace(latestUserMessage))
+        {
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id,
+                Role = MessageRole.User,
+                Content = latestUserMessage
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+
+        var history = session.Messages.OrderBy(m => m.CreatedAt).ToList();
+        var turn = await _engine.NextTurnAsync(session, history, latestUserMessage, ct);
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = turn.ReplyText
+        });
+        await _db.SaveChangesAsync(ct);
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, turn.ReplyText, ct));
     }
 
     private async Task TrySendAsync(Func<Task> send)

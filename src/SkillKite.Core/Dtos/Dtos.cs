@@ -5,6 +5,19 @@ public record AssessmentTurnResult(
     bool IsComplete,
     Dictionary<string, string>? ExtractedFields);
 
+/// <summary>
+/// One conversational turn AFTER the roadmap has been delivered. The bot stays
+/// in chat mode (answering thanks, follow-up questions about the roadmap, etc.)
+/// instead of restarting the assessment.
+///
+/// If the student explicitly asks for a fresh roadmap and confirms, the engine
+/// sets <see cref="ShouldRestart"/> = true and the orchestrator creates a new
+/// assessment session.
+/// </summary>
+public record PostRoadmapTurnResult(
+    string ReplyText,
+    bool ShouldRestart);
+
 public record RoadmapWeek(
     int WeekNumber,
     string Theme,

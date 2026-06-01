@@ -101,6 +101,33 @@ public class ClaudeCareerEngine : ICareerEngine
         }
     }
 
+    public async Task<PostRoadmapTurnResult> PostRoadmapTurnAsync(
+        Student student,
+        GeneratedRoadmap roadmap,
+        IReadOnlyList<ChatMessage> postRoadmapHistory,
+        string latestUserMessage,
+        CancellationToken ct = default)
+    {
+        var system = BuildPostRoadmapSystemPrompt(student, roadmap);
+
+        var messages = postRoadmapHistory
+            .Where(m => m.Role != MessageRole.System)
+            .Select(m => new ClaudeMessage(m.Role == MessageRole.User ? "user" : "assistant", m.Content))
+            .ToList();
+
+        if (!string.IsNullOrWhiteSpace(latestUserMessage) &&
+            (messages.Count == 0 || messages[^1].Role != "user"))
+        {
+            messages.Add(new ClaudeMessage("user", latestUserMessage));
+        }
+
+        if (messages.Count == 0)
+            messages.Add(new ClaudeMessage("user", "<<post-roadmap turn>>"));
+
+        var raw = await CallClaudeAsync(system, messages, ct);
+        return ParsePostRoadmapTurn(raw);
+    }
+
     // ----- prompts -----
 
     private static string BuildAssessmentSystemPrompt(ChatSession session)
@@ -208,6 +235,66 @@ public class ClaudeCareerEngine : ICareerEngine
         """;
     }
 
+    private static string BuildPostRoadmapSystemPrompt(Student student, GeneratedRoadmap roadmap)
+    {
+        var hi = student.PreferredLanguage == PreferredLanguage.Hindi;
+        var careerTitle = hi && !string.IsNullOrWhiteSpace(roadmap.CareerTitleHi)
+            ? roadmap.CareerTitleHi : roadmap.CareerTitle;
+        var summary = hi && !string.IsNullOrWhiteSpace(roadmap.SummaryHi)
+            ? roadmap.SummaryHi : roadmap.Summary;
+        var week1 = roadmap.Weeks?.FirstOrDefault();
+        var week1Theme = week1 != null
+            ? (hi && !string.IsNullOrWhiteSpace(week1.ThemeHi) ? week1.ThemeHi : week1.Theme)
+            : "Week 1";
+        var week1Goals = week1?.Goals != null ? string.Join(" • ", week1.Goals) : "";
+        var week1Practice = week1?.Practice ?? "";
+
+        return $$"""
+        You are SkillKite, continuing to chat with {{student.Name ?? "the student"}}
+        AFTER their roadmap PDF has already been delivered. DO NOT restart the
+        assessment under any circumstances unless the student EXPLICITLY confirms
+        they want a brand-new one (and you've asked them once to be sure).
+
+        The student's context:
+        - Name: {{student.Name ?? "unknown"}}
+        - City: {{student.City ?? "unknown"}}
+        - Education: {{student.EducationLevel ?? "unknown"}}
+        - Preferred language: {{student.PreferredLanguage}}
+
+        Their generated career roadmap:
+        - Career path: {{careerTitle}}
+        - Duration: {{roadmap.TotalWeeks}} weeks
+        - Expected salary: ₹{{roadmap.ExpectedSalaryMin:N0}}–₹{{roadmap.ExpectedSalaryMax:N0}}/month
+        - Summary: {{summary}}
+        - Week 1 theme: {{week1Theme}}
+        - Week 1 goals: {{week1Goals}}
+        - Week 1 practice deliverable: {{week1Practice}}
+
+        Conversation rules:
+        - Keep the same warm Hinglish voice you had during the assessment.
+        - Replies are SHORT — 1-3 sentences max.
+        - If they say thanks / bye / "ok" / "got it" / a closing emoji → reply warmly,
+          gently nudge them toward their Week 1 first task or the practice deliverable.
+        - If they ask a follow-up question about the roadmap (e.g. "yeh course free hai?",
+          "week 5 mein kya hoga?", "is salary realistic?") → answer directly using the
+          roadmap data above.
+        - If they seem confused or worried → reassure, name their first concrete step.
+        - If they EXPLICITLY say they want a fresh roadmap / start over (e.g. "naya roadmap
+          chahiye", "redo this", "start again") → ask ONE confirmation ("Sure? Tumhara
+          existing roadmap save rahega"). Only if they confirm yes in their NEXT message,
+          set shouldRestart=true.
+
+        OUTPUT FORMAT — reply with a single JSON object, nothing else:
+        {
+          "reply": "<message to send to the student>",
+          "shouldRestart": <true|false>
+        }
+
+        Set shouldRestart=true ONLY when the student has just confirmed they want a brand
+        new assessment. Default is false.
+        """;
+    }
+
     // ----- HTTP -----
 
     private async Task<string> CallClaudeAsync(string system, List<ClaudeMessage> messages, CancellationToken ct)
@@ -272,6 +359,33 @@ public class ClaudeCareerEngine : ICareerEngine
             }
 
             return new AssessmentTurnResult(reply, complete, extracted);
+        }
+    }
+
+    private static PostRoadmapTurnResult ParsePostRoadmapTurn(string raw)
+    {
+        var json = ExtractJson(raw);
+
+        JsonDocument? doc = null;
+        try { doc = JsonDocument.Parse(json); }
+        catch (JsonException)
+        {
+            // Fallback to treating the whole response as a friendly reply.
+            return new PostRoadmapTurnResult(raw.Trim(), ShouldRestart: false);
+        }
+
+        using (doc)
+        {
+            var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+                return new PostRoadmapTurnResult(raw.Trim(), false);
+
+            var reply = root.TryGetProperty("reply", out var r) && r.ValueKind == JsonValueKind.String
+                ? r.GetString() ?? raw
+                : raw;
+            var shouldRestart = root.TryGetProperty("shouldRestart", out var sr) && sr.ValueKind == JsonValueKind.True;
+
+            return new PostRoadmapTurnResult(reply, shouldRestart);
         }
     }
 

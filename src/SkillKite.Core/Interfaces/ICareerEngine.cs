@@ -23,4 +23,18 @@ public interface ICareerEngine
         Student student,
         ChatSession session,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Handles a post-roadmap conversational turn. The student has already
+    /// completed assessment and received a PDF; this method answers thanks /
+    /// follow-up questions without restarting the assessment. Returns
+    /// ShouldRestart=true only if the student explicitly confirms they want a
+    /// brand-new roadmap.
+    /// </summary>
+    Task<PostRoadmapTurnResult> PostRoadmapTurnAsync(
+        Student student,
+        GeneratedRoadmap roadmap,
+        IReadOnlyList<ChatMessage> postRoadmapHistory,
+        string latestUserMessage,
+        CancellationToken ct = default);
 }
