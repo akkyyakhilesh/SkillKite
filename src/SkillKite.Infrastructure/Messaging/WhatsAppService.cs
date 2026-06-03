@@ -52,6 +52,88 @@ public class WhatsAppService : IMessagingService
         await PostAsync(payload, ct);
     }
 
+    /// <summary>
+    /// Send an interactive Reply Buttons message (max 3 buttons). Used for
+    /// closed-enum assessment questions like device, govtInterest, workType.
+    /// Each button's id is what we get back in the webhook payload when the
+    /// student taps it — and what Claude sees as the extracted answer.
+    /// </summary>
+    public async Task SendButtonsAsync(
+        string toPhone, string body, IReadOnlyList<InteractiveOption> options,
+        CancellationToken ct = default)
+    {
+        if (options.Count == 0 || options.Count > 3)
+            throw new ArgumentException("WhatsApp Reply Buttons supports 1-3 buttons", nameof(options));
+
+        var payload = new
+        {
+            messaging_product = "whatsapp",
+            to = toPhone,
+            type = "interactive",
+            interactive = new
+            {
+                type = "button",
+                body = new { text = body },
+                action = new
+                {
+                    buttons = options.Select(o => new
+                    {
+                        type = "reply",
+                        reply = new { id = o.Id, title = Truncate(o.Title, 20) }
+                    }).ToArray()
+                }
+            }
+        };
+        await PostAsync(payload, ct);
+    }
+
+    /// <summary>
+    /// Send an interactive List Message (up to 10 rows). Used when we want
+    /// more options than buttons allow, or row descriptions add context
+    /// (e.g. salary ranges with their "what this means" subtext).
+    /// </summary>
+    public async Task SendListAsync(
+        string toPhone, string body, string buttonLabel,
+        string sectionTitle, IReadOnlyList<InteractiveOption> options,
+        CancellationToken ct = default)
+    {
+        if (options.Count == 0 || options.Count > 10)
+            throw new ArgumentException("WhatsApp List Messages support 1-10 rows", nameof(options));
+
+        var payload = new
+        {
+            messaging_product = "whatsapp",
+            to = toPhone,
+            type = "interactive",
+            interactive = new
+            {
+                type = "list",
+                body = new { text = body },
+                action = new
+                {
+                    button = Truncate(buttonLabel, 20),
+                    sections = new[]
+                    {
+                        new
+                        {
+                            title = Truncate(sectionTitle, 24),
+                            rows = options.Select(o => new
+                            {
+                                id = o.Id,
+                                title = Truncate(o.Title, 24),
+                                description = string.IsNullOrEmpty(o.Description) ? null : Truncate(o.Description, 72)
+                            }).ToArray()
+                        }
+                    }
+                }
+            }
+        };
+        await PostAsync(payload, ct);
+    }
+
+    private static string Truncate(string s, int max) =>
+        string.IsNullOrEmpty(s) || s.Length <= max ? s : s[..max];
+
     private async Task PostAsync(object payload, CancellationToken ct)
     {
         using var resp = await _http.PostAsJsonAsync($"{_opts.PhoneNumberId}/messages", payload, ct);
@@ -112,15 +194,41 @@ public class WhatsAppService : IMessagingService
                 foreach (var msg in messages.EnumerateArray())
                 {
                     var type = msg.TryGetProperty("type", out var t) ? t.GetString() : null;
-                    if (type != "text") continue;
 
-                    var from = msg.GetProperty("from").GetString() ?? "";
-                    var id = msg.GetProperty("id").GetString() ?? "";
-                    var body = msg.GetProperty("text").GetProperty("body").GetString() ?? "";
+                    var from = msg.TryGetProperty("from", out var f) ? f.GetString() ?? "" : "";
+                    var id = msg.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
                     var tsStr = msg.TryGetProperty("timestamp", out var ts) ? ts.GetString() : null;
                     var timestamp = long.TryParse(tsStr, out var unix)
                         ? DateTimeOffset.FromUnixTimeSeconds(unix)
                         : DateTimeOffset.UtcNow;
+
+                    string? body = null;
+
+                    if (type == "text")
+                    {
+                        body = msg.GetProperty("text").GetProperty("body").GetString();
+                    }
+                    else if (type == "interactive")
+                    {
+                        // Button tap or list selection: flatten the chosen ID to plain text
+                        // so the orchestrator + Claude can treat it identically to a typed reply.
+                        // The ID is what we set when building the interactive message — so it
+                        // arrives back as a clean normalized value (e.g. "phone", "full_time").
+                        var interactive = msg.GetProperty("interactive");
+                        var subtype = interactive.GetProperty("type").GetString();
+                        if (subtype == "button_reply" &&
+                            interactive.TryGetProperty("button_reply", out var br))
+                        {
+                            body = br.TryGetProperty("id", out var brId) ? brId.GetString() : null;
+                        }
+                        else if (subtype == "list_reply" &&
+                                 interactive.TryGetProperty("list_reply", out var lr))
+                        {
+                            body = lr.TryGetProperty("id", out var lrId) ? lrId.GetString() : null;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(body)) continue;
 
                     yield return new WhatsAppIncomingMessage(from, id, body, profileName, timestamp);
                 }

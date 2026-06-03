@@ -3,7 +3,8 @@ namespace SkillKite.Core.Dtos;
 public record AssessmentTurnResult(
     string ReplyText,
     bool IsComplete,
-    Dictionary<string, string>? ExtractedFields);
+    Dictionary<string, string>? ExtractedFields,
+    InteractiveBlock? Interactive = null);
 
 /// <summary>
 /// One conversational turn AFTER the roadmap has been delivered. The bot stays
@@ -44,3 +45,26 @@ public record WhatsAppIncomingMessage(
     string Text,
     string? ProfileName,
     DateTimeOffset Timestamp);
+
+/// <summary>
+/// One selectable option in a WhatsApp interactive message (Reply Button or
+/// List Row). <see cref="Id"/> is what comes back to us in the webhook when
+/// the student taps the option — and what Claude sees as the extracted answer.
+/// Keep Id short, ASCII, and self-explanatory (e.g. "phone", "full_time").
+/// </summary>
+public record InteractiveOption(
+    string Id,
+    string Title,
+    string? Description = null);
+
+/// <summary>
+/// When Claude wants the next turn rendered as buttons or a list (instead of
+/// free text), it emits this block inside the assessment turn result.
+/// The orchestrator reads it and calls the appropriate WhatsApp send method.
+/// </summary>
+public record InteractiveBlock(
+    string Type,                              // "buttons" | "list"
+    string Body,                              // message text shown above the options
+    IReadOnlyList<InteractiveOption> Options, // 1-3 for buttons, 1-10 for list
+    string? ButtonLabel = null,               // list only: text on the "open list" button
+    string? SectionTitle = null);             // list only: section header

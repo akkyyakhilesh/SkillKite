@@ -132,8 +132,16 @@ public class ClaudeCareerEngine : ICareerEngine
 
     private static string BuildAssessmentSystemPrompt(ChatSession session)
     {
+        // Build the anchor list. For closed-enum questions, append the allowed
+        // option IDs so Claude knows which interactive block to emit.
         var qList = string.Join("\n", AssessmentQuestions.All.Select((q, i) =>
-            $"  {i + 1}. [{q.Key}] EN: {q.English} | HI: {q.Hindi}"));
+        {
+            var optHint = q.Interactive == AssessmentQuestions.InteractiveKind.None
+                ? ""
+                : $"  [INTERACTIVE {q.Interactive.ToString().ToLowerInvariant()} — option ids: " +
+                  string.Join(", ", q.Options!.Select(o => $"\"{o.Id}\"")) + "]";
+            return $"  {i + 1}. [{q.Key}] EN: {q.English} | HI: {q.Hindi}{optHint}";
+        }));
 
         return $$"""
         You are SkillKite, a warm, encouraging AI career coach for students in Tier 2/3 India.
@@ -150,27 +158,55 @@ public class ClaudeCareerEngine : ICareerEngine
         - Ask ONE question per turn. Keep replies short — 1-3 sentences max.
         - Acknowledge what the student just said before asking the next question.
         - If the student volunteers info that answers a later question, skip that question.
-        - Always save the [roadmapLanguage] question for LAST — it should be the final question,
-          asked only after every other anchor field is collected. Frame it as: roadmap is ready,
-          just pick the language for the PDF.
+        - Always save the [roadmapLanguage] question for LAST — asked only after every other anchor
+          field is collected. Frame it as: roadmap is ready, just pick the language for the PDF.
         - When you have answers to ALL keys above (including roadmapLanguage), mark the assessment complete.
         - Never give career advice yet — just gather info warmly.
 
-        OUTPUT FORMAT — you must reply with a single JSON object, nothing else:
+        INTERACTIVE QUESTIONS:
+        Some anchor questions above are marked [INTERACTIVE buttons …] or [INTERACTIVE list …].
+        When you ASK one of those questions, emit an "interactive" block in the JSON envelope so
+        the student gets tappable options instead of typing. The student can still type freely if
+        they prefer — typed answers are valid too.
+
+        - For buttons: use the option ids exactly as listed; titles can be your own short labels.
+        - For list: the salary salaryGoal question has fixed ranges — use those id+title pairs.
+        - When the student's reply is an interactive option id (e.g. "phone", "full_time",
+          "15-25k"), treat it as a clean, already-normalized answer and store it verbatim in
+          "extracted". Do NOT translate or re-interpret.
+
+        OUTPUT FORMAT — reply with a single JSON object, nothing else:
         {
           "reply": "<the message to send to the student>",
           "extracted": { "<question_key>": "<student's answer, normalized>", ... },
-          "complete": <true|false>
+          "complete": <true|false>,
+          "interactive": {                  // OPTIONAL — only when asking an INTERACTIVE question
+            "type": "buttons" | "list",
+            "body": "<short prompt text shown above the options; usually same as reply>",
+            "options": [
+              { "id": "phone",  "title": "📱 Sirf phone" },
+              { "id": "laptop", "title": "💻 Laptop hai" },
+              { "id": "both",   "title": "📱💻 Dono" }
+            ],
+            "buttonLabel": "Select",        // list only
+            "sectionTitle": "Monthly goal", // list only
+            "rowDescriptions": {            // list only — id → short description
+              "10-15k": "Starting out, learning fast"
+            }
+          }
         }
 
         - "extracted" contains ONLY fields you newly learned this turn (can be empty {}).
-        - Normalize: city names in Title Case, dailyHours as "1h" / "2-3h" / "fulltime",
-          device as "laptop" / "phone", booleans as "yes" / "no".
-        - For [roadmapLanguage], normalize the student's answer to EXACTLY one of: "hindi" or "english".
-          Treat "hi", "हिंदी", "hindi mein", "Hindi please" → "hindi".
-          Treat "en", "english", "English please", "angrezi" → "english".
-          If ambiguous (e.g. "hinglish", "mixed", "both", "dono") → "hindi" (Hindi reads naturally with
-          English loanwords for tech terms, so it's the safer default).
+        - Normalize: city names in Title Case. For free-text answers to closed questions,
+          coerce into the listed option ids when possible:
+            device      → "phone" | "laptop" | "both"
+            workType    → "full_time" | "freelance" | "both"
+            govtInterest → "yes" | "no" | "open"
+            familyExpect → "job" | "study" | "both"
+            dailyHours  → "1h" | "2-3h" | "fulltime"
+            salaryGoal  → one of "10-15k" / "15-25k" / "25-40k" / "40-60k" / "60k+" or a free
+                          number if student typed a specific custom amount
+            roadmapLanguage → "hindi" | "english"
         - "complete": true only when every anchor key has been collected.
 
         Current question index hint: {{session.CurrentQuestionIndex}} of {{AssessmentQuestions.All.Count}}.
@@ -358,8 +394,57 @@ public class ClaudeCareerEngine : ICareerEngine
                 }
             }
 
-            return new AssessmentTurnResult(reply, complete, extracted);
+            var interactive = TryParseInteractiveBlock(root);
+
+            return new AssessmentTurnResult(reply, complete, extracted, interactive);
         }
+    }
+
+    private static InteractiveBlock? TryParseInteractiveBlock(JsonElement root)
+    {
+        if (!root.TryGetProperty("interactive", out var ix) || ix.ValueKind != JsonValueKind.Object)
+            return null;
+
+        var type = ix.TryGetProperty("type", out var t) ? t.GetString() : null;
+        if (type != "buttons" && type != "list") return null;
+
+        var body = ix.TryGetProperty("body", out var b) ? b.GetString() ?? "" : "";
+
+        if (!ix.TryGetProperty("options", out var opts) || opts.ValueKind != JsonValueKind.Array)
+            return null;
+
+        // For list rows we accept descriptions either embedded inside each option
+        // (preferred) or as a separate "rowDescriptions" id→description map.
+        Dictionary<string, string>? descMap = null;
+        if (type == "list" && ix.TryGetProperty("rowDescriptions", out var rd) &&
+            rd.ValueKind == JsonValueKind.Object)
+        {
+            descMap = new Dictionary<string, string>();
+            foreach (var prop in rd.EnumerateObject())
+                if (prop.Value.ValueKind == JsonValueKind.String)
+                    descMap[prop.Name] = prop.Value.GetString() ?? "";
+        }
+
+        var options = new List<InteractiveOption>();
+        foreach (var opt in opts.EnumerateArray())
+        {
+            if (opt.ValueKind != JsonValueKind.Object) continue;
+            var id    = opt.TryGetProperty("id",    out var oi) ? oi.GetString() : null;
+            var title = opt.TryGetProperty("title", out var ot) ? ot.GetString() : null;
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(title)) continue;
+
+            var description = opt.TryGetProperty("description", out var od)
+                ? od.GetString()
+                : (descMap != null && descMap.TryGetValue(id, out var dd) ? dd : null);
+
+            options.Add(new InteractiveOption(id, title, description));
+        }
+        if (options.Count == 0) return null;
+
+        var buttonLabel  = ix.TryGetProperty("buttonLabel",  out var bl) ? bl.GetString() : null;
+        var sectionTitle = ix.TryGetProperty("sectionTitle", out var st) ? st.GetString() : null;
+
+        return new InteractiveBlock(type, body, options, buttonLabel, sectionTitle);
     }
 
     private static PostRoadmapTurnResult ParsePostRoadmapTurn(string raw)

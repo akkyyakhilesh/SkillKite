@@ -19,6 +19,9 @@ appsettings.Local.json
 # Local tooling (cloudflared.exe is 54 MB — download per the README instead)
 tools/
 
+# Personal marketing / content drafts (LinkedIn posts, etc.) — stay local
+content/
+
 # Logs and scratch files
 *.log
 .tunnel.stdout
