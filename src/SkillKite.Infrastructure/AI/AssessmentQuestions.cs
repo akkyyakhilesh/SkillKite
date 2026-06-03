@@ -63,18 +63,10 @@ public static class AssessmentQuestions
                                    new InteractiveOption("none",    "❌ Kuch nahi abhi")
                                }),
 
-        // workType — replaces the old "remoteOk" question.
-        // Differentiates roadmap output: full-time path vs freelance path vs both.
-        new("workType",        "Aap kya dhundh rahe ho — full-time job, ya freelance / side work?",
-                               "आप क्या ढूँढ रहे हैं — full-time job, ya freelance / side work?",
-                               InteractiveKind.Buttons,
-                               new[]
-                               {
-                                   new InteractiveOption("full_time", "💼 Work full time"),
-                                   new InteractiveOption("freelance", "🌱 Freelance / side"),
-                                   new InteractiveOption("both",      "🤔 Dono open")
-                               }),
-
+        // Ordered: govtInterest BEFORE workType. If the student wants a govt job
+        // (SSC / banking / railways), workType is implicitly "full_time" and Claude
+        // can skip that question. Asking workType=freelance first and THEN asking
+        // about govt jobs felt jarring — govt jobs are structurally full-time.
         new("govtInterest",    "Are you interested in government jobs (SSC, banking, railways, etc.)?",
                                "क्या आप सरकारी नौकरी में रुचि रखते हैं (SSC, बैंक, रेलवे)?",
                                InteractiveKind.Buttons,
@@ -83,6 +75,19 @@ public static class AssessmentQuestions
                                    new InteractiveOption("yes",  "✅ Haan, interest hai"),
                                    new InteractiveOption("no",   "❌ Nahi"),
                                    new InteractiveOption("open", "🤷 Dono open")
+                               }),
+
+        // workType — replaces the old "remoteOk" question.
+        // Differentiates roadmap output: full-time path vs freelance path vs both.
+        // Skipped automatically by Claude when govtInterest=yes (govt = full-time).
+        new("workType",        "Aap kya dhundh rahe ho — full-time job, ya freelance / side work?",
+                               "आप क्या ढूँढ रहे हैं — full-time job, ya freelance / side work?",
+                               InteractiveKind.Buttons,
+                               new[]
+                               {
+                                   new InteractiveOption("full_time", "💼 Work full time"),
+                                   new InteractiveOption("freelance", "🌱 Freelance / side"),
+                                   new InteractiveOption("both",      "🤔 Dono open")
                                }),
 
         new("familyExpect",    "What does your family expect — a job right away, or further studies?",
@@ -95,14 +100,19 @@ public static class AssessmentQuestions
                                    new InteractiveOption("both",  "🤔 Dono chal sakta")
                                }),
 
-        new("dailyHours",      "How much time can you dedicate to learning daily? 1 hr, 2-3 hrs, or full-time?",
-                               "रोज़ कितना समय सीखने के लिए दे सकते हैं? 1 घंटा, 2-3 घंटे, या पूरा दिन?",
+        // 4-5 ghante is the realistic upper bound for actual focused learning per day.
+        // "Full-time" (8+ hrs) sounded ambitious but no student really sustains that —
+        // even completely free students top out around 4-5 hrs of focused work. Setting
+        // an honest ceiling here prevents the AI from calibrating roadmaps to
+        // unrealistic time budgets.
+        new("dailyHours",      "How much time can you dedicate to learning daily? 1 hr, 2-3 hrs, or 4-5 hrs?",
+                               "रोज़ कितना समय सीखने के लिए दे सकते हैं? 1 घंटा, 2-3 घंटे, या 4-5 घंटे?",
                                InteractiveKind.Buttons,
                                new[]
                                {
-                                   new InteractiveOption("1h",       "⏱ 1 ghanta"),
-                                   new InteractiveOption("2-3h",     "⏰ 2-3 ghante"),
-                                   new InteractiveOption("fulltime", "🔥 Full-time")
+                                   new InteractiveOption("1h",   "⏱ 1 ghanta"),
+                                   new InteractiveOption("2-3h", "⏰ 2-3 ghante"),
+                                   new InteractiveOption("4-5h", "🔥 4-5 ghante")
                                }),
 
         // Everyone using SkillKite has a phone (they're chatting on WhatsApp).

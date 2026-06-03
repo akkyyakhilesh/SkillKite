@@ -201,6 +201,10 @@ public class ClaudeCareerEngine : ICareerEngine
         - Ask ONE question per turn. Keep replies short — 1-3 sentences max.
         - Acknowledge what the student just said before asking the next question.
         - If the student volunteers info that answers a later question, skip that question.
+        - If [govtInterest] = "yes" (they want a government job — SSC, banking, railways, etc.),
+          implicitly set workType = "full_time" and SKIP the [workType] question entirely.
+          Government jobs are structurally full-time, so asking about freelance/full-time after
+          a govt answer is jarring.
         - Always save the [roadmapLanguage] question for LAST — asked only after every other anchor
           field is collected. Frame it as: roadmap is ready, just pick the language for the PDF.
         - When you have answers to ALL keys above (including roadmapLanguage), mark the assessment complete.
@@ -243,7 +247,7 @@ public class ClaudeCareerEngine : ICareerEngine
                           | "none" (nothing yet)
             govtInterest → "yes" | "no" | "open"
             familyExpect → "job" | "study" | "both"
-            dailyHours  → "1h" | "2-3h" | "fulltime"
+            dailyHours  → "1h" | "2-3h" | "4-5h"
             salaryGoal  → "10-25k" | "25-50k" | "50k+"  OR a free number if the student
                           typed a specific custom amount (e.g. "32000", "₹35k", "1 lakh").
             roadmapLanguage → "hindi" | "english"
