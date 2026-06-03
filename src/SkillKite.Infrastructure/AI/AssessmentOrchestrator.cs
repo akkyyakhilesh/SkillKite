@@ -79,6 +79,21 @@ public class AssessmentOrchestrator
         }
         student.LastActiveAt = DateTime.UtcNow;
 
+        // First check: is the student in the middle of choosing a career path?
+        // (They completed assessment, the bot sent 3 suggestions, and now they're
+        // tapping one of the buttons or typing a choice.)
+        var awaitingChoice = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingCareerChoice)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingChoice is not null)
+        {
+            await HandleCareerChoiceAsync(student, awaitingChoice, text, ct);
+            return;
+        }
+
         var session = await _db.ChatSessions
             .Include(s => s.Messages)
             .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.Active)
@@ -140,53 +155,11 @@ public class AssessmentOrchestrator
 
         if (turn.IsComplete)
         {
-            session.Status = SessionStatus.Completed;
-            session.CompletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync(ct);
-
-            // Roadmap generation (Claude) + PDF rendering takes ~15-30 seconds.
-            // Send an interstitial so the user doesn't think the bot has died.
-            var lang = student.PreferredLanguage;
-            var waitMsg = lang == PreferredLanguage.English
-                ? "🪁 Got it! Cooking up your personalized roadmap now — give me about a minute. A good plan needs a little thought!"
-                : "🪁 Bas mil gaya sab kuch! Ab main aapka personalized roadmap aur PDF bana raha hoon — ek minute do mujhe. Achha plan banane mein thoda time lagta hai! 😊";
-            await TrySendAsync(() => _messaging.SendTextAsync(phone, waitMsg, ct));
-
-            try
-            {
-                var generated = await _engine.GenerateRoadmapAsync(student, session, ct);
-                var pdfUrl = await _pdf.GenerateAsync(student, generated, ct);
-
-                var roadmap = new Roadmap
-                {
-                    StudentId = student.Id,
-                    TotalWeeks = generated.TotalWeeks,
-                    WeeksPlanJson = JsonSerializer.Serialize(generated),
-                    PdfUrl = pdfUrl
-                };
-                _db.Roadmaps.Add(roadmap);
-                await _db.SaveChangesAsync(ct);
-
-                var summary =
-                    $"🎯 *Your career roadmap is ready!*\n\n" +
-                    $"Path: {generated.CareerTitle} ({generated.CareerTitleHi})\n" +
-                    $"Duration: {generated.TotalWeeks} weeks\n" +
-                    $"Expected salary: ₹{generated.ExpectedSalaryMin:N0}–₹{generated.ExpectedSalaryMax:N0}/month\n\n" +
-                    $"{generated.Summary}";
-
-                await TrySendAsync(() => _messaging.SendTextAsync(phone, summary, ct));
-                await TrySendAsync(() => _messaging.SendDocumentAsync(
-                    phone, pdfUrl,
-                    "Your SkillKite roadmap 🪁",
-                    $"SkillKite_Roadmap_{student.Name ?? "student"}.pdf",
-                    ct));
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "Roadmap generation failed for student {Id}", student.Id);
-                await TrySendAsync(() => _messaging.SendTextAsync(phone,
-                    "Sorry yaar, roadmap generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
-            }
+            // Assessment is done. Instead of immediately generating the roadmap,
+            // we ask Claude for 3 best-fit career suggestions and let the
+            // student pick one. This catches AI mismatches before we commit to
+            // a 20-week plan the student won't follow.
+            await SuggestCareerPathsAndAwaitChoiceAsync(student, session, ct);
         }
         else
         {
@@ -314,6 +287,178 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
 
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, turn.ReplyText, ct));
+    }
+
+    /// <summary>
+    /// Called when the assessment has just been completed. Pulls 3 career
+    /// suggestions from Claude, sends them as 3 Reply Buttons (with the
+    /// rationale for each in the message body), and parks the session in
+    /// <see cref="SessionStatus.AwaitingCareerChoice"/> so the next inbound
+    /// message can be routed to the choice handler.
+    /// </summary>
+    private async Task SuggestCareerPathsAndAwaitChoiceAsync(
+        Student student, ChatSession session, CancellationToken ct)
+    {
+        CareerSuggestionsResult suggestions;
+        try
+        {
+            suggestions = await _engine.SuggestCareerPathsAsync(student, session, ct);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Career suggestion failed for student {Id}; falling back to direct roadmap.", student.Id);
+            // Defensive fallback: if suggestions fail for any reason, go straight to
+            // the legacy single-roadmap path so the student isn't stranded.
+            await GenerateAndDeliverRoadmapAsync(student, session, chosenCareerTitle: null, ct);
+            return;
+        }
+
+        // Persist the suggestions in the session so we can resolve the chosen ID
+        // back to a title when the student's selection comes in.
+        var data = MergeIntoAssessmentData(session, "suggestedCareers",
+            JsonSerializer.Serialize(suggestions.Suggestions));
+        session.AssessmentDataJson = data;
+        session.Status = SessionStatus.AwaitingCareerChoice;
+        await _db.SaveChangesAsync(ct);
+
+        // Body holds the intro + the per-career rationale (so the student sees
+        // the AI's reasoning before picking). The 3 buttons hold just the titles.
+        var bodyLines = new List<string> { suggestions.IntroLine, "" };
+        var letter = (char)('A');
+        foreach (var s in suggestions.Suggestions)
+        {
+            bodyLines.Add($"{letter}. {s.Title}");
+            bodyLines.Add($"   — {s.Rationale}");
+            bodyLines.Add("");
+            letter++;
+        }
+        bodyLines.Add("Choose one to continue 👇");
+
+        var options = suggestions.Suggestions
+            .Take(3)
+            .Select(s => new InteractiveOption(s.Id, Truncate(s.Title, 20)))
+            .ToList();
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(
+            student.Phone, string.Join("\n", bodyLines), options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = string.Join("\n", bodyLines)
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Called when the student has tapped a career suggestion button (or typed
+    /// the title). Resolves the choice, runs the existing roadmap generation
+    /// pipeline with that career as a constraint, and delivers the PDF.
+    /// </summary>
+    private async Task HandleCareerChoiceAsync(
+        Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        // Persist the user message so the conversation log is complete.
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        // Resolve the student's text to a CareerSuggestion: try matching the
+        // selected button id first, then a case-insensitive title prefix, then
+        // give up and pass the raw text through as the chosen career title.
+        var stored = TryGetStoredSuggestions(session);
+        var chosen = stored?.FirstOrDefault(s =>
+                         string.Equals(s.Id, text.Trim(), StringComparison.OrdinalIgnoreCase))
+                     ?? stored?.FirstOrDefault(s =>
+                         s.Title.StartsWith(text.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        var chosenTitle = chosen?.Title ?? text.Trim();
+        await GenerateAndDeliverRoadmapAsync(student, session, chosenTitle, ct);
+    }
+
+    private IReadOnlyList<CareerSuggestion>? TryGetStoredSuggestions(ChatSession session)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(session.AssessmentDataJson);
+            if (!doc.RootElement.TryGetProperty("suggestedCareers", out var s) ||
+                s.ValueKind != JsonValueKind.String) return null;
+            return JsonSerializer.Deserialize<List<CareerSuggestion>>(s.GetString() ?? "[]");
+        }
+        catch { return null; }
+    }
+
+    private static string MergeIntoAssessmentData(ChatSession session, string key, string value)
+    {
+        var data = string.IsNullOrWhiteSpace(session.AssessmentDataJson) || session.AssessmentDataJson == "{}"
+            ? new Dictionary<string, string>()
+            : JsonSerializer.Deserialize<Dictionary<string, string>>(session.AssessmentDataJson)
+              ?? new Dictionary<string, string>();
+        data[key] = value;
+        return JsonSerializer.Serialize(data);
+    }
+
+    private static string Truncate(string s, int max) =>
+        string.IsNullOrEmpty(s) || s.Length <= max ? s : s[..max];
+
+    /// <summary>
+    /// Existing roadmap-gen + PDF + WhatsApp delivery pipeline. Extracted from
+    /// the old inline block so both the new "student chose a career" path and
+    /// the fallback path can call it.
+    /// </summary>
+    private async Task GenerateAndDeliverRoadmapAsync(
+        Student student, ChatSession session, string? chosenCareerTitle, CancellationToken ct)
+    {
+        session.Status = SessionStatus.Completed;
+        session.CompletedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+
+        var lang = student.PreferredLanguage;
+        var waitMsg = lang == PreferredLanguage.English
+            ? "🪁 Got it! Cooking up your personalized roadmap now — give me about a minute. A good plan needs a little thought!"
+            : "🪁 Bas mil gaya sab kuch! Ab main aapka personalized roadmap aur PDF bana raha hoon — ek minute do mujhe. Achha plan banane mein thoda time lagta hai! 😊";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, waitMsg, ct));
+
+        try
+        {
+            var generated = await _engine.GenerateRoadmapAsync(student, session, chosenCareerTitle, ct);
+            var pdfUrl = await _pdf.GenerateAsync(student, generated, ct);
+
+            var roadmap = new Roadmap
+            {
+                StudentId = student.Id,
+                TotalWeeks = generated.TotalWeeks,
+                WeeksPlanJson = JsonSerializer.Serialize(generated),
+                PdfUrl = pdfUrl
+            };
+            _db.Roadmaps.Add(roadmap);
+            await _db.SaveChangesAsync(ct);
+
+            var summary =
+                $"🎯 *Your career roadmap is ready!*\n\n" +
+                $"Path: {generated.CareerTitle} ({generated.CareerTitleHi})\n" +
+                $"Duration: {generated.TotalWeeks} weeks\n" +
+                $"Expected salary: ₹{generated.ExpectedSalaryMin:N0}–₹{generated.ExpectedSalaryMax:N0}/month\n\n" +
+                $"{generated.Summary}";
+
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
+            await TrySendAsync(() => _messaging.SendDocumentAsync(
+                student.Phone, pdfUrl,
+                "Your SkillKite roadmap 🪁",
+                $"SkillKite_Roadmap_{student.Name ?? "student"}.pdf",
+                ct));
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Roadmap generation failed for student {Id}", student.Id);
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                "Sorry yaar, roadmap generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+        }
     }
 
     /// <summary>

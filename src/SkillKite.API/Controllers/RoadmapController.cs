@@ -33,7 +33,7 @@ public class RoadmapController : ControllerBase
             .FirstOrDefaultAsync(s => s.Id == req.SessionId, ct);
         if (session?.Student is null) return NotFound("session not found");
 
-        var generated = await _engine.GenerateRoadmapAsync(session.Student, session, ct);
+        var generated = await _engine.GenerateRoadmapAsync(session.Student, session, chosenCareerTitle: null, ct);
         var pdfUrl = await _pdf.GenerateAsync(session.Student, generated, ct);
 
         var roadmap = new Roadmap

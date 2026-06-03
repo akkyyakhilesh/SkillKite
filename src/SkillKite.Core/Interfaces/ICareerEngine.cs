@@ -17,11 +17,25 @@ public interface ICareerEngine
         CancellationToken ct = default);
 
     /// <summary>
-    /// Generates a complete personalized roadmap once assessment is complete.
+    /// Once assessment is complete, suggest the student's 3 best-fit career paths
+    /// (with a one-line rationale per path). The student picks one before we
+    /// commit to generating a full 20-week roadmap.
+    /// </summary>
+    Task<CareerSuggestionsResult> SuggestCareerPathsAsync(
+        Student student,
+        ChatSession session,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// Generates the complete personalized roadmap. If <paramref name="chosenCareerTitle"/>
+    /// is provided, Claude is constrained to building the plan for that specific
+    /// career (the one the student picked from the 3 suggestions). If null, the
+    /// engine picks the single best fit itself (legacy / fallback path).
     /// </summary>
     Task<GeneratedRoadmap> GenerateRoadmapAsync(
         Student student,
         ChatSession session,
+        string? chosenCareerTitle = null,
         CancellationToken ct = default);
 
     /// <summary>

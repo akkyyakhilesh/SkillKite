@@ -7,6 +7,21 @@ public record AssessmentTurnResult(
     InteractiveBlock? Interactive = null);
 
 /// <summary>
+/// One of three career paths the engine suggests after assessment completion.
+/// The student picks one of these — only then do we generate the full roadmap.
+/// Title is intentionally short (3-4 words) so it fits in a WhatsApp Reply
+/// Button. The rationale is shown in the message body above the buttons.
+/// </summary>
+public record CareerSuggestion(
+    string Id,        // short slug ("junior_web_dev", "content_writer")
+    string Title,     // 3-4 word career name shown on the button
+    string Rationale); // 1-line "why this fits you" reasoning
+
+public record CareerSuggestionsResult(
+    string IntroLine,                          // friendly preamble shown above the list
+    IReadOnlyList<CareerSuggestion> Suggestions);
+
+/// <summary>
 /// One conversational turn AFTER the roadmap has been delivered. The bot stays
 /// in chat mode (answering thanks, follow-up questions about the roadmap, etc.)
 /// instead of restarting the assessment.

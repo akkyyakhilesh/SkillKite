@@ -43,14 +43,25 @@ public static class AssessmentQuestions
         new("city",            "Which city or town are you from?",
                                "आप किस शहर या क़स्बे से हैं?"),
 
-        new("interests",       "What subjects or activities do you enjoy most?",
-                               "आपको कौन से विषय या काम सबसे ज़्यादा पसंद हैं?"),
+        // Anchored with examples — "subjects" + "activities" alone was too abstract;
+        // testers (including the founder) didn't know what type of answer fit.
+        new("interests",       "What do you enjoy doing most — coding, design, writing, speaking (sales/teaching), numbers, helping people, or something else?",
+                               "आपको क्या करने में मज़ा आता है — coding, design, writing, बात करना (sales/teaching), numbers का काम, लोगों की help, या कुछ और?"),
 
         new("skills",          "Do you have any skills already — coding, design, writing, speaking, anything?",
                                "आपके पास कोई स्किल है क्या — कोडिंग, डिज़ाइन, लिखना, बोलना, कुछ भी?"),
 
-        new("experience",      "Have you done any internships, projects, or freelance work?",
-                               "क्या आपने कोई इंटर्नशिप, प्रोजेक्ट या फ़्रीलांस काम किया है?"),
+        // 3 buttons cover the one useful distinction (real work vs academic only vs none).
+        // The roadmap starts at "absolute basics" for "kuch nahi" and skips ahead for the rest.
+        new("experience",      "Kya aapne koi internship, project, ya freelance kaam kiya hai ab tak?",
+                               "क्या आपने कोई internship, project, या freelance काम किया है?",
+                               InteractiveKind.Buttons,
+                               new[]
+                               {
+                                   new InteractiveOption("real",    "💼 Internship / freelance"),
+                                   new InteractiveOption("college", "📚 Sirf college project"),
+                                   new InteractiveOption("none",    "❌ Kuch nahi abhi")
+                               }),
 
         // workType — replaces the old "remoteOk" question.
         // Differentiates roadmap output: full-time path vs freelance path vs both.
@@ -94,33 +105,31 @@ public static class AssessmentQuestions
                                    new InteractiveOption("fulltime", "🔥 Full-time")
                                }),
 
-        new("device",          "Do you have a laptop, or only a phone?",
-                               "आपके पास लैपटॉप है या सिर्फ़ फ़ोन?",
+        // Everyone using SkillKite has a phone (they're chatting on WhatsApp).
+        // The real binary is whether they also have laptop access — so only
+        // two buttons. "both" was redundant with "laptop" and just added cognitive load.
+        new("device",          "Do you have a laptop too, or only a phone?",
+                               "आपके पास laptop bhi hai, ya sirf phone?",
                                InteractiveKind.Buttons,
                                new[]
                                {
                                    new InteractiveOption("phone",  "📱 Sirf phone"),
-                                   new InteractiveOption("laptop", "💻 Laptop hai"),
-                                   new InteractiveOption("both",   "📱💻 Dono")
+                                   new InteractiveOption("laptop", "💻 Laptop bhi hai")
                                }),
 
-        // Salary as a list message — 5 anchored ranges + a custom escape hatch.
-        // Anchoring prevents unrealistic fresher targets (e.g. ₹80k entry-level CSE
-        // in Bhagalpur) and gives Claude clean signal to calibrate the roadmap.
+        // 3 anchored buckets covering real Tier 2/3 expectations. A student who
+        // wants a specific number can still type one instead of tapping. The
+        // anchors prevent unrealistic fresher fantasies (Bhavesh asked for ₹80k
+        // as a fresh B.Tech; bot quietly anchors to honest ranges).
         new("salaryGoal",      "What monthly salary would make you and your family feel successful?",
                                "कितनी monthly सैलरी आपको और घरवालों को satisfied लगेगी?",
-                               InteractiveKind.List,
+                               InteractiveKind.Buttons,
                                new[]
                                {
-                                   new InteractiveOption("10-15k",  "₹10–15k / month",  "Starting out, learning fast"),
-                                   new InteractiveOption("15-25k",  "₹15–25k / month",  "Typical first-job target"),
-                                   new InteractiveOption("25-40k",  "₹25–40k / month",  "Strong first-job target"),
-                                   new InteractiveOption("40-60k",  "₹40–60k / month",  "Above-average entry"),
-                                   new InteractiveOption("60k+",    "₹60k+ / month",    "Ambitious — specialized skills"),
-                                   new InteractiveOption("custom",  "✏️ Type my own",   "Reply with a specific number")
-                               },
-                               ListButtonLabel: "Select range",
-                               ListSectionTitle: "Monthly salary goal"),
+                                   new InteractiveOption("10-25k", "₹10–25k / month"),
+                                   new InteractiveOption("25-50k", "₹25–50k / month"),
+                                   new InteractiveOption("50k+",   "₹50k+ / month")
+                               }),
 
         // ASKED LAST — right before the roadmap is generated. Determines PDF language.
         new("roadmapLanguage", "Last cheez — roadmap kis language mein bheju? Hindi ya English?",

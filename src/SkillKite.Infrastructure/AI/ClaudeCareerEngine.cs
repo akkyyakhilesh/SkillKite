@@ -66,12 +66,12 @@ public class ClaudeCareerEngine : ICareerEngine
         return ParseAssessmentTurn(raw);
     }
 
-    public async Task<GeneratedRoadmap> GenerateRoadmapAsync(
+    public async Task<CareerSuggestionsResult> SuggestCareerPathsAsync(
         Student student,
         ChatSession session,
         CancellationToken ct = default)
     {
-        var system = BuildRoadmapSystemPrompt(student.PreferredLanguage);
+        var system = BuildCareerSuggestionsSystemPrompt(student.PreferredLanguage);
         var user = $$"""
             Student profile (extracted during assessment):
             {{session.AssessmentDataJson}}
@@ -81,6 +81,49 @@ public class ClaudeCareerEngine : ICareerEngine
             - City: {{student.City ?? "unknown"}}
             - Education: {{student.EducationLevel ?? "unknown"}}
             - Preferred language: {{student.PreferredLanguage}}
+
+            Output the 3-career suggestions JSON now. Output ONLY the JSON object —
+            no prose, no markdown fences.
+            """;
+
+        var raw = await CallClaudeAsync(system, new() { new("user", user) }, ct);
+        var json = ExtractJson(raw);
+
+        try
+        {
+            var parsed = JsonSerializer.Deserialize<CareerSuggestionsResult>(json, JsonOpts);
+            if (parsed is null || parsed.Suggestions.Count == 0)
+                throw new InvalidOperationException("Claude returned no career suggestions");
+            return parsed;
+        }
+        catch (JsonException ex)
+        {
+            _log.LogError(ex, "Failed to parse career suggestions JSON. Raw: {Raw}", raw);
+            throw;
+        }
+    }
+
+    public async Task<GeneratedRoadmap> GenerateRoadmapAsync(
+        Student student,
+        ChatSession session,
+        string? chosenCareerTitle = null,
+        CancellationToken ct = default)
+    {
+        var system = BuildRoadmapSystemPrompt(student.PreferredLanguage);
+        var chosenLine = string.IsNullOrWhiteSpace(chosenCareerTitle)
+            ? "- Chosen career path: <not specified — pick the single best fit yourself>"
+            : $"- Chosen career path: {chosenCareerTitle}  (the student picked this from the 3 suggestions — generate the roadmap for THIS career, not a different one)";
+
+        var user = $$"""
+            Student profile (extracted during assessment):
+            {{session.AssessmentDataJson}}
+
+            Known fields:
+            - Name: {{student.Name ?? "unknown"}}
+            - City: {{student.City ?? "unknown"}}
+            - Education: {{student.EducationLevel ?? "unknown"}}
+            - Preferred language: {{student.PreferredLanguage}}
+            {{chosenLine}}
 
             Generate the roadmap JSON now. Output ONLY the JSON object — no prose, no markdown fences.
             """;
@@ -164,15 +207,15 @@ public class ClaudeCareerEngine : ICareerEngine
         - Never give career advice yet — just gather info warmly.
 
         INTERACTIVE QUESTIONS:
-        Some anchor questions above are marked [INTERACTIVE buttons …] or [INTERACTIVE list …].
+        Some anchor questions above are marked [INTERACTIVE buttons — option ids: …].
         When you ASK one of those questions, emit an "interactive" block in the JSON envelope so
-        the student gets tappable options instead of typing. The student can still type freely if
+        the student gets tappable buttons instead of typing. The student can still type freely if
         they prefer — typed answers are valid too.
 
-        - For buttons: use the option ids exactly as listed; titles can be your own short labels.
-        - For list: the salary salaryGoal question has fixed ranges — use those id+title pairs.
+        - Use the option ids EXACTLY as listed. Titles can be your own short emoji-led labels
+          (≤ 20 chars per button, max 3 buttons per question).
         - When the student's reply is an interactive option id (e.g. "phone", "full_time",
-          "15-25k"), treat it as a clean, already-normalized answer and store it verbatim in
+          "25-50k"), treat it as a clean, already-normalized answer and store it verbatim in
           "extracted". Do NOT translate or re-interpret.
 
         OUTPUT FORMAT — reply with a single JSON object, nothing else:
@@ -181,36 +224,83 @@ public class ClaudeCareerEngine : ICareerEngine
           "extracted": { "<question_key>": "<student's answer, normalized>", ... },
           "complete": <true|false>,
           "interactive": {                  // OPTIONAL — only when asking an INTERACTIVE question
-            "type": "buttons" | "list",
+            "type": "buttons",
             "body": "<short prompt text shown above the options; usually same as reply>",
             "options": [
               { "id": "phone",  "title": "📱 Sirf phone" },
-              { "id": "laptop", "title": "💻 Laptop hai" },
-              { "id": "both",   "title": "📱💻 Dono" }
-            ],
-            "buttonLabel": "Select",        // list only
-            "sectionTitle": "Monthly goal", // list only
-            "rowDescriptions": {            // list only — id → short description
-              "10-15k": "Starting out, learning fast"
-            }
+              { "id": "laptop", "title": "💻 Laptop bhi hai" }
+            ]
           }
         }
 
         - "extracted" contains ONLY fields you newly learned this turn (can be empty {}).
         - Normalize: city names in Title Case. For free-text answers to closed questions,
           coerce into the listed option ids when possible:
-            device      → "phone" | "laptop" | "both"
+            device      → "phone" | "laptop"  (everyone has a phone; "laptop" means they
+                                                also have a laptop. There is no "both".)
             workType    → "full_time" | "freelance" | "both"
+            experience  → "real" (internship/freelance/job) | "college" (only academic projects)
+                          | "none" (nothing yet)
             govtInterest → "yes" | "no" | "open"
             familyExpect → "job" | "study" | "both"
             dailyHours  → "1h" | "2-3h" | "fulltime"
-            salaryGoal  → one of "10-15k" / "15-25k" / "25-40k" / "40-60k" / "60k+" or a free
-                          number if student typed a specific custom amount
+            salaryGoal  → "10-25k" | "25-50k" | "50k+"  OR a free number if the student
+                          typed a specific custom amount (e.g. "32000", "₹35k", "1 lakh").
             roadmapLanguage → "hindi" | "english"
         - "complete": true only when every anchor key has been collected.
 
         Current question index hint: {{session.CurrentQuestionIndex}} of {{AssessmentQuestions.All.Count}}.
         Already extracted so far: {{session.AssessmentDataJson}}
+        """;
+    }
+
+    private static string BuildCareerSuggestionsSystemPrompt(PreferredLanguage lang)
+    {
+        var languageDirective = lang == PreferredLanguage.English
+            ? "Write the introLine, titles, and rationales in English."
+            : "Write the introLine and rationales in natural Hinglish (English words for tech terms are fine). Career titles stay in their canonical form (e.g. 'Junior Web Developer', 'Content Writer') — those are recognised job descriptions and should not be translated.";
+
+        return $$"""
+        You are SkillKite. The student has just completed their assessment.
+        Your ONLY job in this turn: suggest the THREE best-fit career paths for
+        this specific student. The student will pick one — only then will a full
+        20-week roadmap be generated.
+
+        Hard rules:
+        - Output exactly 3 suggestions. Not 2, not 4.
+        - Each title is short, recognisable, 3-4 words MAX. Examples:
+          "Junior Web Developer", "Content Writer", "Mobile App Developer",
+          "Cloud Engineer", "Freelance Graphic Designer", "Digital Marketing Executive",
+          "Data Analyst", "Backend Developer", "Bank PO (SSC track)".
+        - Title length cap: 20 characters TOTAL (so they fit on a WhatsApp button).
+          If a natural title is longer, shorten it sensibly without losing meaning.
+        - Each id is a short lowercase slug version of the title with underscores
+          (e.g. "junior_web_dev", "content_writer", "freelance_designer").
+        - Each rationale is ONE line, ≤ 100 chars, naming the specific assessment
+          field that drove this pick (skills / education / device / salaryGoal / etc).
+          Examples:
+            "BCA + coding interest + 2-3h daily — strong fit for first dev role"
+            "Phone-only + writing skill — earn from anywhere with no laptop needed"
+        - Pick a DIVERSE set. The 3 careers should not all be variants of the same
+          path. If 2 of them are similar (e.g. "Web Developer" and "Frontend Developer"),
+          replace one with a meaningfully different option.
+        - Honour hard constraints from the assessment:
+            device=phone     → at least one of the 3 must be runnable from a phone
+            workType=freelance → at least one of the 3 must be freelance-friendly
+            govtInterest=yes → include a govt-track option (SSC / Bank PO / Railway)
+            education=10th/12th → include a stream- or course-decision-style suggestion
+                                  (e.g. "12th + JEE prep" rather than a degree-only path)
+        - {{languageDirective}}
+
+        OUTPUT FORMAT — reply with a single JSON object, nothing else:
+        {
+          "introLine": "<one short, warm line introducing the 3 options to the student>",
+          "suggestions": [
+            { "id": "<slug>", "title": "<3-4 words>", "rationale": "<one line, ≤100 chars>" },
+            { "id": "<slug>", "title": "<3-4 words>", "rationale": "<one line, ≤100 chars>" },
+            { "id": "<slug>", "title": "<3-4 words>", "rationale": "<one line, ≤100 chars>" }
+          ]
+        }
         """;
     }
 
