@@ -8,6 +8,12 @@ public enum SessionStatus
     /// Next inbound message is treated as the student's career selection.
     /// </summary>
     AwaitingCareerChoice,
+    /// <summary>
+    /// Returning student (gap &gt; the post-roadmap window) just messaged. We sent
+    /// them a 3-button welcome-back menu (chat existing / fresh options / full
+    /// re-assessment). Next inbound message routes to the chosen path.
+    /// </summary>
+    AwaitingReturnChoice,
     Completed,
     Abandoned
 }

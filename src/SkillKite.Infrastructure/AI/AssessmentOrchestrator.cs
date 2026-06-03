@@ -94,6 +94,21 @@ public class AssessmentOrchestrator
             return;
         }
 
+        // Second check: is the student responding to a long-gap welcome-back menu?
+        // (They have a previous roadmap, said hi after > 24h, we sent 3 buttons,
+        // now they're tapping one.)
+        var awaitingReturn = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingReturnChoice)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingReturn is not null)
+        {
+            await HandleReturnChoiceAsync(student, awaitingReturn, text, ct);
+            return;
+        }
+
         var session = await _db.ChatSessions
             .Include(s => s.Messages)
             .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.Active)
@@ -115,6 +130,15 @@ public class AssessmentOrchestrator
                 DateTime.UtcNow - completedAt < PostRoadmapWindow)
             {
                 await HandlePostRoadmapAsync(student, recentCompleted, text, ct);
+                return;
+            }
+
+            // Long-gap return: the student has a completed roadmap from > 24h ago.
+            // Don't blindly start a fresh assessment — recognise them and give
+            // them three sensible options before falling back to "new student" flow.
+            if (recentCompleted is not null)
+            {
+                await SendReturnWelcomeAndAwaitChoiceAsync(student, recentCompleted, ct);
                 return;
             }
 
@@ -245,6 +269,148 @@ public class AssessmentOrchestrator
         {
             await StartRerollFromCompletedAsync(student, completedSession, roadmap!, ct);
         }
+    }
+
+    /// <summary>
+    /// Long-gap return entry point. A student who has a completed roadmap from
+    /// more than the post-roadmap window ago has just messaged us. Instead of
+    /// asking them their name again (the old behaviour — felt awful for testers),
+    /// recognise them and give 3 explicit options:
+    ///   📖 Chat about their existing roadmap
+    ///   🔄 Get fresh career options (same profile data)
+    ///   🆕 Start a brand new assessment (their profile has changed)
+    /// </summary>
+    private async Task SendReturnWelcomeAndAwaitChoiceAsync(
+        Student student, ChatSession lastCompleted, CancellationToken ct)
+    {
+        // We stash the previous completed session's id so the handler can route
+        // "chat existing" back to it without another DB lookup.
+        var data = new Dictionary<string, string>
+        {
+            ["previousCompletedSessionId"] = lastCompleted.Id.ToString()
+        };
+
+        var menuSession = new ChatSession
+        {
+            StudentId = student.Id,
+            Status = SessionStatus.AwaitingReturnChoice,
+            AssessmentDataJson = JsonSerializer.Serialize(data)
+        };
+        _db.ChatSessions.Add(menuSession);
+        await _db.SaveChangesAsync(ct);
+
+        var name = student.Name ?? "friend";
+        var lang = student.PreferredLanguage;
+        var body = lang == PreferredLanguage.English
+            ? $"Welcome back, {name}! 🪁\n\nYou already have a SkillKite roadmap. What would you like to do today?"
+            : $"Welcome back, {name}! 🪁\n\nTumhare paas already ek SkillKite roadmap hai. Kya karna chahti/chahte ho aaj?";
+
+        var options = new List<InteractiveOption>
+        {
+            new("return_chat",   "📖 Pehle wale par baat"),
+            new("return_reroll", "🔄 Fresh career options"),
+            new("return_new",    "🆕 Naya assessment")
+        };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = menuSession.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleReturnChoiceAsync(
+        Student student, ChatSession menuSession, string text, CancellationToken ct)
+    {
+        // Persist the user's tap/typed reply for the conversation log.
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = menuSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        // Close the transient menu session so it doesn't keep catching messages.
+        menuSession.Status = SessionStatus.Abandoned;
+        await _db.SaveChangesAsync(ct);
+
+        // Resolve the previously-completed session that this menu refers to.
+        Guid? prevSessionId = null;
+        try
+        {
+            using var doc = JsonDocument.Parse(menuSession.AssessmentDataJson);
+            if (doc.RootElement.TryGetProperty("previousCompletedSessionId", out var idEl) &&
+                idEl.ValueKind == JsonValueKind.String &&
+                Guid.TryParse(idEl.GetString(), out var pid))
+            {
+                prevSessionId = pid;
+            }
+        }
+        catch { /* fall through to fresh assessment */ }
+
+        var prev = prevSessionId is null ? null : await _db.ChatSessions
+            .Include(s => s.Messages)
+            .FirstOrDefaultAsync(s => s.Id == prevSessionId.Value, ct);
+
+        // Route based on the chosen option id (button taps come back as the id;
+        // typed answers we tolerate by simple prefix matching).
+        var choice = NormaliseReturnChoice(text);
+
+        if (choice == "return_chat" && prev is not null)
+        {
+            // Resume post-roadmap chat using the OLD completed session — no
+            // window check, the student explicitly asked for this.
+            await HandlePostRoadmapAsync(student, prev, text: "Hi", ct);
+            return;
+        }
+
+        if (choice == "return_reroll" && prev is not null)
+        {
+            var prevRoadmap = await LoadLatestRoadmapAsync(student.Id, ct);
+            if (prevRoadmap is not null)
+            {
+                await StartRerollFromCompletedAsync(student, prev, prevRoadmap, ct);
+                return;
+            }
+            // If we can't find the prior roadmap, fall through to a brand-new assessment.
+        }
+
+        // Default + explicit "Naya assessment": create a fresh empty session,
+        // wipe carried context (the student is signalling their profile changed),
+        // and run the first turn.
+        var fresh = new ChatSession { StudentId = student.Id };
+        _db.ChatSessions.Add(fresh);
+        await _db.SaveChangesAsync(ct);
+
+        await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+    }
+
+    private async Task<GeneratedRoadmap?> LoadLatestRoadmapAsync(Guid studentId, CancellationToken ct)
+    {
+        var roadmapRow = await _db.Roadmaps
+            .Where(r => r.StudentId == studentId)
+            .OrderByDescending(r => r.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+        if (roadmapRow is null) return null;
+        try { return JsonSerializer.Deserialize<GeneratedRoadmap>(roadmapRow.WeeksPlanJson); }
+        catch (JsonException) { return null; }
+    }
+
+    private static string NormaliseReturnChoice(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t.StartsWith("return_")) return t;
+        // Tolerate common typed variants
+        if (t.Contains("baat") || t.Contains("question") || t.Contains("chat") || t.Contains("review")) return "return_chat";
+        if (t.Contains("naya") && !t.Contains("assess")) return "return_reroll";
+        if (t.Contains("fresh") || t.Contains("alternat")) return "return_reroll";
+        if (t.Contains("assess") || t.Contains("update") || t.Contains("change")) return "return_new";
+        return "return_new";  // safest default — when in doubt, ask fresh
     }
 
     /// <summary>
