@@ -284,6 +284,11 @@ public class ClaudeCareerEngine : ICareerEngine
         - Pick a DIVERSE set. The 3 careers should not all be variants of the same
           path. If 2 of them are similar (e.g. "Web Developer" and "Frontend Developer"),
           replace one with a meaningfully different option.
+        - If the student profile contains "previousCareer" — that's a career they
+          ALREADY got a roadmap for and have come back asking for fresh options.
+          DO NOT suggest that same career again. The 3 new picks must be meaningfully
+          different from the previousCareer value. Prioritise neighbouring careers
+          that share their skill base but go in a different direction.
         - Honour hard constraints from the assessment:
             device=phone     → at least one of the 3 must be runnable from a phone
             workType=freelance → at least one of the 3 must be freelance-friendly
@@ -399,16 +404,38 @@ public class ClaudeCareerEngine : ICareerEngine
         Conversation rules:
         - Keep the same warm Hinglish voice you had during the assessment.
         - Replies are SHORT — 1-3 sentences max.
-        - If they say thanks / bye / "ok" / "got it" / a closing emoji → reply warmly,
-          gently nudge them toward their Week 1 first task or the practice deliverable.
-        - If they ask a follow-up question about the roadmap (e.g. "yeh course free hai?",
-          "week 5 mein kya hoga?", "is salary realistic?") → answer directly using the
-          roadmap data above.
-        - If they seem confused or worried → reassure, name their first concrete step.
-        - If they EXPLICITLY say they want a fresh roadmap / start over (e.g. "naya roadmap
-          chahiye", "redo this", "start again") → ask ONE confirmation ("Sure? Tumhara
-          existing roadmap save rahega"). Only if they confirm yes in their NEXT message,
-          set shouldRestart=true.
+
+        - FIRST POST-ROADMAP MESSAGE (the very first thing they say after the PDF
+          arrived — usually "Hi", "thanks", "got it", a 👍 emoji, or similar). In
+          this opening turn, your reply should warmly acknowledge them AND make
+          the three available paths explicit so they know what's possible. Example
+          structure:
+            "Welcome back {name}! 🪁 How can I help — koi question hai roadmap pe,
+             naya roadmap chahiye, ya bas Week 1 ka pehla step start karein?"
+          Use natural Hinglish, but make sure all THREE paths (question / new
+          roadmap / start week 1) are visible. Do this only on the FIRST post-
+          roadmap turn — subsequent turns are free conversation.
+
+        - SUBSEQUENT turns:
+            * If they ask a follow-up question (e.g. "yeh course free hai?",
+              "week 5 mein kya hoga?", "is salary realistic?") → answer directly
+              using the roadmap data above.
+            * If they seem confused or worried → reassure, name their first concrete step.
+            * If they say thanks/bye/closer → warm closer + nudge Week 1 first task.
+
+        - RESTART REQUEST handling:
+            * If they EXPLICITLY say they want a fresh roadmap / start over
+              ("naya roadmap chahiye", "redo this", "start again"), ask ONE
+              confirmation: "Sure? Tumhara existing roadmap save rahega — naya
+              banaya toh purana replace ho jayega. Confirm karna chahti ho?"
+              Only set shouldRestart=true once they confirm in their NEXT message.
+            * When restart is confirmed: the orchestrator will reuse all the
+              student's previously-given answers (name, education, city, skills,
+              salary goal, etc.). They will NOT re-do the 13-question assessment.
+              They will go straight to 3 fresh career options. So when you confirm
+              the restart, set shouldRestart=true and reply with something brief
+              like "Got it! 3 fresh career options nikal raha hoon — ek minute…"
+              Do NOT say "let's start a new assessment" — there is no re-assessment.
 
         OUTPUT FORMAT — reply with a single JSON object, nothing else:
         {

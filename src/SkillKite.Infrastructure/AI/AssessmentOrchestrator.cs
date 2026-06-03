@@ -243,14 +243,62 @@ public class AssessmentOrchestrator
 
         if (turn.ShouldRestart)
         {
-            // Student explicitly confirmed they want a fresh assessment.
-            // Start a brand-new session and prime it with a fresh greeting.
-            var fresh = new ChatSession { StudentId = student.Id };
-            _db.ChatSessions.Add(fresh);
-            await _db.SaveChangesAsync(ct);
-
-            await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+            await StartRerollFromCompletedAsync(student, completedSession, roadmap!, ct);
         }
+    }
+
+    /// <summary>
+    /// Returning student wants a new roadmap. We do NOT make them redo the 13-question
+    /// assessment — that was the painful UX testers flagged. Instead:
+    ///   1. Carry forward their existing AssessmentDataJson (name, city, skills, etc.).
+    ///   2. Record the previous career so the suggestion prompt can offer different alternatives.
+    ///   3. Send a warm "welcome back, generating fresh options" message.
+    ///   4. Jump straight to the 3-career suggestion step.
+    /// The student gets new options in under 30 seconds without retyping a single answer.
+    /// </summary>
+    private async Task StartRerollFromCompletedAsync(
+        Student student,
+        ChatSession completedSession,
+        GeneratedRoadmap previousRoadmap,
+        CancellationToken ct)
+    {
+        // Carry forward known answers + stash the previous career so the suggestion
+        // prompt knows to offer different options.
+        var carriedData = string.IsNullOrWhiteSpace(completedSession.AssessmentDataJson) ||
+                          completedSession.AssessmentDataJson == "{}"
+            ? new Dictionary<string, string>()
+            : JsonSerializer.Deserialize<Dictionary<string, string>>(completedSession.AssessmentDataJson)
+              ?? new Dictionary<string, string>();
+        carriedData.Remove("suggestedCareers"); // stale — about to be regenerated
+        carriedData["previousCareer"] = previousRoadmap.CareerTitle ?? "";
+
+        var fresh = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(carriedData),
+            CurrentQuestionIndex = AssessmentQuestions.All.Count, // already "answered" via carry-forward
+            Status = SessionStatus.Active
+        };
+        _db.ChatSessions.Add(fresh);
+        await _db.SaveChangesAsync(ct);
+
+        var lang = student.PreferredLanguage;
+        var welcomeMsg = lang == PreferredLanguage.English
+            ? $"Welcome back, {student.Name ?? "friend"}! 🪁 I remember your details — let me pick 3 fresh career options for you. Give me a moment…"
+            : $"Welcome back {student.Name ?? "friend"}! 🪁 Tumhari details yaad hain mujhe — 3 fresh career options nikal raha hoon. Ek minute do…";
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, welcomeMsg, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = fresh.Id,
+            Role = MessageRole.Assistant,
+            Content = welcomeMsg
+        });
+        await _db.SaveChangesAsync(ct);
+
+        // Skip the assessment entirely — go straight to fresh suggestions.
+        await SuggestCareerPathsAndAwaitChoiceAsync(student, fresh, ct);
     }
 
     /// <summary>
