@@ -20,9 +20,18 @@
 
 ## What it does
 
-You message a WhatsApp number. The bot asks ~10 questions in Hinglish — your education, skills, whether you have a phone or a laptop, what salary would make your family proud. In about 5 minutes, you get back a **personalized 12–24 week career roadmap** with free YouTube + NPTEL resources, delivered as a **bilingual PDF** in the same chat.
+You message a WhatsApp number. The bot asks where you are in your journey and routes you to one of four flows:
 
-Built for BCA, MCA, B.Tech, and M.Tech students in places like Bhagalpur, Purnea, Muzaffarpur, Darbhanga — where career counselors charge ₹5,000+ and metro mentors don't reach.
+| Flow | For | Output |
+|---|---|---|
+| **📚 10th ke baad** | Just finished class 10 | 3-4 page PDF covering every stream (PCM/PCB/Commerce/Arts), plus polytechnic + paramedical diploma options |
+| **🎯 12th ke baad** | Just finished class 12 | Stream-specific PDF (B.Tech / MBBS / CA / BA LLB / etc.) with entrance exams + realistic salary bands |
+| **💼 Career roadmap** | Degree done / final year | ~10-question assessment in Hinglish → 3 best-fit career suggestions → personalized **12–24 week roadmap PDF** with free YouTube + NPTEL resources |
+| **🌱 Skill upgrade** | Already working | *(in build)* |
+
+Everything is in Hinglish, tappable buttons over typing, and delivered as a **bilingual PDF** in the same WhatsApp chat. End-to-end in ~5 minutes.
+
+Built for students in places like Bhagalpur, Purnea, Muzaffarpur, Darbhanga — where career counselors charge ₹5,000+ and metro mentors don't reach.
 
 ## Why it exists
 
@@ -32,9 +41,9 @@ Long-form thesis available on request — DM me on [LinkedIn](https://www.linked
 
 ## Try it
 
-- 🪁 **Live:** [skillkite.pages.dev](https://skillkite.pages.dev) → tap "Chat on WhatsApp"
-- 🌐 **Custom domain:** `skillkite.in` (DNS propagation in progress)
-- 💬 The WhatsApp test number only replies to whitelisted recipients during the Meta sandbox phase. DM me to be added.
+- 📱 **WhatsApp the bot:** **+91 62012 26351** — no signup, no whitelist, no early-access gate
+- 🪁 **Landing page:** [skillkite.in](https://skillkite.in) → tap the green "Chat on WhatsApp" button
+- 🌐 **API:** [bot.skillkite.in/api/healthz](https://bot.skillkite.in/api/healthz)
 
 ## Architecture
 
@@ -146,16 +155,18 @@ SkillKite/
 
 | Phase | Status | What |
 |---|---|---|
-| **1. WhatsApp MVP** | ✅ Shipped | Bot, Claude engine, 27 careers, bilingual PDFs |
-| **2. Angular PWA** | 🟡 Planned | Installable web app, progress dashboard, offline cache |
-| **3. Android via Capacitor** | ⏳ Future | Native push notifications, Play Store listing |
-| **4. Monetization** | ⏳ Future | Premium tier (mock interviews, resume builder), college B2B |
-| **5. Scale** | ⏳ Future | Regional languages, mentor matching, job board |
+| **1. WhatsApp MVP (career roadmap)** | ✅ Shipped | Bot, Claude engine, 27 careers, bilingual PDFs |
+| **1.5. 10th + 12th student flows** | ✅ Shipped | 4-way entry split, thin-discovery PDFs covering streams, polytechnic, paramedical, course selection |
+| **2. Skill upgrade flow** | 🟡 Next | 4th entry option for working professionals — next ladder rung |
+| **3. Angular PWA** | ⏳ Planned | Installable web app, progress dashboard, offline cache |
+| **4. Android via Capacitor** | ⏳ Future | Native push notifications, Play Store listing |
+| **5. Monetization** | ⏳ Future | Premium tier (mock interviews, resume builder), college B2B |
+| **6. Scale** | ⏳ Future | Regional languages, mentor matching, job board |
 
 
 ## Contributing
 
-This is currently a solo project being built in public. Contributions and ideas are welcome — open an issue first to discuss anything substantial. If you're a BCA / MCA / B.Tech / M.Tech student and want to **test the bot**, please open an issue with your WhatsApp number (international format) and I'll whitelist you in the Meta sandbox.
+This is currently a solo project being built in public. Contributions and ideas are welcome — open an issue first to discuss anything substantial. If you're a student or you know one stuck on *"what do I do next?"* — just WhatsApp **+91 62012 26351** and try the bot. No allowlist any more.
 
 ## License
 
