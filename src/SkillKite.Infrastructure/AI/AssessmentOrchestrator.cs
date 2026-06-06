@@ -412,10 +412,25 @@ public class AssessmentOrchestrator
             // If we can't find the prior roadmap, fall through to a brand-new assessment.
         }
 
-        // Default + explicit "Naya assessment": create a fresh empty session,
-        // wipe carried context (the student is signalling their profile changed),
-        // and run the first turn.
-        var fresh = new ChatSession { StudentId = student.Id };
+        // Default + explicit "Naya assessment": fresh session, but pre-seed
+        // identity fields we already know from the Student row (name, city,
+        // education). The engine reads AssessmentDataJson to decide what to
+        // ask — without this seed it'd ask "aapka naam kya hai?" to a student
+        // we've literally just greeted by name. Other answers (skills, salary
+        // goal, work type, etc.) are intentionally NOT carried — that's the
+        // whole point of choosing "naya assessment", the student's profile
+        // may have changed.
+        var seed = new Dictionary<string, string> { ["flowType"] = "career" };
+        if (!string.IsNullOrWhiteSpace(student.Name))           seed["name"]      = student.Name!;
+        if (!string.IsNullOrWhiteSpace(student.City))           seed["city"]      = student.City!;
+        if (!string.IsNullOrWhiteSpace(student.EducationLevel)) seed["education"] = student.EducationLevel!;
+
+        var fresh = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(seed),
+            CurrentQuestionIndex = seed.Count - 1 // exclude flowType; rough hint for Claude
+        };
         _db.ChatSessions.Add(fresh);
         await _db.SaveChangesAsync(ct);
 
