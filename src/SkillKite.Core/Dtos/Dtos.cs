@@ -83,3 +83,39 @@ public record InteractiveBlock(
     IReadOnlyList<InteractiveOption> Options, // 1-3 for buttons, 1-10 for list
     string? ButtonLabel = null,               // list only: text on the "open list" button
     string? SectionTitle = null);             // list only: section header
+
+// --- 10th / 12th "thin discovery" flow DTOs ---
+//
+// These flows do NOT produce a week-by-week roadmap. They generate a comprehensive
+// PDF guide that lists ALL realistic options for a 10th- or 12th-pass student,
+// sorted by relevance to what the student told us (interest area for 10th,
+// stream + direction for 12th). The personalisation is in the ordering — every
+// student gets the same options listed.
+
+/// <summary>
+/// One concrete path (e.g. "12th Science with Maths (PCM)", "Polytechnic — Mechanical",
+/// "Content Creation"). Each field is a 1-3 line Hinglish blurb. All fields are
+/// strings so the PDF renderer can stay simple; empty strings are skipped.
+/// </summary>
+public record GuideOption(
+    string Name,
+    string WhatIsIt,        // "Kya hai" — 1-2 lines
+    string WhoFor,          // "Kaun le" — type of student this suits
+    string LeadsTo,         // "Iske baad kya" — career / next step
+    string KeyExams,        // entrance / certification exams (empty if N/A)
+    string TimeCommitment); // duration / time required
+
+public record GuideSection(
+    string Title,                       // e.g. "Padhai ke options" / "Earning ke options"
+    string? Intro,                      // optional 1-line intro for the section
+    IReadOnlyList<GuideOption> Options);
+
+/// <summary>
+/// Output shape for both the 10th and 12th flows. Same struct, different prompt.
+/// </summary>
+public record StudentGuide(
+    string Heading,                         // e.g. "SkillKite — 10th ke baad aapke options"
+    string Greeting,                        // "Hi Riya, aapne bataya ki..."
+    IReadOnlyList<GuideSection> Sections,   // ordered by relevance to the student
+    string ClosingMessage,                  // CTA + disclaimer
+    string FlowLabel);                      // "10th" | "12th" — used in filename + footer

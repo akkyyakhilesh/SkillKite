@@ -130,4 +130,94 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         var publicUrl = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}";
         return Task.FromResult(publicUrl);
     }
+
+    /// <summary>
+    /// Renders the 10th/12th comprehensive guide PDF. Same SkillKite header/footer
+    /// styling as the roadmap PDF but a much flatter layout — heading, greeting,
+    /// then for each section: section title + intro, followed by a card per
+    /// option with the five labelled blurbs (Kya hai / Kaun le / Iske baad /
+    /// Exams / Time).
+    /// </summary>
+    public Task<string> GenerateGuideAsync(Student student, StudentGuide guide, CancellationToken ct = default)
+    {
+        var filename = $"guide_{guide.FlowLabel}_{student.Id:N}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
+        var path = Path.Combine(_opts.OutputDirectory, filename);
+
+        Document.Create(doc =>
+        {
+            doc.Page(p =>
+            {
+                p.Size(PageSizes.A4);
+                p.Margin(36);
+                p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
+
+                p.Header().Column(col =>
+                {
+                    col.Item().Text("SkillKite").FontSize(24).Bold().FontColor(Colors.Orange.Darken2);
+                    col.Item().Text("Right skills. Higher reach.").Italic().FontColor(Colors.Grey.Darken1);
+                    col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Orange.Lighten2);
+                });
+
+                p.Content().PaddingVertical(12).Column(col =>
+                {
+                    col.Spacing(10);
+
+                    col.Item().Text(guide.Heading).FontSize(16).Bold();
+                    if (!string.IsNullOrWhiteSpace(guide.Greeting))
+                        col.Item().Text(guide.Greeting);
+
+                    foreach (var section in guide.Sections)
+                    {
+                        col.Item().PaddingTop(10).Text(section.Title).FontSize(14).Bold().FontColor(Colors.Orange.Darken1);
+                        if (!string.IsNullOrWhiteSpace(section.Intro))
+                            col.Item().Text(section.Intro!).Italic().FontColor(Colors.Grey.Darken2);
+
+                        foreach (var opt in section.Options)
+                        {
+                            col.Item().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(oc =>
+                            {
+                                oc.Item().Text(opt.Name).Bold();
+
+                                void Field(string label, string value)
+                                {
+                                    if (string.IsNullOrWhiteSpace(value)) return;
+                                    oc.Item().PaddingTop(3).Text(t =>
+                                    {
+                                        t.Span($"{label}: ").SemiBold();
+                                        t.Span(value);
+                                    });
+                                }
+
+                                Field("Kya hai", opt.WhatIsIt);
+                                Field("Kaun le", opt.WhoFor);
+                                Field("Iske baad", opt.LeadsTo);
+                                Field("Exams", opt.KeyExams);
+                                Field("Time", opt.TimeCommitment);
+                            });
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(guide.ClosingMessage))
+                    {
+                        col.Item().PaddingTop(14).Border(1).BorderColor(Colors.Orange.Lighten2)
+                            .Padding(10).Text(guide.ClosingMessage);
+                    }
+
+                    col.Item().PaddingTop(8).Text(
+                        "Disclaimer: Yeh AI-generated guidance hai, professional counseling ki jagah nahi. " +
+                        "Final decision apne teachers aur family ke saath milke lein.")
+                        .FontSize(9).Italic().FontColor(Colors.Grey.Darken1);
+                });
+
+                p.Footer().AlignCenter().Text(t =>
+                {
+                    t.Span($"SkillKite • {guide.FlowLabel} guide • Generated ").FontSize(9).FontColor(Colors.Grey.Darken1);
+                    t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontColor(Colors.Grey.Darken1);
+                });
+            });
+        }).GeneratePdf(path);
+
+        var publicUrl = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}";
+        return Task.FromResult(publicUrl);
+    }
 }

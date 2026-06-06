@@ -109,6 +109,21 @@ public class AssessmentOrchestrator
             return;
         }
 
+        // Third check: is the student responding to the 4-option entry menu?
+        // (Brand-new student said "Hi", we sent the 10th / 12th / Career / Skill
+        // upgrade list, now they're tapping one.)
+        var awaitingFlow = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingFlowChoice)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingFlow is not null)
+        {
+            await HandleFlowChoiceAsync(student, awaitingFlow, text, ct);
+            return;
+        }
+
         var session = await _db.ChatSessions
             .Include(s => s.Messages)
             .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.Active)
@@ -142,9 +157,26 @@ public class AssessmentOrchestrator
                 return;
             }
 
-            session = new ChatSession { StudentId = student.Id };
-            _db.ChatSessions.Add(session);
-            await _db.SaveChangesAsync(ct);
+            // Brand-new student: send the 4-option entry menu so they can pick
+            // 10th / 12th / Career / Skill upgrade. We do NOT drop them straight
+            // into the 13-question career assessment any more — that was a design
+            // bug for 10th- and 12th-pass kids who want different guidance.
+            await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+            return;
+        }
+
+        // Route by flow type. Brand-new flows (10th / 12th) have their own thin
+        // state machine in this class — they don't use the 13-question engine.
+        var flowType = ReadFlowType(session);
+        if (flowType == "10th")
+        {
+            await HandleTenthTurnAsync(student, session, text, ct);
+            return;
+        }
+        if (flowType == "12th")
+        {
+            await HandleTwelfthTurnAsync(student, session, text, ct);
+            return;
         }
 
         _db.ChatMessages.Add(new ChatMessage
@@ -388,6 +420,167 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
 
         await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+    }
+
+    /// <summary>
+    /// Brand-new student just said "Hi" — show the 4-option entry menu so they
+    /// can pick which flow they want (10th / 12th / Career / Skill upgrade)
+    /// instead of being dropped straight into the 13-question career assessment.
+    ///
+    /// Uses a WhatsApp List Message because we have 4 options (Reply Buttons cap at 3).
+    /// </summary>
+    private async Task SendFlowChoiceMenuAndAwaitAsync(Student student, CancellationToken ct)
+    {
+        var menuSession = new ChatSession
+        {
+            StudentId = student.Id,
+            Status = SessionStatus.AwaitingFlowChoice
+        };
+        _db.ChatSessions.Add(menuSession);
+        await _db.SaveChangesAsync(ct);
+
+        var name = student.Name;
+        var greet = string.IsNullOrWhiteSpace(name) ? "" : $", {name}";
+
+        var body =
+            $"Hi{greet}! 🪁 Main SkillKite hoon — aapka AI career guide.\n\n" +
+            "Pehle ek baat batao — aapko kya help chahiye? Neeche se choose karo:";
+
+        var options = new List<InteractiveOption>
+        {
+            new("flow_10th",
+                "📚 10th ke baad",
+                "Stream selection — Science / Commerce / Arts"),
+
+            new("flow_12th",
+                "🎯 12th ke baad",
+                "Course selection — B.Tech / MBBS / BCA etc."),
+
+            new("flow_career",
+                "💼 Career roadmap",
+                "Degree done / final year ke liye"),
+
+            new("flow_upskill",
+                "🌱 Skill upgrade",
+                "Already working — next ladder rung"),
+        };
+
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body,
+            buttonLabel: "Choose one",
+            sectionTitle: "What do you need?",
+            options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = menuSession.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Student tapped a row on the 4-option entry menu (or typed an answer).
+    /// Persist the choice, close the menu session, and dispatch to the
+    /// appropriate downstream flow.
+    /// </summary>
+    private async Task HandleFlowChoiceAsync(
+        Student student, ChatSession menuSession, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = menuSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        menuSession.Status = SessionStatus.Abandoned;
+        await _db.SaveChangesAsync(ct);
+
+        var choice = NormaliseFlowChoice(text);
+
+        switch (choice)
+        {
+            case "flow_career":
+                // The familiar 13-question assessment, untouched. We just spin up
+                // a fresh Active session tagged with flowType=career and run the
+                // first turn so the bot greets the student and asks for their name.
+                await StartCareerFlowAsync(student, ct);
+                return;
+
+            case "flow_upskill":
+                // Phase 1 stub. Saturday's promise — we'll wire up a real
+                // working-professional flow once the 10th/12th flows are stable.
+                await SendAndPersistStubAsync(student, menuSession,
+                    "🌱 Skill upgrade flow abhi build ho raha hai — agle hafte tak ready!\n\n" +
+                    "Tab tak, agar aap upper rung ke career roadmap ke liye chahte ho, " +
+                    "send 'career roadmap' for the standard SkillKite flow.",
+                    ct);
+                return;
+
+            case "flow_10th":
+                await StartTenthFlowAsync(student, ct);
+                return;
+
+            case "flow_12th":
+                await StartTwelfthFlowAsync(student, ct);
+                return;
+
+            default:
+                // Unknown reply — re-show the menu so the student isn't stranded.
+                await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+                return;
+        }
+    }
+
+    private async Task SendAndPersistStubAsync(
+        Student student, ChatSession session, string body, CancellationToken ct)
+    {
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, body, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Start the existing 13-question career assessment for a student who picked
+    /// "💼 Career roadmap" on the entry menu. The new session is tagged with
+    /// flowType=career in AssessmentDataJson so later code (and queries) can tell
+    /// which flow it belongs to without inferring from question shape.
+    /// </summary>
+    private async Task StartCareerFlowAsync(Student student, CancellationToken ct)
+    {
+        var data = new Dictionary<string, string> { ["flowType"] = "career" };
+        var fresh = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(data),
+            Status = SessionStatus.Active
+        };
+        _db.ChatSessions.Add(fresh);
+        await _db.SaveChangesAsync(ct);
+
+        await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+    }
+
+    private static string NormaliseFlowChoice(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t.StartsWith("flow_")) return t;
+
+        // Tolerate common typed variants
+        if (t.Contains("10th") || t.Contains("10 th") || t.Contains("class 10") || t.Contains("dasvi"))     return "flow_10th";
+        if (t.Contains("12th") || t.Contains("12 th") || t.Contains("class 12") || t.Contains("barahvi"))   return "flow_12th";
+        if (t.Contains("skill") || t.Contains("upgrade") || t.Contains("upskill") || t.Contains("ladder"))  return "flow_upskill";
+        if (t.Contains("career") || t.Contains("roadmap") || t.Contains("degree"))                          return "flow_career";
+
+        return "unknown";
     }
 
     private async Task<GeneratedRoadmap?> LoadLatestRoadmapAsync(Guid studentId, CancellationToken ct)
@@ -673,6 +866,526 @@ public class AssessmentOrchestrator
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
                 "Sorry yaar, roadmap generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
         }
+    }
+
+    // ============================================================================
+    // 10th flow — thin discovery state machine.
+    //
+    // Three steps stored in AssessmentDataJson under "step":
+    //   "name"      → bot asked the student's name, awaiting free-text reply
+    //   "interest"  → bot showed the 5-row interest list, awaiting tap/typed reply
+    //   "goal"      → bot showed the 3-button goal prompt, awaiting tap/typed reply
+    //
+    // After "goal" we call Claude → render PDF → send PDF → mark session Completed.
+    // No 13-question assessment, no career-suggestion loop — that's by design.
+    // ============================================================================
+
+    private async Task StartTenthFlowAsync(Student student, CancellationToken ct)
+    {
+        var data = new Dictionary<string, string>
+        {
+            ["flowType"] = "10th",
+            ["step"]     = "name"
+        };
+        var session = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(data),
+            Status = SessionStatus.Active
+        };
+        _db.ChatSessions.Add(session);
+        await _db.SaveChangesAsync(ct);
+
+        var ask = "Bahut accha! 📚 10th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = ask
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleTenthTurnAsync(Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        // Persist user message
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var step = ReadField(session, "step") ?? "name";
+
+        switch (step)
+        {
+            case "name":
+            {
+                var name = text.Trim();
+                if (string.IsNullOrWhiteSpace(name) || name.Length > 60)
+                    name = student.Name ?? "friend";
+                student.Name = name;
+                session.AssessmentDataJson = WriteField(session, ("name", name), ("step", "interest"));
+                await _db.SaveChangesAsync(ct);
+                await SendTenthInterestPromptAsync(student, session, ct);
+                return;
+            }
+            case "interest":
+            {
+                var interest = NormaliseTenthInterest(text);
+                session.AssessmentDataJson = WriteField(session, ("interest", interest), ("step", "goal"));
+                await _db.SaveChangesAsync(ct);
+                await SendTenthGoalPromptAsync(student, session, interest, ct);
+                return;
+            }
+            case "goal":
+            {
+                var goal = NormaliseGoal(text);
+                session.AssessmentDataJson = WriteField(session, ("goal", goal), ("step", "generating"));
+                await _db.SaveChangesAsync(ct);
+                await DeliverTenthGuideAsync(student, session, ct);
+                return;
+            }
+            default:
+                // Already generating or post-complete — just acknowledge.
+                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                return;
+        }
+    }
+
+    private async Task SendTenthInterestPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var name = student.Name ?? "friend";
+        var body = $"Nice to meet you, {name}! 🙌\n\nAapko *kis cheez mein interest* hai? Neeche se choose karo:";
+        var options = new List<InteractiveOption>
+        {
+            new("science_medical", "🩺 Science / Medical",  "Doctor, Nurse, Lab tech banna hai"),
+            new("science_maths",   "🔢 Science / Maths",    "Engineer, IT, Computer interest hai"),
+            new("commerce",        "📊 Commerce",            "Business, Accounting, CA"),
+            new("arts",            "🎨 Arts / Humanities",   "Teacher, Lawyer, Govt job, Writing"),
+            new("confused",        "🤔 Fix nahi hai",        "Confused — sab options dikhao")
+        };
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, "Choose one", "Aapka interest", options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendTenthGoalPromptAsync(Student student, ChatSession session, string interest, CancellationToken ct)
+    {
+        var body = "Got it 👍\n\nAap *aage padhna* chahte ho ya *abhi earning start* karni hai?";
+        var options = new List<InteractiveOption>
+        {
+            new("study", "📖 Padhna hai"),
+            new("earn",  "💰 Earning start"),
+            new("both",  "🤔 Dono jaanna hai")
+        };
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task DeliverTenthGuideAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = wait
+        });
+        await _db.SaveChangesAsync(ct);
+
+        try
+        {
+            var guide = await _engine.GenerateTenthGuideAsync(student, session, ct);
+            var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
+
+            session.Status = SessionStatus.Completed;
+            session.CompletedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync(ct);
+
+            var summary = $"🎯 *Aapki 10th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein saare options labelled hain — padh kar parents/teachers se discuss karo.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
+            await TrySendAsync(() => _messaging.SendDocumentAsync(
+                student.Phone, pdfUrl,
+                "Your SkillKite 10th guide 🪁",
+                $"SkillKite_10th_Guide_{student.Name ?? "student"}.pdf",
+                ct));
+
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id,
+                Role = MessageRole.Assistant,
+                Content = summary
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "10th-flow guide generation failed for student {Id}", student.Id);
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+        }
+    }
+
+    private static string NormaliseTenthInterest(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "science_medical" or "science_maths" or "commerce" or "arts" or "confused") return t;
+        if (t.Contains("medical") || t.Contains("doctor") || t.Contains("nurse") || t.Contains("bio")) return "science_medical";
+        if (t.Contains("math") || t.Contains("engineer") || t.Contains("comput") || t.Contains("pcm"))  return "science_maths";
+        if (t.Contains("commerce") || t.Contains("ca ") || t.Contains("business") || t.Contains("account")) return "commerce";
+        if (t.Contains("arts") || t.Contains("humanit") || t.Contains("teach") || t.Contains("law"))    return "arts";
+        return "confused";
+    }
+
+    private static string NormaliseGoal(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "study" or "earn" or "both") return t;
+        if (t.Contains("padh") || t.Contains("study"))   return "study";
+        if (t.Contains("earn") || t.Contains("kamai") || t.Contains("job") || t.Contains("paisa")) return "earn";
+        if (t.Contains("both") || t.Contains("dono"))    return "both";
+        return "both";
+    }
+
+    // ============================================================================
+    // 12th flow — same thin-discovery pattern as 10th, but stream-aware Q4.
+    //
+    // Steps stored in AssessmentDataJson under "step":
+    //   "name"      → bot asked the student's name
+    //   "stream"    → bot showed the 5-row stream list (PCM/PCB/Commerce/Arts/BBA)
+    //   "goal"      → bot showed the 3-button goal prompt (study/earn/both)
+    //   "direction" → ONLY if goal=study|both — bot showed stream-specific
+    //                 direction list. If goal=earn we skip this step entirely.
+    //
+    // After the last applicable step we call Claude → render PDF → send PDF.
+    // ============================================================================
+
+    private async Task StartTwelfthFlowAsync(Student student, CancellationToken ct)
+    {
+        var data = new Dictionary<string, string>
+        {
+            ["flowType"] = "12th",
+            ["step"]     = "name"
+        };
+        var session = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(data),
+            Status = SessionStatus.Active
+        };
+        _db.ChatSessions.Add(session);
+        await _db.SaveChangesAsync(ct);
+
+        var ask = "Bahut accha! 🎯 12th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = ask
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleTwelfthTurnAsync(Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var step = ReadField(session, "step") ?? "name";
+
+        switch (step)
+        {
+            case "name":
+            {
+                var name = text.Trim();
+                if (string.IsNullOrWhiteSpace(name) || name.Length > 60)
+                    name = student.Name ?? "friend";
+                student.Name = name;
+                session.AssessmentDataJson = WriteField(session, ("name", name), ("step", "stream"));
+                await _db.SaveChangesAsync(ct);
+                await SendTwelfthStreamPromptAsync(student, session, ct);
+                return;
+            }
+            case "stream":
+            {
+                var stream = NormaliseStream(text);
+                session.AssessmentDataJson = WriteField(session, ("stream", stream), ("step", "goal"));
+                await _db.SaveChangesAsync(ct);
+                await SendTwelfthGoalPromptAsync(student, session, ct);
+                return;
+            }
+            case "goal":
+            {
+                var goal = NormaliseGoal(text);
+                if (goal == "earn")
+                {
+                    // Skip Q4 — no direction needed if they're not studying further.
+                    session.AssessmentDataJson = WriteField(session,
+                        ("goal", goal), ("direction", "not_sure"), ("step", "generating"));
+                    await _db.SaveChangesAsync(ct);
+                    await DeliverTwelfthGuideAsync(student, session, ct);
+                    return;
+                }
+                session.AssessmentDataJson = WriteField(session, ("goal", goal), ("step", "direction"));
+                await _db.SaveChangesAsync(ct);
+                var stream = ReadField(session, "stream") ?? "not_sure";
+                await SendTwelfthDirectionPromptAsync(student, session, stream, ct);
+                return;
+            }
+            case "direction":
+            {
+                var stream = ReadField(session, "stream") ?? "not_sure";
+                var direction = NormaliseDirection(stream, text);
+                session.AssessmentDataJson = WriteField(session,
+                    ("direction", direction), ("step", "generating"));
+                await _db.SaveChangesAsync(ct);
+                await DeliverTwelfthGuideAsync(student, session, ct);
+                return;
+            }
+            default:
+                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                return;
+        }
+    }
+
+    private async Task SendTwelfthStreamPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var name = student.Name ?? "friend";
+        var body = $"Nice to meet you, {name}! 🙌\n\nAapne 12th mein *kaunsa stream* liya tha? Neeche se choose karo:";
+        var options = new List<InteractiveOption>
+        {
+            new("pcm",      "🔢 PCM",       "Science with Maths"),
+            new("pcb",      "🧬 PCB",       "Science with Biology"),
+            new("commerce", "📊 Commerce",  "B.Com, CA, BBA"),
+            new("arts",     "📖 Arts",      "Humanities, Law, UPSC"),
+            new("bba",      "💼 BBA / Voc", "Vocational / BBA stream")
+        };
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, "Choose one", "Aapka stream", options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendTwelfthGoalPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var body = "Got it 👍\n\nAap *aage padhna* chahte ho ya *job/earning start* karni hai?";
+        var options = new List<InteractiveOption>
+        {
+            new("study", "📖 Padhna hai"),
+            new("earn",  "💰 Job / earning"),
+            new("both",  "🤔 Dono jaanna hai")
+        };
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendTwelfthDirectionPromptAsync(
+        Student student, ChatSession session, string stream, CancellationToken ct)
+    {
+        var body = "Aapke mann mein koi *specific direction* hai? Neeche se choose karo (ya 'sab dikhao' bolo):";
+        var options = stream switch
+        {
+            "pcm" => new List<InteractiveOption>
+            {
+                new("engineering",  "🛠️ Engineering",   "B.Tech / BE"),
+                new("pure_science", "🔬 Pure Science",  "B.Sc Physics/Maths"),
+                new("bca",          "💻 BCA",            "Computer Applications"),
+                new("architecture", "🏛️ Architecture",  "B.Arch via NATA"),
+                new("defence",      "🪖 Defence (NDA)", "Army / Navy / Air Force"),
+                new("not_sure",     "🤷 Sab dikhao",    "Not sure — show all")
+            },
+            "pcb" => new List<InteractiveOption>
+            {
+                new("medical",     "🩺 Medical (MBBS/BDS)", "NEET wala route"),
+                new("paramedical", "💊 Paramedical",         "Nursing, BPT, BMLT"),
+                new("pharmacy",    "💉 Pharmacy",            "B.Pharm"),
+                new("pure_science","🔬 Pure Science",        "B.Sc Bio / Biotech"),
+                new("not_sure",    "🤷 Sab dikhao",          "Not sure — show all")
+            },
+            "commerce" => new List<InteractiveOption>
+            {
+                new("ca_cs_cma", "📒 CA / CS / CMA", "Professional courses"),
+                new("bcom",      "📊 B.Com / Hons", "Most common route"),
+                new("bba",       "💼 BBA / Mgmt",    "Management track"),
+                new("law",       "⚖️ Law (B.Com LLB)", "Integrated law"),
+                new("banking",   "🏦 Banking / Finance", "BFSI sector"),
+                new("not_sure",  "🤷 Sab dikhao",   "Not sure — show all")
+            },
+            "arts" => new List<InteractiveOption>
+            {
+                new("law",       "⚖️ Law (BA LLB / CLAT)", "Integrated law"),
+                new("upsc",      "🇮🇳 Govt job prep",       "UPSC / SSC / PSC"),
+                new("mass_comm", "📰 Mass Comm / Media",   "Journalism / PR"),
+                new("design",    "🎨 Design (NID/NIFT)",   "B.Des track"),
+                new("ba_hons",   "📚 BA / BA Hons",        "General degree"),
+                new("not_sure",  "🤷 Sab dikhao",          "Not sure — show all")
+            },
+            "bba" => new List<InteractiveOption>
+            {
+                new("mba",            "🎯 MBA track",         "CAT/MAT/XAT route"),
+                new("entrepreneurship","🚀 Entrepreneurship", "Apna startup"),
+                new("not_sure",       "🤷 Sab dikhao",        "Not sure — show all")
+            },
+            _ => new List<InteractiveOption>
+            {
+                new("not_sure", "🤷 Sab dikhao", "Show me all options")
+            }
+        };
+
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, "Choose one", "Direction", options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task DeliverTwelfthGuideAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = wait
+        });
+        await _db.SaveChangesAsync(ct);
+
+        try
+        {
+            var guide = await _engine.GenerateTwelfthGuideAsync(student, session, ct);
+            var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
+
+            session.Status = SessionStatus.Completed;
+            session.CompletedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync(ct);
+
+            var summary = $"🎯 *Aapki 12th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein har option detailed hai — padh kar parents/teachers se discuss karo.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
+            await TrySendAsync(() => _messaging.SendDocumentAsync(
+                student.Phone, pdfUrl,
+                "Your SkillKite 12th guide 🪁",
+                $"SkillKite_12th_Guide_{student.Name ?? "student"}.pdf",
+                ct));
+
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = summary
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "12th-flow guide generation failed for student {Id}", student.Id);
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+        }
+    }
+
+    private static string NormaliseStream(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "pcm" or "pcb" or "commerce" or "arts" or "bba") return t;
+        if (t.Contains("pcm") || (t.Contains("math") && !t.Contains("bio")))            return "pcm";
+        if (t.Contains("pcb") || t.Contains("bio") || t.Contains("medical"))             return "pcb";
+        if (t.Contains("commerce") || t.Contains("com"))                                 return "commerce";
+        if (t.Contains("arts") || t.Contains("humanit"))                                 return "arts";
+        if (t.Contains("bba") || t.Contains("voc"))                                      return "bba";
+        return "not_sure";
+    }
+
+    private static string NormaliseDirection(string stream, string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        // Known ids from the lists above
+        var knownIds = new[]
+        {
+            "engineering","pure_science","bca","architecture","defence",
+            "medical","paramedical","pharmacy",
+            "ca_cs_cma","bcom","bba","law","banking",
+            "upsc","mass_comm","design","ba_hons",
+            "mba","entrepreneurship","not_sure"
+        };
+        if (knownIds.Contains(t)) return t;
+
+        if (t.Contains("sab") || t.Contains("show all") || t.Contains("not"))   return "not_sure";
+        if (t.Contains("engineer") || t.Contains("btech") || t.Contains("b.tech")) return "engineering";
+        if (t.Contains("doctor") || t.Contains("mbbs") || t.Contains("neet"))    return "medical";
+        if (t.Contains("nursing") || t.Contains("paramed"))                     return "paramedical";
+        if (t.Contains("pharm"))                                                 return "pharmacy";
+        if (t.Contains("ca ") || t.Contains("chartered"))                       return "ca_cs_cma";
+        if (t.Contains("upsc") || t.Contains("ssc") || t.Contains("govt"))      return "upsc";
+        if (t.Contains("law") || t.Contains("clat"))                            return "law";
+        if (t.Contains("mba"))                                                   return "mba";
+        if (t.Contains("design") || t.Contains("nid") || t.Contains("nift"))    return "design";
+        if (t.Contains("media") || t.Contains("journ"))                         return "mass_comm";
+        if (t.Contains("bca") || t.Contains("computer"))                        return "bca";
+        return "not_sure";
+    }
+
+    // ============================================================================
+    // Small helpers for flow-typed sessions.
+    // ============================================================================
+
+    private static string? ReadFlowType(ChatSession session) => ReadField(session, "flowType");
+
+    private static string? ReadField(ChatSession session, string key)
+    {
+        if (string.IsNullOrWhiteSpace(session.AssessmentDataJson)) return null;
+        try
+        {
+            using var doc = JsonDocument.Parse(session.AssessmentDataJson);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return null;
+            if (doc.RootElement.TryGetProperty(key, out var el) && el.ValueKind == JsonValueKind.String)
+                return el.GetString();
+        }
+        catch { /* fall through */ }
+        return null;
+    }
+
+    private static string WriteField(ChatSession session, params (string Key, string Value)[] updates)
+    {
+        var data = string.IsNullOrWhiteSpace(session.AssessmentDataJson) || session.AssessmentDataJson == "{}"
+            ? new Dictionary<string, string>()
+            : JsonSerializer.Deserialize<Dictionary<string, string>>(session.AssessmentDataJson)
+              ?? new Dictionary<string, string>();
+        foreach (var (k, v) in updates) data[k] = v;
+        return JsonSerializer.Serialize(data);
     }
 
     /// <summary>

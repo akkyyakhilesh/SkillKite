@@ -51,4 +51,28 @@ public interface ICareerEngine
         IReadOnlyList<ChatMessage> postRoadmapHistory,
         string latestUserMessage,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Generates the 10th-flow comprehensive guide. The student has answered
+    /// 2-3 light questions (name, interest area, study/earn/both). Claude
+    /// returns a full guide covering ALL options after 10th — streams,
+    /// polytechnic, paramedical, earning paths — with the most relevant
+    /// section ordered first based on the student's stated interest.
+    /// </summary>
+    Task<StudentGuide> GenerateTenthGuideAsync(
+        Student student,
+        ChatSession session,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// Generates the 12th-flow comprehensive guide. Stream-aware: PCM/PCB/
+    /// Commerce/Arts/BBA each get their own option set, with the student's
+    /// stated direction ordered first. For PCB students paramedical options
+    /// are always included; for PCM, polytechnic lateral entry is always
+    /// included.
+    /// </summary>
+    Task<StudentGuide> GenerateTwelfthGuideAsync(
+        Student student,
+        ChatSession session,
+        CancellationToken ct = default);
 }

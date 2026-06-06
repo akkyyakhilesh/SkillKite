@@ -4,6 +4,12 @@ public enum SessionStatus
 {
     Active,
     /// <summary>
+    /// New student just said "Hi". Bot has sent the 4-option entry menu
+    /// (10th / 12th / Career / Skill upgrade). Next inbound message is
+    /// treated as the flow choice and routed accordingly.
+    /// </summary>
+    AwaitingFlowChoice,
+    /// <summary>
     /// Assessment is fully answered. Bot has suggested 3 career paths.
     /// Next inbound message is treated as the student's career selection.
     /// </summary>
