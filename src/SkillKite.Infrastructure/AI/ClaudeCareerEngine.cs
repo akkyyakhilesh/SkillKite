@@ -222,7 +222,13 @@ public class ClaudeCareerEngine : ICareerEngine
           "25-50k"), treat it as a clean, already-normalized answer and store it verbatim in
           "extracted". Do NOT translate or re-interpret.
 
-        OUTPUT FORMAT — reply with a single JSON object, nothing else:
+        OUTPUT FORMAT — reply with a SINGLE JSON object and absolutely nothing else.
+        No prose, no markdown code fences (no ```json), no language identifier line, no
+        "wait let me correct that" preamble or postamble, no second JSON block. If you
+        realise mid-turn that your first draft was wrong, REPLACE it — do not append a
+        correction. The orchestrator parses your reply directly; anything other than a
+        single JSON object will be sent to the student verbatim and confuse them.
+        The object schema is:
         {
           "reply": "<the message to send to the student>",
           "extracted": { "<question_key>": "<student's answer, normalized>", ... },
@@ -595,22 +601,71 @@ public class ClaudeCareerEngine : ICareerEngine
         }
     }
 
+    /// <summary>
+    /// Extract a parseable JSON object from Claude's raw response.
+    ///
+    /// Claude sometimes wraps responses in markdown ```json fences, emits a
+    /// language hint ("json") on its own line, or — worst case — produces a
+    /// JSON block followed by prose like "wait, let me correct that" followed
+    /// by a second JSON block. We need to be robust to all three.
+    ///
+    /// Strategy: walk the text scanning for brace-balanced candidate objects,
+    /// try to JSON-parse each one, return the LAST one that parses cleanly
+    /// (Claude's most recent "intended" response). Falls back to the legacy
+    /// first-brace / last-brace span if none parse, and finally the raw text.
+    /// </summary>
     private static string ExtractJson(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return "{}";
-        var s = raw.Trim();
-        // Strip ```json fences if Claude added them.
-        if (s.StartsWith("```"))
+
+        // Strip code fences anywhere they appear (could be multiple).
+        var s = raw.Replace("```json", "```", StringComparison.OrdinalIgnoreCase)
+                   .Replace("```", "");
+
+        // Collect all top-level brace-balanced spans.
+        var candidates = new List<string>();
+        int depth = 0, start = -1;
+        bool inString = false;
+        for (int i = 0; i < s.Length; i++)
         {
-            var firstNl = s.IndexOf('\n');
-            if (firstNl > 0) s = s[(firstNl + 1)..];
-            if (s.EndsWith("```")) s = s[..^3];
-            s = s.Trim();
+            var c = s[i];
+            if (inString)
+            {
+                if (c == '\\' && i + 1 < s.Length) { i++; continue; }
+                if (c == '"') inString = false;
+                continue;
+            }
+            switch (c)
+            {
+                case '"': inString = true; break;
+                case '{':
+                    if (depth == 0) start = i;
+                    depth++;
+                    break;
+                case '}':
+                    depth--;
+                    if (depth == 0 && start >= 0)
+                    {
+                        candidates.Add(s[start..(i + 1)]);
+                        start = -1;
+                    }
+                    break;
+            }
         }
-        var firstBrace = s.IndexOf('{');
-        var lastBrace = s.LastIndexOf('}');
-        if (firstBrace >= 0 && lastBrace > firstBrace)
-            return s[firstBrace..(lastBrace + 1)];
+
+        // Take the LAST candidate that parses cleanly — Claude often emits a
+        // first attempt then "corrects" itself with a second block.
+        for (int i = candidates.Count - 1; i >= 0; i--)
+        {
+            try { using var _ = JsonDocument.Parse(candidates[i]); return candidates[i]; }
+            catch (JsonException) { /* try the next candidate up the list */ }
+        }
+
+        // Last resort: legacy span between first { and last } (may include
+        // prose between two JSON blocks — caller's try/parse will fail safely).
+        var first = s.IndexOf('{');
+        var last = s.LastIndexOf('}');
+        if (first >= 0 && last > first) return s[first..(last + 1)];
         return s;
     }
 
