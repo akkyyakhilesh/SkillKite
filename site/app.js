@@ -5,14 +5,12 @@
   'use strict';
 
   // -------- Config --------
-  // The bot's WhatsApp number — only whitelisted recipients can chat it
-  // during the Meta sandbox phase. Used for the SECONDARY CTA shown to
-  // users already on the early-access list.
-  var BOT_PHONE = '15556472099'; // Meta WhatsApp test number
+  // The bot's WhatsApp number — verified Meta WhatsApp Business sender.
+  // No more sandbox allowlist — anyone with WhatsApp can chat directly.
+  var BOT_PHONE = '916201226351'; // SkillKite — +91 62012 26351
 
-  // Founder's WhatsApp — used for the PRIMARY 'Get early access' CTA.
-  // Visitors send a whitelist request here; founder adds their number to
-  // Meta's allowed-recipients list, then they can chat the bot.
+  // Founder's WhatsApp — kept for "swap notes / DM me about the build"
+  // sort of outreach. Not used for whitelisting any more (no longer needed).
   var FOUNDER_PHONE = '919492040362';
 
   // -------- Language toggle --------
@@ -39,24 +37,13 @@
   }
 
   // -------- WhatsApp CTAs --------
-  // Two flavors:
-  //   PRIMARY  ('cta-access')     → founder, asking to be whitelisted
-  //   DIRECT   ('cta-bot-direct') → bot test number, for users already whitelisted
-
-  var accessText = encodeURIComponent(
-    "Hi Akkyy! I'd like to try SkillKite — please add me to the early-access list. 🪁"
-  );
+  // SkillKite is out of Meta's sandbox now — anyone can message the bot directly
+  // and get a reply. The old "DM founder → manual whitelist → then chat" path
+  // is no longer needed. Both primary and secondary buttons go straight to the
+  // bot's verified number.
   var botText = encodeURIComponent('Hi SkillKite!');
+  var botUrl  = 'https://wa.me/' + BOT_PHONE + '?text=' + botText;
 
-  var accessUrl = 'https://wa.me/' + FOUNDER_PHONE + '?text=' + accessText;
-  var botUrl    = 'https://wa.me/' + BOT_PHONE     + '?text=' + botText;
-
-  // Wire the two flavors. Anything else (e.g. sample-PDF download with
-  // .cta-secondary) is left untouched.
-  Array.prototype.forEach.call(
-    document.querySelectorAll('.cta-access'),
-    function (a) { a.href = accessUrl; a.target = '_blank'; a.rel = 'noopener'; }
-  );
   Array.prototype.forEach.call(
     document.querySelectorAll('.cta-bot-direct'),
     function (a) { a.href = botUrl; a.target = '_blank'; a.rel = 'noopener'; }
