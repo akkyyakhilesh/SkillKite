@@ -178,6 +178,11 @@ public class AssessmentOrchestrator
             await HandleTwelfthTurnAsync(student, session, text, ct);
             return;
         }
+        if (flowType == "upskill")
+        {
+            await HandleSkillUpgradeTurnAsync(student, session, text, ct);
+            return;
+        }
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -526,13 +531,7 @@ public class AssessmentOrchestrator
                 return;
 
             case "flow_upskill":
-                // Phase 1 stub. Saturday's promise — we'll wire up a real
-                // working-professional flow once the 10th/12th flows are stable.
-                await SendAndPersistStubAsync(student, menuSession,
-                    "🌱 Skill upgrade flow abhi build ho raha hai — agle hafte tak ready!\n\n" +
-                    "Tab tak, agar aap upper rung ke career roadmap ke liye chahte ho, " +
-                    "send 'career roadmap' for the standard SkillKite flow.",
-                    ct);
+                await StartSkillUpgradeFlowAsync(student, ct);
                 return;
 
             case "flow_10th":
@@ -1370,6 +1369,206 @@ public class AssessmentOrchestrator
         if (t.Contains("design") || t.Contains("nid") || t.Contains("nift"))    return "design";
         if (t.Contains("media") || t.Contains("journ"))                         return "mass_comm";
         if (t.Contains("bca") || t.Contains("computer"))                        return "bca";
+        return "not_sure";
+    }
+
+    // ============================================================================
+    // Skill upgrade flow — same thin-discovery pattern as 10th/12th, but for
+    // working professionals (1-10 yrs experience). 3 steps:
+    //   "name"  → free-text name
+    //   "field" → 7-row list (current professional field)
+    //   "goal"  → 5-row list (what they want next)
+    // After "goal" we call Claude → render PDF → send. No degree-level
+    // assessment, no week-by-week roadmap.
+    // ============================================================================
+
+    private async Task StartSkillUpgradeFlowAsync(Student student, CancellationToken ct)
+    {
+        var data = new Dictionary<string, string>
+        {
+            ["flowType"] = "upskill",
+            ["step"]     = "name"
+        };
+        var session = new ChatSession
+        {
+            StudentId = student.Id,
+            AssessmentDataJson = JsonSerializer.Serialize(data),
+            Status = SessionStatus.Active
+        };
+        _db.ChatSessions.Add(session);
+        await _db.SaveChangesAsync(ct);
+
+        var ask = "Sahi choice! 🌱 Aap already kaam kar rahe ho — chaliye next rung ke liye plan banate hain.\n\nPehle batao — *aapka naam kya hai?*";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = ask
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleSkillUpgradeTurnAsync(Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.User, Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var step = ReadField(session, "step") ?? "name";
+
+        switch (step)
+        {
+            case "name":
+            {
+                var name = text.Trim();
+                if (string.IsNullOrWhiteSpace(name) || name.Length > 60)
+                    name = student.Name ?? "friend";
+                student.Name = name;
+                session.AssessmentDataJson = WriteField(session, ("name", name), ("step", "field"));
+                await _db.SaveChangesAsync(ct);
+                await SendUpskillFieldPromptAsync(student, session, ct);
+                return;
+            }
+            case "field":
+            {
+                var field = NormaliseUpskillField(text);
+                session.AssessmentDataJson = WriteField(session, ("field", field), ("step", "goal"));
+                await _db.SaveChangesAsync(ct);
+                await SendUpskillGoalPromptAsync(student, session, ct);
+                return;
+            }
+            case "goal":
+            {
+                var goal = NormaliseUpskillGoal(text);
+                session.AssessmentDataJson = WriteField(session, ("goal", goal), ("step", "generating"));
+                await _db.SaveChangesAsync(ct);
+                await DeliverSkillUpgradeGuideAsync(student, session, ct);
+                return;
+            }
+            default:
+                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                return;
+        }
+    }
+
+    private async Task SendUpskillFieldPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var name = student.Name ?? "friend";
+        var body = $"Nice to meet you, {name}! 🙌\n\nAap abhi *kaunse field* mein kaam karte ho? Neeche se choose karo:";
+        var options = new List<InteractiveOption>
+        {
+            new("software_it",      "💻 Software / IT",     "Dev, QA, DevOps, SRE"),
+            new("data_analytics",   "📊 Data / Analytics",  "Analyst, DS, DE"),
+            new("design_creative",  "🎨 Design / Creative", "UI/UX, graphic, video"),
+            new("content_marketing","📝 Content / Marketing","Writer, SEO, social"),
+            new("banking_finance",  "🏦 Banking / Finance", "Bank, fintech, accounting"),
+            new("healthcare",       "🏥 Healthcare",         "Nurse, lab, pharma, hospital"),
+            new("teaching_edu",     "🎓 Teaching / Edu",    "School, coaching, ed-tech"),
+            new("ops_support",      "🛠️ Ops / Support",     "Customer support, ops, logistics"),
+            new("other",            "🤷 Other / Mixed",     "Kuch aur — bot decide karega")
+        };
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, "Choose one", "Aapka field", options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendUpskillGoalPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var body = "Got it 👍\n\n*Aage kya chahiye?* Neeche se choose karo:";
+        var options = new List<InteractiveOption>
+        {
+            new("higher_salary_same", "💰 Same field, higher salary", "Promotion / better company"),
+            new("switch_field",       "🔀 Switch to new field",       "Pivot — naya domain"),
+            new("management",         "👔 Management track",          "Lead / EM / people mgr"),
+            new("freelance",          "🚀 Freelance / own thing",     "Consulting / startup"),
+            new("abroad",             "🌍 Remote / abroad",            "Global companies / visa route"),
+            new("not_sure",           "🤷 Not sure — sab options",     "Show me everything")
+        };
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, "Choose one", "Aapka next goal", options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task DeliverSkillUpgradeGuideAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized upskill guide ban rahi hai — ek minute do mujhe.";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = wait
+        });
+        await _db.SaveChangesAsync(ct);
+
+        try
+        {
+            var guide = await _engine.GenerateSkillUpgradeGuideAsync(student, session, ct);
+            var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
+
+            session.Status = SessionStatus.Completed;
+            session.CompletedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync(ct);
+
+            var summary = $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein skills, next roles, side moves — sab detailed hai. 3 mahine ke andar ek skill deeply seekho.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
+            await TrySendAsync(() => _messaging.SendDocumentAsync(
+                student.Phone, pdfUrl,
+                "Your SkillKite upskill guide 🪁",
+                $"SkillKite_Upskill_Guide_{student.Name ?? "professional"}.pdf",
+                ct));
+
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = summary
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Upskill-flow guide generation failed for student {Id}", student.Id);
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+        }
+    }
+
+    private static string NormaliseUpskillField(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        var ids = new[] { "software_it","data_analytics","design_creative","content_marketing",
+                          "banking_finance","healthcare","teaching_edu","ops_support","other" };
+        if (ids.Contains(t)) return t;
+        if (t.Contains("dev") || t.Contains("software") || t.Contains("coding") || t.Contains("engineer")) return "software_it";
+        if (t.Contains("data") || t.Contains("analyt") || t.Contains("sql") || t.Contains("ml"))           return "data_analytics";
+        if (t.Contains("design") || t.Contains("ui") || t.Contains("ux") || t.Contains("graphic"))         return "design_creative";
+        if (t.Contains("content") || t.Contains("market") || t.Contains("seo") || t.Contains("social"))    return "content_marketing";
+        if (t.Contains("bank") || t.Contains("finance") || t.Contains("account"))                          return "banking_finance";
+        if (t.Contains("hospital") || t.Contains("nurse") || t.Contains("pharma") || t.Contains("health")) return "healthcare";
+        if (t.Contains("teach") || t.Contains("school") || t.Contains("coach") || t.Contains("ed"))        return "teaching_edu";
+        if (t.Contains("support") || t.Contains("ops") || t.Contains("logist") || t.Contains("customer")) return "ops_support";
+        return "other";
+    }
+
+    private static string NormaliseUpskillGoal(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        var ids = new[] { "higher_salary_same","switch_field","management","freelance","abroad","not_sure" };
+        if (ids.Contains(t)) return t;
+        if (t.Contains("salary") || t.Contains("paisa") || t.Contains("hike") || t.Contains("promotion")) return "higher_salary_same";
+        if (t.Contains("switch") || t.Contains("pivot") || t.Contains("naya field"))                     return "switch_field";
+        if (t.Contains("manag") || t.Contains("lead") || t.Contains("em "))                              return "management";
+        if (t.Contains("freelance") || t.Contains("startup") || t.Contains("apna") || t.Contains("own")) return "freelance";
+        if (t.Contains("abroad") || t.Contains("remote") || t.Contains("global") || t.Contains("visa"))  return "abroad";
         return "not_sure";
     }
 

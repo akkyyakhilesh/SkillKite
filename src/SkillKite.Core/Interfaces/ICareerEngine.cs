@@ -75,4 +75,18 @@ public interface ICareerEngine
         Student student,
         ChatSession session,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Generates the skill-upgrade guide for a working professional. The
+    /// student told us their current field and what they want next (higher
+    /// salary same field, switch field, management, freelance, abroad,
+    /// not_sure). Output covers: 3-5 specific skills to add now, 3-5 next
+    /// roles to target with rough salary bands, adjacent side-moves where
+    /// existing skills transfer, plus a goal-specific bonus section
+    /// (freelance path / abroad path) when relevant.
+    /// </summary>
+    Task<StudentGuide> GenerateSkillUpgradeGuideAsync(
+        Student student,
+        ChatSession session,
+        CancellationToken ct = default);
 }
