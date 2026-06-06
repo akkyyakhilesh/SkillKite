@@ -21,7 +21,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
 // --- HTTP clients for external APIs ---
-builder.Services.AddHttpClient<ICareerEngine, ClaudeCareerEngine>();
+// Claude roadmap generation is our heaviest call (20 weeks × resources × bilingual
+// fields, plus retries on parse failures). The .NET HttpClient default of 100s
+// timed out on real students — Shristi (06-06) tapped a career suggestion, the
+// roadmap call ran past 100s, the request was cancelled, and she never got a PDF.
+// 180s gives Claude enough headroom for the largest plans without letting a truly
+// hung request block a connection forever.
+builder.Services.AddHttpClient<ICareerEngine, ClaudeCareerEngine>(c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(180);
+});
 builder.Services.AddHttpClient<IMessagingService, WhatsAppService>();
 
 // --- Services ---

@@ -15,15 +15,28 @@ public class RoadmapController : ControllerBase
     private readonly AppDbContext _db;
     private readonly ICareerEngine _engine;
     private readonly IRoadmapGenerator _pdf;
+    private readonly IMessagingService _messaging;
 
-    public RoadmapController(AppDbContext db, ICareerEngine engine, IRoadmapGenerator pdf)
+    public RoadmapController(
+        AppDbContext db, ICareerEngine engine, IRoadmapGenerator pdf, IMessagingService messaging)
     {
         _db = db;
         _engine = engine;
         _pdf = pdf;
+        _messaging = messaging;
     }
 
-    public record GenerateRequest(Guid SessionId);
+    /// <summary>
+    /// Generate a roadmap for an existing session. ChosenCareerTitle is optional —
+    /// when provided, Claude is constrained to that specific career (matches the
+    /// "student picked one of three suggestions" flow). SendToStudent=true also
+    /// delivers the PDF over WhatsApp — used as a recovery hook when a real
+    /// orchestrator run timed out and never sent the document.
+    /// </summary>
+    public record GenerateRequest(
+        Guid SessionId,
+        string? ChosenCareerTitle = null,
+        bool SendToStudent = false);
 
     [HttpPost("generate")]
     public async Task<IActionResult> Generate([FromBody] GenerateRequest req, CancellationToken ct)
@@ -33,7 +46,8 @@ public class RoadmapController : ControllerBase
             .FirstOrDefaultAsync(s => s.Id == req.SessionId, ct);
         if (session?.Student is null) return NotFound("session not found");
 
-        var generated = await _engine.GenerateRoadmapAsync(session.Student, session, chosenCareerTitle: null, ct);
+        var generated = await _engine.GenerateRoadmapAsync(
+            session.Student, session, chosenCareerTitle: req.ChosenCareerTitle, ct);
         var pdfUrl = await _pdf.GenerateAsync(session.Student, generated, ct);
 
         var roadmap = new Roadmap
@@ -46,7 +60,28 @@ public class RoadmapController : ControllerBase
         _db.Roadmaps.Add(roadmap);
         await _db.SaveChangesAsync(ct);
 
-        return Ok(new { roadmapId = roadmap.Id, pdfUrl, roadmap = generated });
+        bool delivered = false;
+        if (req.SendToStudent && !string.IsNullOrWhiteSpace(session.Student.Phone))
+        {
+            try
+            {
+                var summary =
+                    $"🎯 *Your career roadmap is ready!*\n\n" +
+                    $"Path: {generated.CareerTitle} ({generated.CareerTitleHi})\n" +
+                    $"Duration: {generated.TotalWeeks} weeks\n\n" +
+                    $"{generated.Summary}";
+                await _messaging.SendTextAsync(session.Student.Phone, summary, ct);
+                await _messaging.SendDocumentAsync(
+                    session.Student.Phone, pdfUrl,
+                    "Your SkillKite roadmap 🪁",
+                    $"SkillKite_Roadmap_{session.Student.Name ?? "student"}.pdf",
+                    ct);
+                delivered = true;
+            }
+            catch { /* roadmap row is saved either way; caller sees delivered=false */ }
+        }
+
+        return Ok(new { roadmapId = roadmap.Id, pdfUrl, delivered, roadmap = generated });
     }
 
     [HttpGet("{id:guid}")]
