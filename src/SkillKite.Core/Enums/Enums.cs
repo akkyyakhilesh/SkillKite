@@ -21,6 +21,14 @@ public enum SessionStatus
     /// </summary>
     AwaitingReturnChoice,
     /// <summary>
+    /// New student just picked their flow (10th / 12th / Career / Upskill).
+    /// Before kicking off the first real question, we asked which language
+    /// they want — English or Hinglish — and parked the session here.
+    /// The flow they chose is stashed in AssessmentDataJson under
+    /// "pendingFlow" so HandleLanguageChoiceAsync can dispatch correctly.
+    /// </summary>
+    AwaitingLanguageChoice,
+    /// <summary>
     /// PDF / guide just delivered. Bot sent 3 feedback buttons
     /// (👍 Useful / 😐 OK / 👎 Not useful). Next inbound message is interpreted
     /// as either a button tap (saved as rating) or free text (saved as "Skipped"
@@ -51,4 +59,13 @@ public enum RoadmapStatus { Active, Completed, Abandoned }
 public enum ProgressStatus { Pending, InProgress, Completed, Skipped }
 public enum CareerCategory { Tech, Government, Creative, Trades, Gig, Emerging }
 public enum DemandLevel { Low, Medium, High }
-public enum PreferredLanguage { Hindi, English }
+/// <summary>
+/// What language the bot uses with the student. Renamed from `Hindi` to
+/// `Hinglish` on 2026-06-09 — the original "Hindi" value rendered Devanagari
+/// chrome which Tier 2/3 users found heavier than helpful. The enum's
+/// underlying integer value is unchanged (Hinglish=0), so existing rows that
+/// stored `Hindi` are now interpreted as `Hinglish` — closer to what those
+/// students were actually getting in chat anyway. Pure Hindi can be added
+/// back as a third value if real users explicitly ask for it.
+/// </summary>
+public enum PreferredLanguage { Hinglish, English }

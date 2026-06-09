@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SkillKite.Core.Enums;
 using SkillKite.Core.Models;
 
 namespace SkillKite.Data;
@@ -27,7 +29,16 @@ public class AppDbContext : DbContext
             e.Property(x => x.State).HasMaxLength(50);
             e.Property(x => x.EducationLevel).HasMaxLength(50);
             e.Property(x => x.CollegeName).HasMaxLength(200);
-            e.Property(x => x.PreferredLanguage).HasConversion<string>();
+            // Backward-compat converter: legacy rows in production may carry the
+            // string "Hindi" (the enum's old name before 2026-06-09's rename to
+            // Hinglish). We accept either spelling on the way in and write
+            // Hinglish on the way out. Lets us deploy code + migrate data
+            // without taking the bot offline.
+            e.Property(x => x.PreferredLanguage)
+             .HasConversion(new ValueConverter<PreferredLanguage, string>(
+                 enumVal => enumVal.ToString(),
+                 dbVal   => dbVal == "Hindi" ? PreferredLanguage.Hinglish
+                                             : (PreferredLanguage)System.Enum.Parse(typeof(PreferredLanguage), dbVal, true)));
         });
 
         b.Entity<ChatSession>(e =>

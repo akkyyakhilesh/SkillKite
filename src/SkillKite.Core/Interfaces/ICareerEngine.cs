@@ -9,8 +9,13 @@ public interface ICareerEngine
     /// Runs the next conversational assessment turn. Returns the reply to send
     /// back to the student, whether the assessment is complete, and any
     /// structured fields extracted from the student's latest reply.
+    ///
+    /// The student's <see cref="Student.PreferredLanguage"/> drives whether
+    /// Claude replies in Hinglish (default) or English — picked upfront before
+    /// the first assessment question, since 2026-06-09.
     /// </summary>
     Task<AssessmentTurnResult> NextTurnAsync(
+        Student student,
         ChatSession session,
         IReadOnlyList<ChatMessage> history,
         string? latestUserMessage,

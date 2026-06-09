@@ -39,12 +39,13 @@ public class ClaudeCareerEngine : ICareerEngine
     }
 
     public async Task<AssessmentTurnResult> NextTurnAsync(
+        Student student,
         ChatSession session,
         IReadOnlyList<ChatMessage> history,
         string? latestUserMessage,
         CancellationToken ct = default)
     {
-        var system = BuildAssessmentSystemPrompt(session);
+        var system = BuildAssessmentSystemPrompt(student, session);
         var messages = history
             .Where(m => m.Role != MessageRole.System)
             .Select(m => new ClaudeMessage(m.Role == MessageRole.User ? "user" : "assistant", m.Content))
@@ -173,7 +174,7 @@ public class ClaudeCareerEngine : ICareerEngine
 
     // ----- prompts -----
 
-    private static string BuildAssessmentSystemPrompt(ChatSession session)
+    private static string BuildAssessmentSystemPrompt(Student student, ChatSession session)
     {
         // Build the anchor list. For closed-enum questions, append the allowed
         // option IDs so Claude knows which interactive block to emit.
@@ -186,11 +187,14 @@ public class ClaudeCareerEngine : ICareerEngine
             return $"  {i + 1}. [{q.Key}] EN: {q.English} | HI: {q.Hindi}{optHint}";
         }));
 
+        var languageDirective = student.PreferredLanguage == PreferredLanguage.English
+            ? "REPLY LANGUAGE: Pure professional English throughout. Do not mix Hindi words in. The student picked English upfront because they prefer a fully English experience."
+            : "REPLY LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English, like how college students in Lucknow, Patna, or Indore actually text. Use Hindi words for warmth ('haan', 'bhai', 'kya'), English for tech and structural terms. Do NOT use Devanagari script — student prefers Latin-script Hinglish.";
+
         return $$"""
         You are SkillKite, a warm, encouraging AI career coach for students in Tier 2/3 India.
-        You speak Hinglish by default — natural mix of Hindi (Devanagari) and English, like how college
-        students in Lucknow, Patna, or Indore actually text. Switch fully to English or Hindi if the
-        student clearly prefers one.
+
+        {{languageDirective}}
 
         Your job RIGHT NOW: conduct a friendly career assessment, one question at a time.
 
@@ -205,10 +209,11 @@ public class ClaudeCareerEngine : ICareerEngine
           implicitly set workType = "full_time" and SKIP the [workType] question entirely.
           Government jobs are structurally full-time, so asking about freelance/full-time after
           a govt answer is jarring.
-        - Always save the [roadmapLanguage] question for LAST — asked only after every other anchor
-          field is collected. Frame it as: roadmap is ready, just pick the language for the PDF.
-        - When you have answers to ALL keys above (including roadmapLanguage), mark the assessment complete.
+        - When you have answers to ALL keys above, mark the assessment complete.
         - Never give career advice yet — just gather info warmly.
+
+        NOTE: We removed the old "what language for the PDF?" question — student picked
+        language upfront, before this assessment started. Do NOT ask language again here.
 
         RETURNING STUDENTS (already-extracted name):
         - If "Already extracted so far" already contains a "name" value, the student is NOT new —
@@ -274,7 +279,6 @@ public class ClaudeCareerEngine : ICareerEngine
             dailyHours  → "1h" | "2-3h" | "4-5h"
             salaryGoal  → "10-25k" | "25-50k" | "50k+"  OR a free number if the student
                           typed a specific custom amount (e.g. "32000", "₹35k", "1 lakh").
-            roadmapLanguage → "hindi" | "english"
         - "complete": true only when every anchor key has been collected.
 
         Current question index hint: {{session.CurrentQuestionIndex}} of {{AssessmentQuestions.All.Count}}.
@@ -396,15 +400,15 @@ public class ClaudeCareerEngine : ICareerEngine
 
     private static string BuildPostRoadmapSystemPrompt(Student student, GeneratedRoadmap roadmap)
     {
-        var hi = student.PreferredLanguage == PreferredLanguage.Hindi;
-        var careerTitle = hi && !string.IsNullOrWhiteSpace(roadmap.CareerTitleHi)
-            ? roadmap.CareerTitleHi : roadmap.CareerTitle;
-        var summary = hi && !string.IsNullOrWhiteSpace(roadmap.SummaryHi)
-            ? roadmap.SummaryHi : roadmap.Summary;
+        // No more pure Hindi rendering. Hinglish (default) and English both use
+        // the primary fields — Claude's prompt already produces content in the
+        // student's chosen mode, so the *Hi fields are redundant. Legacy data
+        // (sessions completed before 2026-06-09) may still have the Hi fields
+        // populated but we just don't read them anymore.
+        var careerTitle = roadmap.CareerTitle;
+        var summary = roadmap.Summary;
         var week1 = roadmap.Weeks?.FirstOrDefault();
-        var week1Theme = week1 != null
-            ? (hi && !string.IsNullOrWhiteSpace(week1.ThemeHi) ? week1.ThemeHi : week1.Theme)
-            : "Week 1";
+        var week1Theme = week1?.Theme ?? "Week 1";
         var week1Goals = week1?.Goals != null ? string.Join(" • ", week1.Goals) : "";
         var week1Practice = week1?.Practice ?? "";
 
@@ -632,10 +636,21 @@ public class ClaudeCareerEngine : ICareerEngine
     /// (Claude's most recent "intended" response). Falls back to the legacy
     /// first-brace / last-brace span if none parse, and finally the raw text.
     /// </summary>
+    /// <summary>
+    /// Returns a 2-line OUTPUT LANGUAGE block to prepend to a guide / suggestion
+    /// system prompt so Claude knows whether to produce Hinglish (default) or
+    /// pure English content. Picked upfront by the student before the first
+    /// real flow question (see SendLanguageChoicePromptAsync in the orchestrator).
+    /// </summary>
+    private static string LanguageDirective(PreferredLanguage lang) =>
+        lang == PreferredLanguage.English
+            ? "OUTPUT LANGUAGE: Pure professional English throughout. Do not mix Hindi words in. The student picked English upfront because they prefer a fully English experience.\n\n"
+            : "OUTPUT LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English. Use Hindi words for warmth ('haan', 'bhai', 'kya', 'bahut achha'), English for tech and structural terms. Do NOT use Devanagari script — student prefers Latin-script Hinglish.\n\n";
+
     public async Task<StudentGuide> GenerateTenthGuideAsync(
         Student student, ChatSession session, CancellationToken ct = default)
     {
-        var system = BuildTenthGuideSystemPrompt();
+        var system = LanguageDirective(student.PreferredLanguage) + BuildTenthGuideSystemPrompt();
         var user = $$"""
             Student profile (from the 2-question 10th flow):
             {{session.AssessmentDataJson}}
@@ -655,7 +670,7 @@ public class ClaudeCareerEngine : ICareerEngine
     public async Task<StudentGuide> GenerateTwelfthGuideAsync(
         Student student, ChatSession session, CancellationToken ct = default)
     {
-        var system = BuildTwelfthGuideSystemPrompt();
+        var system = LanguageDirective(student.PreferredLanguage) + BuildTwelfthGuideSystemPrompt();
         var user = $$"""
             Student profile (from the 3-question 12th flow):
             {{session.AssessmentDataJson}}
@@ -675,7 +690,7 @@ public class ClaudeCareerEngine : ICareerEngine
     public async Task<StudentGuide> GenerateSkillUpgradeGuideAsync(
         Student student, ChatSession session, CancellationToken ct = default)
     {
-        var system = BuildSkillUpgradeSystemPrompt();
+        var system = LanguageDirective(student.PreferredLanguage) + BuildSkillUpgradeSystemPrompt();
         var user = $$"""
             Working professional's profile (from the 3-question upskill flow):
             {{session.AssessmentDataJson}}

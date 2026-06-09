@@ -64,16 +64,12 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 // Devanagari characters render with matching weight/style.
                 p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
 
-                // Render in ONE language, chosen during the assessment.
-                // The PDF is a long-form artifact people read at their own pace; mixing two
-                // languages on every line adds clutter. Brand wordmarks ("SkillKite",
-                // "WhatsApp") stay in Latin script in both modes because they're proper nouns.
-                var hi = student.PreferredLanguage == PreferredLanguage.Hindi;
-
-                // Pick the right field for each piece. The schema keeps both EN and HI fields
-                // for future-proofing (a Phase 2 PWA could let the user flip languages without
-                // re-running Claude) — here we just choose one.
-                string PickLang(string en, string h) => hi && !string.IsNullOrWhiteSpace(h) ? h : en;
+                // No more pure-Hindi mode. The student's choice now is Hinglish
+                // (default) or English, and Claude generates the content in
+                // whichever they picked — so we just use the primary fields.
+                // The schema's *Hi fields are vestigial but kept for legacy
+                // sessions; PDF render no longer reads them.
+                string PickLang(string en, string h) => en;
 
                 p.Header().Column(col =>
                 {

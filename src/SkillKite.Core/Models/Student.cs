@@ -13,7 +13,7 @@ public class Student
     public string? EducationLevel { get; set; }
     public string? CollegeName { get; set; }
     public int? GraduationYear { get; set; }
-    public PreferredLanguage PreferredLanguage { get; set; } = PreferredLanguage.Hindi;
+    public PreferredLanguage PreferredLanguage { get; set; } = PreferredLanguage.Hinglish;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastActiveAt { get; set; }
 

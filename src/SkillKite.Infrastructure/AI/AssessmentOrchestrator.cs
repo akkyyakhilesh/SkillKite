@@ -124,7 +124,21 @@ public class AssessmentOrchestrator
             return;
         }
 
-        // Fourth check: did we just deliver a PDF and ask for feedback?
+        // Fourth check: did we just ask the student which language they want
+        // before kicking off their first flow? (Only ever happens once per student.)
+        var awaitingLanguage = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingLanguageChoice)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingLanguage is not null)
+        {
+            await HandleLanguageChoiceAsync(student, awaitingLanguage, text, ct);
+            return;
+        }
+
+        // Fifth check: did we just deliver a PDF and ask for feedback?
         // (Session is parked in AwaitingFeedback until they tap a button or
         // type something; either way we capture a rating and move to Completed.)
         var awaitingFeedback = await _db.ChatSessions
@@ -209,7 +223,7 @@ public class AssessmentOrchestrator
 
         var history = session.Messages.OrderBy(m => m.CreatedAt).ToList();
 
-        var turn = await _engine.NextTurnAsync(session, history, text, ct);
+        var turn = await _engine.NextTurnAsync(student, session, history, text, ct);
 
         // Merge extracted fields into session + student.
         if (turn.ExtractedFields is { Count: > 0 })
@@ -536,32 +550,125 @@ public class AssessmentOrchestrator
 
         var choice = NormaliseFlowChoice(text);
 
-        switch (choice)
+        // Validate the choice. Unknown → re-show menu so student isn't stranded.
+        if (choice is not ("flow_career" or "flow_10th" or "flow_12th" or "flow_upskill"))
         {
-            case "flow_career":
-                // The familiar 13-question assessment, untouched. We just spin up
-                // a fresh Active session tagged with flowType=career and run the
-                // first turn so the bot greets the student and asks for their name.
-                await StartCareerFlowAsync(student, ct);
-                return;
-
-            case "flow_upskill":
-                await StartSkillUpgradeFlowAsync(student, ct);
-                return;
-
-            case "flow_10th":
-                await StartTenthFlowAsync(student, ct);
-                return;
-
-            case "flow_12th":
-                await StartTwelfthFlowAsync(student, ct);
-                return;
-
-            default:
-                // Unknown reply — re-show the menu so the student isn't stranded.
-                await SendFlowChoiceMenuAndAwaitAsync(student, ct);
-                return;
+            await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+            return;
         }
+
+        // If this student has never been asked their language preference, ask it
+        // ONCE — upfront, before the first real flow question — so the rest of
+        // the conversation respects what they pick. Returning students who've
+        // already completed a flow keep their existing preference and skip
+        // straight to the chosen flow's first question.
+        var isFirstTime = !await _db.ChatSessions
+            .AnyAsync(s => s.StudentId == student.Id && s.Status == SessionStatus.Completed, ct);
+
+        if (isFirstTime)
+        {
+            await SendLanguageChoicePromptAsync(student, choice, ct);
+            return;
+        }
+
+        await StartChosenFlowAsync(student, choice, ct);
+    }
+
+    /// <summary>
+    /// Helper: dispatch to the right Start*FlowAsync given a normalised flow id.
+    /// Used both by HandleFlowChoiceAsync (returning users skip language ask)
+    /// and HandleLanguageChoiceAsync (after a new user picks their language).
+    /// </summary>
+    private Task StartChosenFlowAsync(Student student, string flowChoice, CancellationToken ct) => flowChoice switch
+    {
+        "flow_career"  => StartCareerFlowAsync(student, ct),
+        "flow_upskill" => StartSkillUpgradeFlowAsync(student, ct),
+        "flow_10th"    => StartTenthFlowAsync(student, ct),
+        "flow_12th"    => StartTwelfthFlowAsync(student, ct),
+        _              => SendFlowChoiceMenuAndAwaitAsync(student, ct)
+    };
+
+    /// <summary>
+    /// Brand-new student just picked their flow. Before they answer name /
+    /// stream / field, ask which language they want the bot in. The flow they
+    /// picked is stashed in the session's AssessmentDataJson under "pendingFlow"
+    /// so HandleLanguageChoiceAsync can resume the right path after their tap.
+    ///
+    /// We use a SHORT bilingual prompt (one line English + one line Hinglish)
+    /// so even a student who'd be uncomfortable in one mode can read the other.
+    /// </summary>
+    private async Task SendLanguageChoicePromptAsync(Student student, string pendingFlow, CancellationToken ct)
+    {
+        var data = new Dictionary<string, string>
+        {
+            ["pendingFlow"] = pendingFlow
+        };
+
+        var langSession = new ChatSession
+        {
+            StudentId = student.Id,
+            Status = SessionStatus.AwaitingLanguageChoice,
+            AssessmentDataJson = JsonSerializer.Serialize(data)
+        };
+        _db.ChatSessions.Add(langSession);
+        await _db.SaveChangesAsync(ct);
+
+        var body =
+            "Which language should we continue in?\n" +
+            "Hum kis language mein baat karein?\n\n" +
+            "🤝 Hinglish — Hindi + English mix (default, most natural for most students)\n" +
+            "🇬🇧 English — formal English throughout";
+
+        var options = new List<InteractiveOption>
+        {
+            new("lang_hinglish", "🤝 Hinglish"),
+            new("lang_english",  "🇬🇧 English")
+        };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = langSession.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Student tapped a language button (or typed something). Save the
+    /// preference on the Student row, abandon the transient AwaitingLanguageChoice
+    /// session, and resume into the flow they originally picked.
+    /// </summary>
+    private async Task HandleLanguageChoiceAsync(
+        Student student, ChatSession langSession, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = langSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        // Default to Hinglish if the student types something other than a button id
+        // ("namaste", "Hello", "Hi", emojis, etc.) — Hinglish is fine for everyone.
+        var t = text.Trim().ToLowerInvariant();
+        student.PreferredLanguage = t switch
+        {
+            "lang_english" => PreferredLanguage.English,
+            "english"      => PreferredLanguage.English,
+            "lang_hinglish" => PreferredLanguage.Hinglish,
+            _              => PreferredLanguage.Hinglish
+        };
+
+        langSession.Status = SessionStatus.Abandoned;
+        await _db.SaveChangesAsync(ct);
+
+        // Resume into the flow that was queued before we asked for language.
+        string pendingFlow = ReadField(langSession, "pendingFlow") ?? "flow_career";
+        await StartChosenFlowAsync(student, pendingFlow, ct);
     }
 
     private async Task SendAndPersistStubAsync(
@@ -712,7 +819,7 @@ public class AssessmentOrchestrator
         }
 
         var history = session.Messages.OrderBy(m => m.CreatedAt).ToList();
-        var turn = await _engine.NextTurnAsync(session, history, latestUserMessage, ct);
+        var turn = await _engine.NextTurnAsync(student, session, history, latestUserMessage, ct);
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -928,7 +1035,9 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = "Bahut accha! 📚 10th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
+        var ask = student.PreferredLanguage == PreferredLanguage.English
+            ? "Great! 📚 To suggest the best options after 10th, I'd like to know a few things about you.\n\nFirst — *what's your name?*"
+            : "Bahut accha! 📚 10th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1128,7 +1237,9 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = "Bahut accha! 🎯 12th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
+        var ask = student.PreferredLanguage == PreferredLanguage.English
+            ? "Great! 🎯 To suggest the best options after 12th, I'd like to know a few things about you.\n\nFirst — *what's your name?*"
+            : "Bahut accha! 🎯 12th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1418,7 +1529,9 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = "Sahi choice! 🌱 Aap already kaam kar rahe ho — chaliye next rung ke liye plan banate hain.\n\nPehle batao — *aapka naam kya hai?*";
+        var ask = student.PreferredLanguage == PreferredLanguage.English
+            ? "Great choice! 🌱 You're already working — let's plan the next rung.\n\nFirst — *what's your name?*"
+            : "Sahi choice! 🌱 Aap already kaam kar rahe ho — chaliye next rung ke liye plan banate hain.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1697,14 +1810,17 @@ public class AssessmentOrchestrator
         if (data.TryGetValue("city",      out var c)) student.City           = c;
         if (data.TryGetValue("education", out var e)) student.EducationLevel = e;
 
-        // Roadmap language preference — drives the PDF render language.
-        // Claude is instructed to normalize to "hindi" or "english"; we tolerate variants defensively.
+        // Roadmap language preference. Legacy code path — kept so that any
+        // session whose Claude-extracted data still carries roadmapLanguage
+        // (e.g. an in-flight career session started before 2026-06-09's
+        // upfront-language change) gets respected. Defaults to Hinglish when
+        // the answer isn't a recognised English variant.
         if (data.TryGetValue("roadmapLanguage", out var lang) && !string.IsNullOrWhiteSpace(lang))
         {
             student.PreferredLanguage = lang.Trim().ToLowerInvariant() switch
             {
                 "english" or "en" or "eng" => PreferredLanguage.English,
-                _                          => PreferredLanguage.Hindi,
+                _                          => PreferredLanguage.Hinglish,
             };
         }
     }

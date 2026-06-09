@@ -139,17 +139,13 @@ public static class AssessmentQuestions
                                    new InteractiveOption("10-25k", "₹10–25k / month"),
                                    new InteractiveOption("25-50k", "₹25–50k / month"),
                                    new InteractiveOption("50k+",   "₹50k+ / month")
-                               }),
-
-        // ASKED LAST — right before the roadmap is generated. Determines PDF language.
-        new("roadmapLanguage", "Last cheez — roadmap kis language mein bheju? Hindi ya English?",
-                               "एक आख़िरी बात — रोडमैप किस language में भेजूँ? Hindi ya English?",
-                               InteractiveKind.Buttons,
-                               new[]
-                               {
-                                   new InteractiveOption("hindi",   "🇮🇳 हिंदी"),
-                                   new InteractiveOption("english", "🇬🇧 English")
                                })
+
+        // NOTE: roadmapLanguage used to be the very last question (Hindi vs English).
+        // As of 2026-06-09 we ask language UPFRONT, right after the flow choice menu
+        // (see SendLanguageChoicePromptAsync in AssessmentOrchestrator), so the bot
+        // chats in the student's chosen language end-to-end instead of asking only
+        // for PDF rendering. The result is on Student.PreferredLanguage.
     };
 
     public static Question? ByKey(string key) =>
