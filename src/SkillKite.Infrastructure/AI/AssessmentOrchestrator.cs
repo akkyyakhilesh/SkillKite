@@ -79,6 +79,32 @@ public class AssessmentOrchestrator
         }
         student.LastActiveAt = DateTime.UtcNow;
 
+        // ZEROTH check: did we just ask "do you really want to wipe everything?"
+        // The reset confirm session is short-lived and transient — handle it
+        // before anything else so a typed "reset" while in this state doesn't
+        // re-trigger the reset prompt.
+        var awaitingResetConfirm = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingResetConfirm)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingResetConfirm is not null)
+        {
+            await HandleResetConfirmAsync(student, awaitingResetConfirm, text, ct);
+            return;
+        }
+
+        // Highest-priority intent: "delete my data" / "reset" / etc. Detected
+        // BEFORE any normal dispatch so it works from any state (mid-assessment,
+        // post-roadmap chat, AwaitingFeedback, anywhere). Sends a 2-button
+        // confirmation; actual wipe happens only after the student taps Yes.
+        if (IsResetIntent(text))
+        {
+            await SendResetConfirmPromptAsync(student, ct);
+            return;
+        }
+
         // First check: is the student in the middle of choosing a career path?
         // (They completed assessment, the bot sent 3 suggestions, and now they're
         // tapping one of the buttons or typing a choice.)
@@ -1823,6 +1849,147 @@ public class AssessmentOrchestrator
                 _                          => PreferredLanguage.Hinglish,
             };
         }
+    }
+
+    // ============================================================================
+    // User-initiated "reset / delete my data" flow (added 2026-06-09)
+    //
+    // Triggered by typing any of a handful of intent phrases in English,
+    // Hinglish, or Hindi. Sends a 2-button confirmation; on Yes, deletes
+    // ChatMessages, ChatSessions, Roadmaps, the Student row itself (via
+    // FK cascade), and the PDFs on disk. On No or any other reply, just
+    // abandons the confirm session and falls back to normal handling.
+    //
+    // DPDP Act 2023 compliance (India): students have the right to data
+    // erasure; this is the in-band way to exercise it without emailing.
+    // ============================================================================
+
+    private static bool IsResetIntent(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+
+        // Exact-match short phrases
+        switch (t)
+        {
+            case "reset":
+            case "delete my data":
+            case "delete data":
+            case "wipe my data":
+            case "clear my data":
+            case "forget me":
+            case "reset karo":
+            case "data delete karo":
+            case "mera data delete karo":
+            case "data hatao":
+            case "data delete":
+                return true;
+        }
+
+        // Devanagari variants
+        if (text.Contains("रीसेट")) return true;
+        if (text.Contains("डेटा हटाओ")) return true;
+        if (text.Contains("मेरा डेटा हटाओ")) return true;
+        if (text.Contains("डाटा डिलीट")) return true;
+
+        return false;
+    }
+
+    private async Task SendResetConfirmPromptAsync(Student student, CancellationToken ct)
+    {
+        var resetSession = new ChatSession
+        {
+            StudentId = student.Id,
+            Status = SessionStatus.AwaitingResetConfirm
+        };
+        _db.ChatSessions.Add(resetSession);
+        await _db.SaveChangesAsync(ct);
+
+        var name = student.Name ?? "friend";
+        var body = student.PreferredLanguage == PreferredLanguage.English
+            ? $"Just to confirm, {name} — do you want me to delete ALL your SkillKite data?\n\nThat means: every chat message, every roadmap / guide PDF I made for you, and your profile. This cannot be undone. 🪁"
+            : $"Confirm karo {name} — kya tumhara saara SkillKite data delete kar du?\n\nMatlab: saari chats, saare roadmap/guide PDFs, aur tumhari profile. Yeh undo nahi ho sakta. 🪁";
+
+        var options = new List<InteractiveOption>
+        {
+            new("reset_yes", "✅ Haan, delete"),
+            new("reset_no",  "❌ Nahi, keep")
+        };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = resetSession.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleResetConfirmAsync(
+        Student student, ChatSession resetSession, string text, CancellationToken ct)
+    {
+        // Persist the inbound reply BEFORE we potentially destroy everything.
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = resetSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var t = text.Trim().ToLowerInvariant();
+        var confirmed = t is "reset_yes" or "yes" or "haan" or "हाँ" or "haan delete" or "haan, delete" or "✅";
+
+        if (!confirmed)
+        {
+            // Either an explicit "no" tap or unrelated text. Either way, drop
+            // the confirm session and let the next message flow through normal
+            // dispatch (we DON'T forward `text` as the student's next intent —
+            // they may have just been confused).
+            resetSession.Status = SessionStatus.Abandoned;
+            await _db.SaveChangesAsync(ct);
+
+            var keep = student.PreferredLanguage == PreferredLanguage.English
+                ? "OK, your SkillKite data is safe. 🪁 Carry on whenever you're ready."
+                : "Theek hai — aapka data safe hai. 🪁 Jab time mile tab continue karna.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, keep, ct));
+
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = resetSession.Id,
+                Role = MessageRole.Assistant,
+                Content = keep
+            });
+            await _db.SaveChangesAsync(ct);
+            return;
+        }
+
+        // Confirmed delete. Capture the few things we need before the wipe.
+        var studentId = student.Id;
+        var phone = student.Phone;
+        var name = student.Name ?? "friend";
+        var preferredLang = student.PreferredLanguage;
+
+        // Send confirmation FIRST — once we delete the Student row, the FK cascade
+        // takes ChatSessions and ChatMessages with it, so we can't persist a
+        // reply after. The outbound text via WhatsApp doesn't need DB persistence.
+        var done = preferredLang == PreferredLanguage.English
+            ? $"Done {name}. Every chat, roadmap, and profile detail I had on you is gone. 🪁\n\nIf you ever want help again — just say Hi. We'll start completely fresh."
+            : $"Done {name}. Saari chats, roadmaps aur profile sab delete ho gayi. 🪁\n\nKabhi bhi help chahiye ho — bas Hi bhejna, ekdum naya start karenge.";
+        await TrySendAsync(() => _messaging.SendTextAsync(phone, done, ct));
+
+        // FK cascade: deleting Student takes ChatSessions → ChatMessages and
+        // Roadmaps with it (per AppDbContext config).
+        _db.Students.Remove(student);
+        await _db.SaveChangesAsync(ct);
+
+        // Now the on-disk PDFs.
+        try { await _pdf.DeletePdfsForStudentAsync(studentId, ct); }
+        catch (Exception ex) { _log.LogWarning(ex, "PDF cleanup failed during reset for student {Id} (DB rows already deleted)", studentId); }
+
+        _log.LogInformation("Student {Id} reset their data (phone hash {Hash})",
+            studentId, phone.GetHashCode());
     }
 
     // ============================================================================

@@ -17,4 +17,12 @@ public interface IRoadmapGenerator
     /// sectioned option lists with consistent labelled blocks per option.
     /// </summary>
     Task<string> GenerateGuideAsync(Student student, StudentGuide guide, CancellationToken ct = default);
+
+    /// <summary>
+    /// Deletes every PDF on disk that belongs to a specific student. Called as
+    /// part of the user-initiated "reset my data" flow. Best-effort — silently
+    /// swallows per-file IO errors so a few permission glitches don't block
+    /// the rest of the wipe.
+    /// </summary>
+    Task DeletePdfsForStudentAsync(Guid studentId, CancellationToken ct = default);
 }

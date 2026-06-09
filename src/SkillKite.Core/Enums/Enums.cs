@@ -36,6 +36,14 @@ public enum SessionStatus
     /// the rating is captured.
     /// </summary>
     AwaitingFeedback,
+    /// <summary>
+    /// Student typed a "delete my data" / "reset" intent. Bot sent 2 buttons
+    /// (✅ Yes, delete / ❌ No, keep). On Yes, we wipe their ChatMessages,
+    /// ChatSessions, Roadmaps, and the Student row itself (cascading) + their
+    /// PDFs on disk. On No or any other free text, we abandon this transient
+    /// session and fall back to normal dispatch.
+    /// </summary>
+    AwaitingResetConfirm,
     Completed,
     Abandoned
 }

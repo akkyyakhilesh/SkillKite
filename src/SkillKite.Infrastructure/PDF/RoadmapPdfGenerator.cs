@@ -216,4 +216,22 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         var publicUrl = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}";
         return Task.FromResult(publicUrl);
     }
+
+    public Task DeletePdfsForStudentAsync(Guid studentId, CancellationToken ct = default)
+    {
+        var dir = _opts.OutputDirectory;
+        if (!Directory.Exists(dir)) return Task.CompletedTask;
+
+        // Both roadmap PDFs (roadmap_<studentId>_<ts>.pdf) and guide PDFs
+        // (guide_<flow>_<studentId>_<ts>.pdf) embed the student id in their
+        // filename, written via Guid.ToString("N") — 32 hex chars, no dashes.
+        var idTag = studentId.ToString("N");
+
+        foreach (var file in Directory.EnumerateFiles(dir, $"*{idTag}*.pdf"))
+        {
+            try { File.Delete(file); }
+            catch { /* best-effort — DB row goes away regardless */ }
+        }
+        return Task.CompletedTask;
+    }
 }
