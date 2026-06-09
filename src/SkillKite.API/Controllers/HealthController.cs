@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillKite.Core.Enums;
@@ -71,6 +72,55 @@ public class HealthController : ControllerBase
         var newStudentsLast7d = await _db.Students.CountAsync(s => s.CreatedAt >= since, ct);
         var roadmapsLast7d = await _db.Roadmaps.CountAsync(r => r.CreatedAt >= since, ct);
 
+        // Feedback ratings per flow. We don't have a Feedback table —
+        // rating is stored as a string key in ChatSession.AssessmentDataJson
+        // ("feedbackRating" = "Useful"/"Ok"/"NotUseful"/"Skipped"). Pull the
+        // raw payload + flowType for any session that has a rating, then
+        // bucket in memory (small N for the foreseeable future; if it grows
+        // past tens of thousands we'll move to a generated column).
+        // Pull JSON for all completed sessions; filter for those carrying a
+        // feedbackRating in memory. EF Core can't translate Contains() on a
+        // jsonb column to SQL LIKE (jsonb doesn't support it), and we don't
+        // want a Postgres-specific raw query in a portable controller. At
+        // tens of thousands of sessions this is still cheap.
+        var allCompletedData = await _db.ChatSessions
+            .Where(s => s.Status == SessionStatus.Completed)
+            .Select(s => s.AssessmentDataJson)
+            .ToListAsync(ct);
+
+        var feedback = new Dictionary<string, Dictionary<string, int>>();
+        foreach (var json in allCompletedData)
+        {
+            if (string.IsNullOrWhiteSpace(json) || json == "{}") continue;
+            string flow = "unknown", rating = "Skipped";
+            bool hasRating = false;
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.ValueKind != JsonValueKind.Object) continue;
+                if (doc.RootElement.TryGetProperty("flowType", out var f) && f.ValueKind == JsonValueKind.String)
+                    flow = f.GetString() ?? "unknown";
+                if (doc.RootElement.TryGetProperty("feedbackRating", out var r) && r.ValueKind == JsonValueKind.String)
+                {
+                    rating = r.GetString() ?? "Skipped";
+                    hasRating = true;
+                }
+            }
+            catch { continue; }
+
+            if (!hasRating) continue;
+
+            if (!feedback.TryGetValue(flow, out var bucket))
+            {
+                bucket = new Dictionary<string, int>
+                {
+                    ["Useful"] = 0, ["Ok"] = 0, ["NotUseful"] = 0, ["Skipped"] = 0
+                };
+                feedback[flow] = bucket;
+            }
+            if (bucket.ContainsKey(rating)) bucket[rating]++;
+        }
+
         return Ok(new
         {
             totals = new
@@ -86,6 +136,7 @@ public class HealthController : ControllerBase
                 newStudents = newStudentsLast7d,
                 roadmaps = roadmapsLast7d
             },
+            feedback,  // { "career": {Useful, Ok, NotUseful, Skipped}, "10th": ..., ... }
             utc = DateTime.UtcNow
         });
     }

@@ -124,6 +124,21 @@ public class AssessmentOrchestrator
             return;
         }
 
+        // Fourth check: did we just deliver a PDF and ask for feedback?
+        // (Session is parked in AwaitingFeedback until they tap a button or
+        // type something; either way we capture a rating and move to Completed.)
+        var awaitingFeedback = await _db.ChatSessions
+            .Include(s => s.Messages)
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingFeedback)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingFeedback is not null)
+        {
+            await HandleFeedbackAsync(student, awaitingFeedback, text, ct);
+            return;
+        }
+
         var session = await _db.ChatSessions
             .Include(s => s.Messages)
             .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.Active)
@@ -835,10 +850,6 @@ public class AssessmentOrchestrator
     private async Task GenerateAndDeliverRoadmapAsync(
         Student student, ChatSession session, string? chosenCareerTitle, CancellationToken ct)
     {
-        session.Status = SessionStatus.Completed;
-        session.CompletedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync(ct);
-
         var lang = student.PreferredLanguage;
         var waitMsg = lang == PreferredLanguage.English
             ? "🪁 Got it! Cooking up your personalized roadmap now — give me about a minute. A good plan needs a little thought!"
@@ -873,10 +884,17 @@ public class AssessmentOrchestrator
                 "Your SkillKite roadmap 🪁",
                 $"SkillKite_Roadmap_{student.Name ?? "student"}.pdf",
                 ct));
+
+            // PDF delivered — park session in AwaitingFeedback and send the
+            // 3-button rating prompt. Old behaviour (immediately marking
+            // Completed before generation) hid silent failures; that's gone.
+            await SendFeedbackPromptAsync(student, session, ct);
         }
         catch (Exception ex)
         {
             _log.LogError(ex, "Roadmap generation failed for student {Id}", student.Id);
+            session.Status = SessionStatus.Abandoned;
+            await _db.SaveChangesAsync(ct);
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
                 "Sorry yaar, roadmap generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
         }
@@ -1031,10 +1049,6 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateTenthGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            session.Status = SessionStatus.Completed;
-            session.CompletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync(ct);
-
             var summary = $"🎯 *Aapki 10th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein saare options labelled hain — padh kar parents/teachers se discuss karo.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
@@ -1050,10 +1064,15 @@ public class AssessmentOrchestrator
                 Content = summary
             });
             await _db.SaveChangesAsync(ct);
+
+            // PDF delivered → ask for feedback. Session moves to AwaitingFeedback.
+            await SendFeedbackPromptAsync(student, session, ct);
         }
         catch (Exception ex)
         {
             _log.LogError(ex, "10th-flow guide generation failed for student {Id}", student.Id);
+            session.Status = SessionStatus.Abandoned;
+            await _db.SaveChangesAsync(ct);
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
                 "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
         }
@@ -1305,10 +1324,6 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateTwelfthGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            session.Status = SessionStatus.Completed;
-            session.CompletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync(ct);
-
             var summary = $"🎯 *Aapki 12th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein har option detailed hai — padh kar parents/teachers se discuss karo.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
@@ -1322,10 +1337,15 @@ public class AssessmentOrchestrator
                 SessionId = session.Id, Role = MessageRole.Assistant, Content = summary
             });
             await _db.SaveChangesAsync(ct);
+
+            // PDF delivered → ask for feedback. Session moves to AwaitingFeedback.
+            await SendFeedbackPromptAsync(student, session, ct);
         }
         catch (Exception ex)
         {
             _log.LogError(ex, "12th-flow guide generation failed for student {Id}", student.Id);
+            session.Status = SessionStatus.Abandoned;
+            await _db.SaveChangesAsync(ct);
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
                 "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
         }
@@ -1516,10 +1536,6 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateSkillUpgradeGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            session.Status = SessionStatus.Completed;
-            session.CompletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync(ct);
-
             var summary = $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein skills, next roles, side moves — sab detailed hai. 3 mahine ke andar ek skill deeply seekho.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
@@ -1533,10 +1549,15 @@ public class AssessmentOrchestrator
                 SessionId = session.Id, Role = MessageRole.Assistant, Content = summary
             });
             await _db.SaveChangesAsync(ct);
+
+            // PDF delivered → ask for feedback. Session moves to AwaitingFeedback.
+            await SendFeedbackPromptAsync(student, session, ct);
         }
         catch (Exception ex)
         {
             _log.LogError(ex, "Upskill-flow guide generation failed for student {Id}", student.Id);
+            session.Status = SessionStatus.Abandoned;
+            await _db.SaveChangesAsync(ct);
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
                 "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
         }
@@ -1686,5 +1707,121 @@ public class AssessmentOrchestrator
                 _                          => PreferredLanguage.Hindi,
             };
         }
+    }
+
+    // ============================================================================
+    // Post-delivery feedback prompt (added 2026-06-09)
+    //
+    // After ANY successful PDF delivery (career roadmap, 10th guide, 12th guide,
+    // upskill guide), we send 3 reply buttons asking "kaisi lagi?". The session
+    // sits in AwaitingFeedback until the student taps a button OR types something
+    // else.
+    //
+    //   - Button tap → save rating, send ack, mark Completed.
+    //   - Free text  → save "Skipped" rating, mark Completed, forward to the
+    //                  existing post-roadmap chat handler so the student gets
+    //                  a real reply.
+    //
+    // Rating + timestamp are stored in ChatSession.AssessmentDataJson under
+    // "feedbackRating" / "feedbackAt" — no schema migration needed.
+    // /api/stats reads from there to compute distributions.
+    // ============================================================================
+
+    /// <summary>
+    /// Call this AFTER a PDF has been sent successfully to the student. Marks
+    /// the session AwaitingFeedback and sends the 3-button prompt.
+    /// </summary>
+    private async Task SendFeedbackPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        session.Status = SessionStatus.AwaitingFeedback;
+        await _db.SaveChangesAsync(ct);
+
+        var body = "🪁 Yeh guide kaisi lagi?\n\nEk tap se feedback de do — agle student ke liye PDF aur improve karenge.";
+        var options = new List<InteractiveOption>
+        {
+            new("fb_useful",    "👍 Useful"),
+            new("fb_ok",        "😐 Theek hai"),
+            new("fb_notuseful", "👎 Improve karo")
+        };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Student replied while session was in AwaitingFeedback. Interpret as
+    /// rating button tap or free text (= Skipped + forward to post-roadmap chat).
+    /// </summary>
+    private async Task HandleFeedbackAsync(Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var (rating, isButtonTap) = NormaliseFeedback(text);
+
+        // Persist rating + timestamp in the session's assessment data blob.
+        session.AssessmentDataJson = WriteField(session,
+            ("feedbackRating", rating.ToString()),
+            ("feedbackAt",     DateTime.UtcNow.ToString("o")));
+        session.Status = SessionStatus.Completed;
+        session.CompletedAt ??= DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+
+        if (isButtonTap)
+        {
+            var name = student.Name ?? "friend";
+            var ack = rating switch
+            {
+                FeedbackRating.Useful =>
+                    $"Thanks {name}! 🪁 Apna roadmap save rakhna — kabhi bhi question ho toh bas message kar dena.",
+                FeedbackRating.Ok =>
+                    $"Thanks {name}! 😊 Specific kya improve karein? Ek line mein bata sakte ho — ya bas next se start karo, hum dhyan rakhenge.",
+                FeedbackRating.NotUseful =>
+                    $"Sorry yaar 🙏 — kya specifically miss laga? Ek line mein bata do toh main re-generate kar sakta hoon ya kuch aur try karenge.",
+                _ => "Thanks!"
+            };
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ack, ct));
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id,
+                Role = MessageRole.Assistant,
+                Content = ack
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+        else
+        {
+            // They typed real content instead of tapping. Forward to post-roadmap chat
+            // so they get a meaningful reply (Q&A about their roadmap). Rating already
+            // saved as "Skipped" above. We re-route the SAME inbound text through the
+            // existing handler — no duplicate persistence (HandlePostRoadmapAsync also
+            // appends a user message, but that's the SAME content for the same session
+            // — duplicate by design, gives clean audit trail).
+            await HandlePostRoadmapAsync(student, session, text, ct);
+        }
+    }
+
+    private static (FeedbackRating rating, bool isButtonTap) NormaliseFeedback(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        return t switch
+        {
+            "fb_useful"    => (FeedbackRating.Useful,    true),
+            "fb_ok"        => (FeedbackRating.Ok,        true),
+            "fb_notuseful" => (FeedbackRating.NotUseful, true),
+            _              => (FeedbackRating.Skipped,   false)
+        };
     }
 }

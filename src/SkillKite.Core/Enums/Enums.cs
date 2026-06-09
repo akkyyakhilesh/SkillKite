@@ -20,9 +20,32 @@ public enum SessionStatus
     /// re-assessment). Next inbound message routes to the chosen path.
     /// </summary>
     AwaitingReturnChoice,
+    /// <summary>
+    /// PDF / guide just delivered. Bot sent 3 feedback buttons
+    /// (👍 Useful / 😐 OK / 👎 Not useful). Next inbound message is interpreted
+    /// as either a button tap (saved as rating) or free text (saved as "Skipped"
+    /// rating + routed to post-roadmap chat). Session moves to Completed after
+    /// the rating is captured.
+    /// </summary>
+    AwaitingFeedback,
     Completed,
     Abandoned
 }
+
+/// <summary>
+/// What a student said about their generated roadmap/guide via the post-PDF
+/// 3-button prompt. Stored in ChatSession.AssessmentDataJson under
+/// "feedbackRating" so we don't have to alter the schema.
+/// </summary>
+public enum FeedbackRating
+{
+    Useful,
+    Ok,
+    NotUseful,
+    /// <summary>Student ignored the buttons (e.g. typed something else, or never replied).</summary>
+    Skipped
+}
+
 public enum MessageRole { User, Assistant, System }
 public enum RoadmapStatus { Active, Completed, Abandoned }
 public enum ProgressStatus { Pending, InProgress, Completed, Skipped }
