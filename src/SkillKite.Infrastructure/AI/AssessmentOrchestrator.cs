@@ -1625,21 +1625,41 @@ public class AssessmentOrchestrator
     private async Task SendUpskillFieldPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
         var name = student.Name ?? "friend";
-        var body = $"Nice to meet you, {name}! 🙌\n\nAap abhi *kaunse field* mein kaam karte ho? Neeche se choose karo:";
-        var options = new List<InteractiveOption>
-        {
-            new("software_it",      "💻 Software / IT",     "Dev, QA, DevOps, SRE"),
-            new("data_analytics",   "📊 Data / Analytics",  "Analyst, DS, DE"),
-            new("design_creative",  "🎨 Design / Creative", "UI/UX, graphic, video"),
-            new("content_marketing","📝 Content / Marketing","Writer, SEO, social"),
-            new("banking_finance",  "🏦 Banking / Finance", "Bank, fintech, accounting"),
-            new("healthcare",       "🏥 Healthcare",         "Nurse, lab, pharma, hospital"),
-            new("teaching_edu",     "🎓 Teaching / Edu",    "School, coaching, ed-tech"),
-            new("ops_support",      "🛠️ Ops / Support",     "Customer support, ops, logistics"),
-            new("other",            "🤷 Other / Mixed",     "Kuch aur — bot decide karega")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? $"Nice to meet you, {name}! 🙌\n\nWhich *field* are you currently working in? Pick one below:"
+            : $"Nice to meet you, {name}! 🙌\n\nAap abhi *kaunse field* mein kaam karte ho? Neeche se choose karo:";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("software_it",       "💻 Software / IT",      "Dev, QA, DevOps, SRE"),
+                new("data_analytics",    "📊 Data / Analytics",   "Analyst, DS, DE"),
+                new("design_creative",   "🎨 Design / Creative",  "UI/UX, graphic, video"),
+                new("content_marketing", "📝 Content / Marketing","Writer, SEO, social"),
+                new("banking_finance",   "🏦 Banking / Finance",  "Bank, fintech, accounting"),
+                new("healthcare",        "🏥 Healthcare",          "Nurse, lab, pharma, hospital"),
+                new("teaching_edu",      "🎓 Teaching / Edu",     "School, coaching, ed-tech"),
+                new("ops_support",       "🛠️ Ops / Support",      "Customer support, ops, logistics"),
+                new("other",             "🤷 Other / Mixed",      "Something else — let the bot decide")
+            }
+            : new List<InteractiveOption>
+            {
+                new("software_it",       "💻 Software / IT",      "Dev, QA, DevOps, SRE"),
+                new("data_analytics",    "📊 Data / Analytics",   "Analyst, DS, DE"),
+                new("design_creative",   "🎨 Design / Creative",  "UI/UX, graphic, video"),
+                new("content_marketing", "📝 Content / Marketing","Writer, SEO, social"),
+                new("banking_finance",   "🏦 Banking / Finance",  "Bank, fintech, accounting"),
+                new("healthcare",        "🏥 Healthcare",          "Nurse, lab, pharma, hospital"),
+                new("teaching_edu",      "🎓 Teaching / Edu",     "School, coaching, ed-tech"),
+                new("ops_support",       "🛠️ Ops / Support",      "Customer support, ops, logistics"),
+                new("other",             "🤷 Other / Mixed",      "Kuch aur — bot decide karega")
+            };
+
         await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one", "Aapka field", options, ct));
+            student.Phone, body, "Choose one",
+            english ? "Your field" : "Aapka field",
+            options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1650,18 +1670,35 @@ public class AssessmentOrchestrator
 
     private async Task SendUpskillGoalPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var body = "Got it 👍\n\n*Aage kya chahiye?* Neeche se choose karo:";
-        var options = new List<InteractiveOption>
-        {
-            new("higher_salary_same", "💰 Same field, higher salary", "Promotion / better company"),
-            new("switch_field",       "🔀 Switch to new field",       "Pivot — naya domain"),
-            new("management",         "👔 Management track",          "Lead / EM / people mgr"),
-            new("freelance",          "🚀 Freelance / own thing",     "Consulting / startup"),
-            new("abroad",             "🌍 Remote / abroad",            "Global companies / visa route"),
-            new("not_sure",           "🤷 Not sure — sab options",     "Show me everything")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Got it 👍\n\n*What do you want next?* Pick one below:"
+            : "Got it 👍\n\n*Aage kya chahiye?* Neeche se choose karo:";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("higher_salary_same", "💰 Higher salary",        "Promotion / better company"),
+                new("switch_field",       "🔀 Switch fields",        "Pivot to a new domain"),
+                new("management",         "👔 Management track",     "Lead / EM / people manager"),
+                new("freelance",          "🚀 Freelance / own thing","Consulting / startup"),
+                new("abroad",             "🌍 Remote / abroad",      "Global companies / visa route"),
+                new("not_sure",           "🤷 Show me all",          "Not sure — show everything")
+            }
+            : new List<InteractiveOption>
+            {
+                new("higher_salary_same", "💰 Same field, higher salary", "Promotion / better company"),
+                new("switch_field",       "🔀 Switch to new field",       "Pivot — naya domain"),
+                new("management",         "👔 Management track",          "Lead / EM / people mgr"),
+                new("freelance",          "🚀 Freelance / own thing",     "Consulting / startup"),
+                new("abroad",             "🌍 Remote / abroad",            "Global companies / visa route"),
+                new("not_sure",           "🤷 Not sure — sab options",     "Show me everything")
+            };
+
         await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one", "Aapka next goal", options, ct));
+            student.Phone, body, "Choose one",
+            english ? "Your next goal" : "Aapka next goal",
+            options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1672,7 +1709,10 @@ public class AssessmentOrchestrator
 
     private async Task DeliverSkillUpgradeGuideAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized upskill guide ban rahi hai — ek minute do mujhe.";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var wait = english
+            ? "Got everything I need! 🪁 Generating your personalized upskill guide — give me about a minute."
+            : "Bas mil gaya sab kuch! 🪁 Aapki personalized upskill guide ban rahi hai — ek minute do mujhe.";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1685,7 +1725,9 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateSkillUpgradeGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            var summary = $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein skills, next roles, side moves — sab detailed hai. 3 mahine ke andar ek skill deeply seekho.";
+            var summary = english
+                ? $"🎯 *Your skill-upgrade guide is ready!*\n\n{guide.Greeting}\n\nThe PDF has all the skills, next roles and side moves laid out in detail. In the next 3 months, learn one of these skills deeply."
+                : $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein skills, next roles, side moves — sab detailed hai. 3 mahine ke andar ek skill deeply seekho.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
                 student.Phone, pdfUrl,
@@ -1707,8 +1749,10 @@ public class AssessmentOrchestrator
             _log.LogError(ex, "Upskill-flow guide generation failed for student {Id}", student.Id);
             session.Status = SessionStatus.Abandoned;
             await _db.SaveChangesAsync(ct);
-            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+            var err = english
+                ? "Sorry — something went wrong while generating your guide. Please try again in a bit. 🙏"
+                : "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, err, ct));
         }
     }
 
