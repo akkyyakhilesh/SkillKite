@@ -1729,14 +1729,25 @@ public class AssessmentOrchestrator
 
     /// <summary>
     /// Call this AFTER a PDF has been sent successfully to the student. Marks
-    /// the session AwaitingFeedback and sends the 3-button prompt.
+    /// the session AwaitingFeedback immediately (so any free-text the student
+    /// sends during the delay window routes to the feedback handler), then
+    /// waits FeedbackPromptDelay so the PDF has time to actually reach the
+    /// student's phone via Meta's relay, then sends the 3-button prompt.
     /// </summary>
     private async Task SendFeedbackPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
         session.Status = SessionStatus.AwaitingFeedback;
         await _db.SaveChangesAsync(ct);
 
-        var body = "🪁 Yeh guide kaisi lagi?\n\nEk tap se feedback de do — agle student ke liye PDF aur improve karenge.";
+        // WhatsApp Cloud API returns immediately on SendDocumentAsync but Meta's
+        // relay takes 5–30 seconds to actually fetch + push the PDF to the
+        // student's phone (longer on slower Tier 2/3 networks). Without this
+        // delay, the feedback prompt appears before the PDF finishes downloading
+        // — student ends up rating something they haven't read (Shivani, 06-09).
+        try { await Task.Delay(FeedbackPromptDelay, ct); }
+        catch (TaskCanceledException) { /* shutdown — still try to send the prompt below */ }
+
+        var body = "🪁 PDF padh ke kaisi lagi batao — jab time mile tab ek tap kar dena.\n\nAapka feedback se agle student ke liye PDF aur improve karenge.";
         var options = new List<InteractiveOption>
         {
             new("fb_useful",    "👍 Useful"),
@@ -1754,6 +1765,13 @@ public class AssessmentOrchestrator
         });
         await _db.SaveChangesAsync(ct);
     }
+
+    /// <summary>
+    /// How long to wait between PDF delivery and the feedback button prompt.
+    /// 25s covers Meta's typical PDF relay latency (5-30s) and gives the
+    /// student a few seconds to start reading before being asked to rate.
+    /// </summary>
+    private static readonly TimeSpan FeedbackPromptDelay = TimeSpan.FromSeconds(25);
 
     /// <summary>
     /// Student replied while session was in AwaitingFeedback. Interpret as
