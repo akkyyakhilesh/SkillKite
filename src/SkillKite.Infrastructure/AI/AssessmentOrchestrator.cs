@@ -397,12 +397,22 @@ public class AssessmentOrchestrator
             ? $"Welcome back, {name}! 🪁\n\nYou already have a SkillKite roadmap. What would you like to do today?"
             : $"Welcome back, {name}! 🪁\n\nTumhare paas already ek SkillKite roadmap hai. Kya karna chahti/chahte ho aaj?";
 
-        var options = new List<InteractiveOption>
-        {
-            new("return_chat",   "📖 Pehle wale par baat"),
-            new("return_reroll", "🔄 Fresh career options"),
-            new("return_new",    "🆕 Naya assessment")
-        };
+        // Reply button titles cap at 20 visible characters on WhatsApp — emojis
+        // included. Anything longer gets silently truncated mid-word. Keep
+        // labels short and respect the student's chosen language.
+        var options = lang == PreferredLanguage.English
+            ? new List<InteractiveOption>
+            {
+                new("return_chat",   "📖 Discuss roadmap"),
+                new("return_reroll", "🔄 New options"),
+                new("return_new",    "🆕 Fresh start")
+            }
+            : new List<InteractiveOption>
+            {
+                new("return_chat",   "📖 Purana chat"),
+                new("return_reroll", "🔄 Naye options"),
+                new("return_new",    "🆕 Naya plan")
+            };
 
         await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
 
