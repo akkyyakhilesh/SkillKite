@@ -1867,29 +1867,34 @@ public class AssessmentOrchestrator
     private static bool IsResetIntent(string text)
     {
         var t = text.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(t)) return false;
 
-        // Exact-match short phrases
-        switch (t)
+        // Skip button-id replies — they're underscore-prefixed and never contain
+        // spaces. Stops "reset_yes" / "reset_no" from re-triggering the intent,
+        // and stops "fb_*" / "lang_*" / "flow_*" / "return_*" from matching.
+        if (!t.Contains(' '))
         {
-            case "reset":
-            case "delete my data":
-            case "delete data":
-            case "wipe my data":
-            case "clear my data":
-            case "forget me":
-            case "reset karo":
-            case "data delete karo":
-            case "mera data delete karo":
-            case "data hatao":
-            case "data delete":
-                return true;
+            if (t.StartsWith("fb_") || t.StartsWith("lang_")
+                || t.StartsWith("flow_") || t.StartsWith("return_")
+                || t.StartsWith("reset_"))
+                return false;
         }
 
+        // Substring matches — covers "Mughe reset karna hai", "I want to reset
+        // my data", "Bhai reset kar do please", etc. Plus the explicit phrases.
+        if (t.Contains("reset"))         return true;
+        if (t.Contains("delete my data")) return true;
+        if (t.Contains("delete data"))   return true;
+        if (t.Contains("data delete"))   return true;
+        if (t.Contains("data hatao"))    return true;
+        if (t.Contains("forget me"))     return true;
+        if (t.Contains("wipe my data"))  return true;
+        if (t.Contains("clear my data")) return true;
+
         // Devanagari variants
-        if (text.Contains("रीसेट")) return true;
-        if (text.Contains("डेटा हटाओ")) return true;
-        if (text.Contains("मेरा डेटा हटाओ")) return true;
-        if (text.Contains("डाटा डिलीट")) return true;
+        if (text.Contains("रीसेट"))       return true;
+        if (text.Contains("डेटा हटाओ"))   return true;
+        if (text.Contains("डाटा डिलीट"))  return true;
 
         return false;
     }
