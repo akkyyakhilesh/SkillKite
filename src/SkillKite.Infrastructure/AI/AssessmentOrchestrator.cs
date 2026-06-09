@@ -105,6 +105,16 @@ public class AssessmentOrchestrator
             return;
         }
 
+        // Same-priority "didn't get the PDF" intent. Meta's WhatsApp relay
+        // occasionally fails to deliver documents even when our SendDocumentAsync
+        // call succeeded server-side — caught from Shivani's chat 2026-06-09.
+        // Find the latest PDF on disk for this student and re-send it.
+        if (IsPdfResendIntent(text))
+        {
+            await HandlePdfResendAsync(student, ct);
+            return;
+        }
+
         // First check: is the student in the middle of choosing a career path?
         // (They completed assessment, the bot sent 3 suggestions, and now they're
         // tapping one of the buttons or typing a choice.)
@@ -1057,10 +1067,14 @@ public class AssessmentOrchestrator
 
     private async Task StartTenthFlowAsync(Student student, CancellationToken ct)
     {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var hasName = HasUsableName(student);
+        var initialStep = hasName ? "interest" : "name";
+
         var data = new Dictionary<string, string>
         {
             ["flowType"] = "10th",
-            ["step"]     = "name"
+            ["step"]     = initialStep
         };
         var session = new ChatSession
         {
@@ -1071,7 +1085,23 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = student.PreferredLanguage == PreferredLanguage.English
+        if (hasName)
+        {
+            var nm = student.Name!.Trim();
+            var greet = english
+                ? $"Great {nm}! 📚 Let me ask a couple of quick things to suggest the best options after 10th."
+                : $"Bahut accha {nm}! 📚 10th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, greet, ct));
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = greet
+            });
+            await _db.SaveChangesAsync(ct);
+            await SendTenthInterestPromptAsync(student, session, ct);
+            return;
+        }
+
+        var ask = english
             ? "Great! 📚 To suggest the best options after 10th, I'd like to know a few things about you.\n\nFirst — *what's your name?*"
             : "Bahut accha! 📚 10th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
@@ -1259,10 +1289,14 @@ public class AssessmentOrchestrator
 
     private async Task StartTwelfthFlowAsync(Student student, CancellationToken ct)
     {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var hasName = HasUsableName(student);
+        var initialStep = hasName ? "stream" : "name";
+
         var data = new Dictionary<string, string>
         {
             ["flowType"] = "12th",
-            ["step"]     = "name"
+            ["step"]     = initialStep
         };
         var session = new ChatSession
         {
@@ -1273,7 +1307,23 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = student.PreferredLanguage == PreferredLanguage.English
+        if (hasName)
+        {
+            var nm = student.Name!.Trim();
+            var greet = english
+                ? $"Great {nm}! 🎯 Let me ask a couple of quick things to suggest the best options after 12th."
+                : $"Bahut accha {nm}! 🎯 12th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, greet, ct));
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = greet
+            });
+            await _db.SaveChangesAsync(ct);
+            await SendTwelfthStreamPromptAsync(student, session, ct);
+            return;
+        }
+
+        var ask = english
             ? "Great! 🎯 To suggest the best options after 12th, I'd like to know a few things about you.\n\nFirst — *what's your name?*"
             : "Bahut accha! 🎯 12th ke baad ke options dekhne ke liye thoda tumhare baare mein janna chahta hoon.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
@@ -1549,12 +1599,50 @@ public class AssessmentOrchestrator
     // assessment, no week-by-week roadmap.
     // ============================================================================
 
+    /// <summary>
+    /// Whether the student.Name field is good enough to greet by, vs. needing to
+    /// ask explicitly. WhatsApp passes a profile name in every incoming webhook
+    /// (used to populate Student.Name on first contact), so most real students
+    /// already have a usable name before they tap any flow. We only re-ask if
+    /// the WhatsApp profile name looks unusable: blank, "iPhone User",
+    /// emoji-only, single-character, or trivially generic.
+    /// </summary>
+    private static bool HasUsableName(Student student)
+    {
+        var n = student.Name?.Trim();
+        if (string.IsNullOrEmpty(n)) return false;
+
+        // Must contain at least 2 contiguous Latin or Devanagari letters.
+        bool anyTwoLetters = false;
+        int run = 0;
+        foreach (var ch in n)
+        {
+            if (char.IsLetter(ch)) { run++; if (run >= 2) { anyTwoLetters = true; break; } }
+            else run = 0;
+        }
+        if (!anyTwoLetters) return false;
+
+        // Reject obvious generic placeholders from WhatsApp.
+        var lower = n.ToLowerInvariant();
+        if (lower is "iphone user" or "user" or "whatsapp user" or "friend") return false;
+
+        return true;
+    }
+
     private async Task StartSkillUpgradeFlowAsync(Student student, CancellationToken ct)
     {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var hasName = HasUsableName(student);
+
+        // If we already know their name (from WhatsApp profile or a prior session),
+        // skip the redundant "what's your name?" question and go straight to the
+        // field selector — saves one round-trip and feels more natural.
+        var initialStep = hasName ? "field" : "name";
+
         var data = new Dictionary<string, string>
         {
             ["flowType"] = "upskill",
-            ["step"]     = "name"
+            ["step"]     = initialStep
         };
         var session = new ChatSession
         {
@@ -1565,7 +1653,24 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        var ask = student.PreferredLanguage == PreferredLanguage.English
+        if (hasName)
+        {
+            // Personalised greeting → straight to field selector
+            var name = student.Name!.Trim();
+            var greet = english
+                ? $"Great choice {name}! 🌱 You're already working — let's plan the next rung."
+                : $"Sahi choice {name}! 🌱 Aap already kaam kar rahe ho — chaliye next rung ke liye plan banate hain.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, greet, ct));
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = greet
+            });
+            await _db.SaveChangesAsync(ct);
+            await SendUpskillFieldPromptAsync(student, session, ct);
+            return;
+        }
+
+        var ask = english
             ? "Great choice! 🌱 You're already working — let's plan the next rung.\n\nFirst — *what's your name?*"
             : "Sahi choice! 🌱 Aap already kaam kar rahe ho — chaliye next rung ke liye plan banate hain.\n\nPehle batao — *aapka naam kya hai?*";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ask, ct));
@@ -1596,6 +1701,21 @@ public class AssessmentOrchestrator
                 student.Name = name;
                 session.AssessmentDataJson = WriteField(session, ("name", name), ("step", "field"));
                 await _db.SaveChangesAsync(ct);
+
+                // Quick warmth before the field prompt (since the field prompt
+                // body itself no longer says "Nice to meet you, X" — that would
+                // have double-greeted the skip-name path).
+                var english = student.PreferredLanguage == PreferredLanguage.English;
+                var ack = english
+                    ? $"Nice to meet you, {name}! 🙌"
+                    : $"Nice to meet you, {name}! 🙌";
+                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ack, ct));
+                _db.ChatMessages.Add(new ChatMessage
+                {
+                    SessionId = session.Id, Role = MessageRole.Assistant, Content = ack
+                });
+                await _db.SaveChangesAsync(ct);
+
                 await SendUpskillFieldPromptAsync(student, session, ct);
                 return;
             }
@@ -1624,11 +1744,15 @@ public class AssessmentOrchestrator
 
     private async Task SendUpskillFieldPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var name = student.Name ?? "friend";
         var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        // No more "Nice to meet you, X!" prefix — the preceding greeting (either
+        // the "Great choice {name}" personalised one, or the post-name-entry
+        // acknowledgement) already did that. Going straight to the question
+        // avoids the back-to-back-greeting awkwardness we caught on 2026-06-09.
         var body = english
-            ? $"Nice to meet you, {name}! 🙌\n\nWhich *field* are you currently working in? Pick one below:"
-            : $"Nice to meet you, {name}! 🙌\n\nAap abhi *kaunse field* mein kaam karte ho? Neeche se choose karo:";
+            ? "Which *field* are you currently working in? Pick one below:"
+            : "*Kaunse field* mein kaam karte ho? Neeche se choose karo:";
 
         var options = english
             ? new List<InteractiveOption>
@@ -2049,6 +2173,113 @@ public class AssessmentOrchestrator
 
         _log.LogInformation("Student {Id} reset their data (phone hash {Hash})",
             studentId, phone.GetHashCode());
+    }
+
+    // ============================================================================
+    // "Didn't get the PDF" resend intent (added 2026-06-09 from Shivani's chat)
+    //
+    // Sometimes Meta's WhatsApp relay drops a document send even though our
+    // server-side call succeeded — the user sees the summary text but no PDF
+    // arrives on their phone. Before this, the only path forward for them was
+    // to redo the whole assessment. Now: type "didn't get pdf" / "pdf nahi mila"
+    // / "send pdf again" → bot looks up their latest generated PDF on disk
+    // and re-sends via WhatsApp.
+    // ============================================================================
+
+    private static bool IsPdfResendIntent(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(t)) return false;
+
+        // Skip button-id replies (avoid lang_/fb_/flow_/return_/reset_ accidentally matching).
+        if (!t.Contains(' '))
+        {
+            if (t.StartsWith("fb_") || t.StartsWith("lang_")
+                || t.StartsWith("flow_") || t.StartsWith("return_")
+                || t.StartsWith("reset_"))
+                return false;
+        }
+
+        // English-y phrasings (substring match — covers natural sentence forms)
+        if (t.Contains("didn't get") && t.Contains("pdf")) return true;
+        if (t.Contains("did not get") && t.Contains("pdf")) return true;
+        if (t.Contains("pdf not received")) return true;
+        if (t.Contains("send pdf") || t.Contains("send the pdf")) return true;
+        if (t.Contains("resend") && t.Contains("pdf")) return true;
+        if (t.Contains("send again") && t.Contains("pdf")) return true;
+        if (t.Contains("no pdf") || t.Contains("missing pdf")) return true;
+        if (t.Contains("where is the pdf") || t.Contains("where's the pdf")) return true;
+
+        // Hinglish
+        if (t.Contains("pdf nahi") && (t.Contains("mila") || t.Contains("aaya") || t.Contains("aayi"))) return true;
+        if (t.Contains("pdf bhejo") || t.Contains("pdf bhej do")) return true;
+        if (t.Contains("pdf dobara") || t.Contains("pdf wapas")) return true;
+        if (t.Contains("pdf send")) return true;
+
+        // Devanagari
+        if (text.Contains("पीडीएफ नहीं")) return true;
+
+        return false;
+    }
+
+    private async Task HandlePdfResendAsync(Student student, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        // Persist messages onto the student's most recent session (any status).
+        // Without a session anchor we'd lose the chat audit trail.
+        var anchorSession = await _db.ChatSessions
+            .Where(s => s.StudentId == student.Id)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        var pdf = _pdf.FindLatestPdfForStudent(student.Id);
+        if (pdf is null)
+        {
+            var none = english
+                ? "I don't have a PDF generated for you yet. Send 'Hi' to start fresh — your guide will be ready in a few minutes."
+                : "Aapka PDF abhi tak generate nahi hua. 'Hi' bhejo, fresh shuru karte hain — guide thodi der mein ready ho jayegi.";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, none, ct));
+            if (anchorSession is not null)
+            {
+                _db.ChatMessages.Add(new ChatMessage
+                {
+                    SessionId = anchorSession.Id,
+                    Role = MessageRole.Assistant,
+                    Content = none
+                });
+                await _db.SaveChangesAsync(ct);
+            }
+            return;
+        }
+
+        var apology = english
+            ? "Sorry — that's frustrating. Resending your PDF now. 🙏 If it still doesn't arrive in 30 seconds, your phone may have a download issue with WhatsApp documents."
+            : "Sorry yaar — irritating hua hoga. PDF dobara bhej raha hoon. 🙏 Agar 30 sec mein bhi na aaye toh phone mein WhatsApp documents ki problem ho sakti hai.";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, apology, ct));
+
+        var caption = pdf.Value.Filename.StartsWith("guide_", StringComparison.OrdinalIgnoreCase)
+            ? "Your SkillKite guide 🪁"
+            : "Your SkillKite roadmap 🪁";
+
+        await TrySendAsync(() => _messaging.SendDocumentAsync(
+            student.Phone, pdf.Value.Url,
+            caption,
+            pdf.Value.Filename,
+            ct));
+
+        if (anchorSession is not null)
+        {
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = anchorSession.Id,
+                Role = MessageRole.Assistant,
+                Content = apology + $"\n[resent PDF: {pdf.Value.Filename}]"
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+
+        _log.LogInformation("Resent PDF {File} to student {Id} on request", pdf.Value.Filename, student.Id);
     }
 
     // ============================================================================

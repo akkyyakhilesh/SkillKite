@@ -25,4 +25,13 @@ public interface IRoadmapGenerator
     /// the rest of the wipe.
     /// </summary>
     Task DeletePdfsForStudentAsync(Guid studentId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Resolves the most recent PDF generated for a student (any flow:
+    /// career roadmap or guide). Returns the public URL (suitable for
+    /// SendDocumentAsync) and an inferred filename. Returns null if no
+    /// PDF exists for them. Used when a student says "didn't get the PDF"
+    /// and we need to resend.
+    /// </summary>
+    (string Url, string Filename)? FindLatestPdfForStudent(Guid studentId);
 }

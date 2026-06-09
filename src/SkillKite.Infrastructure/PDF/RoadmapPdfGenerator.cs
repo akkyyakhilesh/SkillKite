@@ -234,4 +234,21 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         }
         return Task.CompletedTask;
     }
+
+    public (string Url, string Filename)? FindLatestPdfForStudent(Guid studentId)
+    {
+        var dir = _opts.OutputDirectory;
+        if (!Directory.Exists(dir)) return null;
+
+        var idTag = studentId.ToString("N");
+        var latest = Directory.EnumerateFiles(dir, $"*{idTag}*.pdf")
+            .Select(p => new FileInfo(p))
+            .OrderByDescending(fi => fi.LastWriteTimeUtc)
+            .FirstOrDefault();
+
+        if (latest is null) return null;
+
+        var url = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{latest.Name}";
+        return (url, latest.Name);
+    }
 }
