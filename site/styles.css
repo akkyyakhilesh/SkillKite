@@ -390,3 +390,14 @@ footer {
 footer a { color: var(--saffron-light); }
 footer p { margin: 6px 0; }
 .footer-meta { font-size: 13px; opacity: 0.7; }
+.footer-privacy {
+  font-size: 13px;
+  opacity: 0.78;
+  max-width: 540px;
+  margin: 14px auto 4px !important;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.footer-privacy strong { color: var(--saffron-light); font-weight: 600; }
