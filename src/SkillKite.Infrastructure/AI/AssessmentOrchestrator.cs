@@ -1166,18 +1166,33 @@ public class AssessmentOrchestrator
 
     private async Task SendTenthInterestPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var name = student.Name ?? "friend";
-        var body = $"Nice to meet you, {name}! 🙌\n\nAapko *kis cheez mein interest* hai? Neeche se choose karo:";
-        var options = new List<InteractiveOption>
-        {
-            new("science_medical", "🩺 Science / Medical",  "Doctor, Nurse, Lab tech banna hai"),
-            new("science_maths",   "🔢 Science / Maths",    "Engineer, IT, Computer interest hai"),
-            new("commerce",        "📊 Commerce",            "Business, Accounting, CA"),
-            new("arts",            "🎨 Arts / Humanities",   "Teacher, Lawyer, Govt job, Writing"),
-            new("confused",        "🤔 Fix nahi hai",        "Confused — sab options dikhao")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "What *interests* you the most? Pick one below:"
+            : "Aapko *kis cheez mein interest* hai? Neeche se choose karo:";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("science_medical", "🩺 Science / Medical",  "Doctor, Nurse, Lab tech"),
+                new("science_maths",   "🔢 Science / Maths",    "Engineer, IT, Computer Science"),
+                new("commerce",        "📊 Commerce",            "Business, Accounting, CA"),
+                new("arts",            "🎨 Arts / Humanities",   "Teacher, Lawyer, Govt job, Writing"),
+                new("confused",        "🤔 Not sure yet",        "Show me everything")
+            }
+            : new List<InteractiveOption>
+            {
+                new("science_medical", "🩺 Science / Medical",  "Doctor, Nurse, Lab tech banna hai"),
+                new("science_maths",   "🔢 Science / Maths",    "Engineer, IT, Computer interest hai"),
+                new("commerce",        "📊 Commerce",            "Business, Accounting, CA"),
+                new("arts",            "🎨 Arts / Humanities",   "Teacher, Lawyer, Govt job, Writing"),
+                new("confused",        "🤔 Fix nahi hai",        "Confused — sab options dikhao")
+            };
+
         await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one", "Aapka interest", options, ct));
+            student.Phone, body, "Choose one",
+            english ? "Your interest" : "Aapka interest",
+            options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1190,13 +1205,25 @@ public class AssessmentOrchestrator
 
     private async Task SendTenthGoalPromptAsync(Student student, ChatSession session, string interest, CancellationToken ct)
     {
-        var body = "Got it 👍\n\nAap *aage padhna* chahte ho ya *abhi earning start* karni hai?";
-        var options = new List<InteractiveOption>
-        {
-            new("study", "📖 Padhna hai"),
-            new("earn",  "💰 Earning start"),
-            new("both",  "🤔 Dono jaanna hai")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Got it 👍\n\nDo you want to *continue studying* or *start earning soon*?"
+            : "Got it 👍\n\nAap *aage padhna* chahte ho ya *abhi earning start* karni hai?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("study", "📖 Study further"),
+                new("earn",  "💰 Start earning"),
+                new("both",  "🤔 Tell me both")
+            }
+            : new List<InteractiveOption>
+            {
+                new("study", "📖 Padhna hai"),
+                new("earn",  "💰 Earning start"),
+                new("both",  "🤔 Dono jaanna hai")
+            };
+
         await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1209,7 +1236,11 @@ public class AssessmentOrchestrator
 
     private async Task DeliverTenthGuideAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        var wait = english
+            ? "Got everything I need! 🪁 Generating your personalized guide — give me about a minute."
+            : "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1224,7 +1255,9 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateTenthGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            var summary = $"🎯 *Aapki 10th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein saare options labelled hain — padh kar parents/teachers se discuss karo.";
+            var summary = english
+                ? $"🎯 *Your after-10th guide is ready!*\n\n{guide.Greeting}\n\nEvery option in the PDF is labelled — read through it and discuss with your parents / teachers."
+                : $"🎯 *Aapki 10th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein saare options labelled hain — padh kar parents/teachers se discuss karo.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
                 student.Phone, pdfUrl,
@@ -1248,8 +1281,10 @@ public class AssessmentOrchestrator
             _log.LogError(ex, "10th-flow guide generation failed for student {Id}", student.Id);
             session.Status = SessionStatus.Abandoned;
             await _db.SaveChangesAsync(ct);
-            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+            var err = english
+                ? "Sorry — something went wrong while generating your guide. Please try again in a bit. 🙏"
+                : "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, err, ct));
         }
     }
 
@@ -1406,8 +1441,11 @@ public class AssessmentOrchestrator
 
     private async Task SendTwelfthStreamPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var name = student.Name ?? "friend";
-        var body = $"Nice to meet you, {name}! 🙌\n\nAapne 12th mein *kaunsa stream* liya tha? Neeche se choose karo:";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Which *stream* did you take in 12th? Pick one below:"
+            : "Aapne 12th mein *kaunsa stream* liya tha? Neeche se choose karo:";
+
         var options = new List<InteractiveOption>
         {
             new("pcm",      "🔢 PCM",       "Science with Maths"),
@@ -1416,8 +1454,11 @@ public class AssessmentOrchestrator
             new("arts",     "📖 Arts",      "Humanities, Law, UPSC"),
             new("bba",      "💼 BBA / Voc", "Vocational / BBA stream")
         };
+
         await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one", "Aapka stream", options, ct));
+            student.Phone, body, "Choose one",
+            english ? "Your stream" : "Aapka stream",
+            options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1428,13 +1469,25 @@ public class AssessmentOrchestrator
 
     private async Task SendTwelfthGoalPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var body = "Got it 👍\n\nAap *aage padhna* chahte ho ya *job/earning start* karni hai?";
-        var options = new List<InteractiveOption>
-        {
-            new("study", "📖 Padhna hai"),
-            new("earn",  "💰 Job / earning"),
-            new("both",  "🤔 Dono jaanna hai")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Got it 👍\n\nDo you want to *continue studying* or *start working / earning*?"
+            : "Got it 👍\n\nAap *aage padhna* chahte ho ya *job/earning start* karni hai?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("study", "📖 Study further"),
+                new("earn",  "💰 Job / earning"),
+                new("both",  "🤔 Tell me both")
+            }
+            : new List<InteractiveOption>
+            {
+                new("study", "📖 Padhna hai"),
+                new("earn",  "💰 Job / earning"),
+                new("both",  "🤔 Dono jaanna hai")
+            };
+
         await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1446,7 +1499,19 @@ public class AssessmentOrchestrator
     private async Task SendTwelfthDirectionPromptAsync(
         Student student, ChatSession session, string stream, CancellationToken ct)
     {
-        var body = "Aapke mann mein koi *specific direction* hai? Neeche se choose karo (ya 'sab dikhao' bolo):";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        var body = english
+            ? "Any *specific direction* in mind? Pick one below (or say 'show all'):"
+            : "Aapke mann mein koi *specific direction* hai? Neeche se choose karo (ya 'sab dikhao' bolo):";
+
+        // The "show all" / "sab dikhao" row at the end of every list translates;
+        // the rest of the descriptive sub-labels are mostly English-coded already
+        // (course names, exam codes) so they read fine in both languages.
+        var showAll = english
+            ? new InteractiveOption("not_sure", "🤷 Show me all", "Not sure — show every option")
+            : new InteractiveOption("not_sure", "🤷 Sab dikhao",  "Not sure — show all");
+
         var options = stream switch
         {
             "pcm" => new List<InteractiveOption>
@@ -1456,15 +1521,15 @@ public class AssessmentOrchestrator
                 new("bca",          "💻 BCA",            "Computer Applications"),
                 new("architecture", "🏛️ Architecture",  "B.Arch via NATA"),
                 new("defence",      "🪖 Defence (NDA)", "Army / Navy / Air Force"),
-                new("not_sure",     "🤷 Sab dikhao",    "Not sure — show all")
+                showAll
             },
             "pcb" => new List<InteractiveOption>
             {
-                new("medical",     "🩺 Medical (MBBS/BDS)", "NEET wala route"),
+                new("medical",     "🩺 Medical (MBBS/BDS)", english ? "NEET route" : "NEET wala route"),
                 new("paramedical", "💊 Paramedical",         "Nursing, BPT, BMLT"),
                 new("pharmacy",    "💉 Pharmacy",            "B.Pharm"),
                 new("pure_science","🔬 Pure Science",        "B.Sc Bio / Biotech"),
-                new("not_sure",    "🤷 Sab dikhao",          "Not sure — show all")
+                showAll
             },
             "commerce" => new List<InteractiveOption>
             {
@@ -1473,7 +1538,7 @@ public class AssessmentOrchestrator
                 new("bba",       "💼 BBA / Mgmt",    "Management track"),
                 new("law",       "⚖️ Law (B.Com LLB)", "Integrated law"),
                 new("banking",   "🏦 Banking / Finance", "BFSI sector"),
-                new("not_sure",  "🤷 Sab dikhao",   "Not sure — show all")
+                showAll
             },
             "arts" => new List<InteractiveOption>
             {
@@ -1482,22 +1547,21 @@ public class AssessmentOrchestrator
                 new("mass_comm", "📰 Mass Comm / Media",   "Journalism / PR"),
                 new("design",    "🎨 Design (NID/NIFT)",   "B.Des track"),
                 new("ba_hons",   "📚 BA / BA Hons",        "General degree"),
-                new("not_sure",  "🤷 Sab dikhao",          "Not sure — show all")
+                showAll
             },
             "bba" => new List<InteractiveOption>
             {
                 new("mba",            "🎯 MBA track",         "CAT/MAT/XAT route"),
-                new("entrepreneurship","🚀 Entrepreneurship", "Apna startup"),
-                new("not_sure",       "🤷 Sab dikhao",        "Not sure — show all")
+                new("entrepreneurship","🚀 Entrepreneurship", english ? "Your own startup" : "Apna startup"),
+                showAll
             },
-            _ => new List<InteractiveOption>
-            {
-                new("not_sure", "🤷 Sab dikhao", "Show me all options")
-            }
+            _ => new List<InteractiveOption> { showAll }
         };
 
         await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one", "Direction", options, ct));
+            student.Phone, body, "Choose one",
+            english ? "Direction" : "Direction",
+            options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1508,7 +1572,11 @@ public class AssessmentOrchestrator
 
     private async Task DeliverTwelfthGuideAsync(Student student, ChatSession session, CancellationToken ct)
     {
-        var wait = "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        var wait = english
+            ? "Got everything I need! 🪁 Generating your personalized guide — give me about a minute."
+            : "Bas mil gaya sab kuch! 🪁 Aapki personalized guide ban rahi hai — ek minute do mujhe.";
         await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, wait, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
@@ -1521,7 +1589,9 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateTwelfthGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
-            var summary = $"🎯 *Aapki 12th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein har option detailed hai — padh kar parents/teachers se discuss karo.";
+            var summary = english
+                ? $"🎯 *Your after-12th guide is ready!*\n\n{guide.Greeting}\n\nEvery option in the PDF is laid out in detail — read it and discuss with your parents / teachers."
+                : $"🎯 *Aapki 12th-ke-baad guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein har option detailed hai — padh kar parents/teachers se discuss karo.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
                 student.Phone, pdfUrl,
@@ -1543,8 +1613,10 @@ public class AssessmentOrchestrator
             _log.LogError(ex, "12th-flow guide generation failed for student {Id}", student.Id);
             session.Status = SessionStatus.Abandoned;
             await _db.SaveChangesAsync(ct);
-            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏", ct));
+            var err = english
+                ? "Sorry — something went wrong while generating your guide. Please try again in a bit. 🙏"
+                : "Sorry yaar, guide generate karte time ek dikkat aa gayi. Thodi der baad try karenge. 🙏";
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, err, ct));
         }
     }
 
