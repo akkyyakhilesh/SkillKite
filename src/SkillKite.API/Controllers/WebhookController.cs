@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SkillKite.Core.Interfaces;
@@ -10,6 +11,18 @@ namespace SkillKite.API.Controllers;
 [Route("api/webhook/whatsapp")]
 public class WebhookController : ControllerBase
 {
+    // In-memory dedup of WhatsApp inbound message ids. Meta retries the same
+    // webhook payload if it doesn't receive our 200 in ~5s (Tier 2/3 networks
+    // can be slow). Without this we'd double-process the same message — caught
+    // from Shivani's 06-10 transcript where her "I will check the PDF" arrived
+    // twice at 11:45:25 IST. Single-process app, so a static ConcurrentDictionary
+    // is sufficient; pair each id with insertion time so we can sweep old
+    // entries when the dict crosses a soft cap. WhatsApp message ids look like
+    // "wamid.HBgM..." and are globally unique per send.
+    private static readonly ConcurrentDictionary<string, DateTime> _seenMessageIds = new();
+    private static readonly TimeSpan _seenTtl = TimeSpan.FromMinutes(10);
+    private const int _seenSoftCap = 5_000;
+
     private readonly IMessagingService _messaging;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly WhatsAppOptions _opts;
@@ -52,12 +65,28 @@ public class WebhookController : ControllerBase
 
         var messages = _messaging.ParseIncoming(body).ToList();
 
+        // Drop messages we've already processed (Meta retry). Inbound id is
+        // empty for status callbacks etc. — let those through unchanged since
+        // ParseIncoming already filters to type=text/interactive only.
+        var fresh = new List<Core.Dtos.WhatsAppIncomingMessage>(messages.Count);
+        foreach (var m in messages)
+        {
+            if (!string.IsNullOrEmpty(m.MessageId) &&
+                !_seenMessageIds.TryAdd(m.MessageId, DateTime.UtcNow))
+            {
+                _log.LogInformation("Dropping duplicate WhatsApp message {Id} from {From}", m.MessageId, m.From);
+                continue;
+            }
+            fresh.Add(m);
+        }
+        SweepSeenIfNeeded();
+
         // Always return 200 fast so Meta doesn't retry. The orchestrator runs
         // in a fresh DI scope on a background task — the request scope (and
         // its scoped AppDbContext) is disposed as soon as we return.
         _ = Task.Run(async () =>
         {
-            foreach (var msg in messages)
+            foreach (var msg in fresh)
             {
                 try
                 {
@@ -73,5 +102,16 @@ public class WebhookController : ControllerBase
         }, CancellationToken.None);
 
         return Ok();
+    }
+
+    private static void SweepSeenIfNeeded()
+    {
+        if (_seenMessageIds.Count < _seenSoftCap) return;
+        var cutoff = DateTime.UtcNow - _seenTtl;
+        foreach (var kv in _seenMessageIds)
+        {
+            if (kv.Value < cutoff)
+                _seenMessageIds.TryRemove(kv.Key, out _);
+        }
     }
 }
