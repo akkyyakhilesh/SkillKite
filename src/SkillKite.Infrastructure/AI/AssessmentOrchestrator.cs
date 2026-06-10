@@ -2392,13 +2392,23 @@ public class AssessmentOrchestrator
         try { await Task.Delay(FeedbackPromptDelay, ct); }
         catch (TaskCanceledException) { /* shutdown — still try to send the prompt below */ }
 
-        var body = "🪁 PDF padh ke kaisi lagi batao — jab time mile tab ek tap kar dena.\n\nAapka feedback se agle student ke liye PDF aur improve karenge.";
-        var options = new List<InteractiveOption>
-        {
-            new("fb_useful",    "👍 Useful"),
-            new("fb_ok",        "😐 Theek hai"),
-            new("fb_notuseful", "👎 Improve karo")
-        };
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "🪁 How was the PDF? When you get a moment, tap one below.\n\nYour feedback helps me improve the guide for the next student."
+            : "🪁 PDF padh ke kaisi lagi batao — jab time mile tab ek tap kar dena.\n\nAapka feedback se agle student ke liye PDF aur improve karenge.";
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("fb_useful",    "👍 Useful"),
+                new("fb_ok",        "😐 It's okay"),
+                new("fb_notuseful", "👎 Needs work")
+            }
+            : new List<InteractiveOption>
+            {
+                new("fb_useful",    "👍 Useful"),
+                new("fb_ok",        "😐 Theek hai"),
+                new("fb_notuseful", "👎 Improve karo")
+            };
 
         await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
 
@@ -2445,14 +2455,21 @@ public class AssessmentOrchestrator
         if (isButtonTap)
         {
             var name = student.Name ?? "friend";
-            var ack = rating switch
+            var english = student.PreferredLanguage == PreferredLanguage.English;
+            var ack = (rating, english) switch
             {
-                FeedbackRating.Useful =>
+                (FeedbackRating.Useful, true) =>
+                    $"Thanks {name}! 🪁 Keep your roadmap saved — whenever you have a question, just message me.",
+                (FeedbackRating.Useful, false) =>
                     $"Thanks {name}! 🪁 Apna roadmap save rakhna — kabhi bhi question ho toh bas message kar dena.",
-                FeedbackRating.Ok =>
+                (FeedbackRating.Ok, true) =>
+                    $"Thanks {name}! 😊 What specifically should I improve? One line is enough — or just start with the next step and we'll keep this in mind.",
+                (FeedbackRating.Ok, false) =>
                     $"Thanks {name}! 😊 Specific kya improve karein? Ek line mein bata sakte ho — ya bas next se start karo, hum dhyan rakhenge.",
-                FeedbackRating.NotUseful =>
-                    $"Sorry yaar 🙏 — kya specifically miss laga? Ek line mein bata do toh main re-generate kar sakta hoon ya kuch aur try karenge.",
+                (FeedbackRating.NotUseful, true) =>
+                    "Sorry about that 🙏 — what specifically felt missing? One line and I can re-generate or try a different angle.",
+                (FeedbackRating.NotUseful, false) =>
+                    "Sorry yaar 🙏 — kya specifically miss laga? Ek line mein bata do toh main re-generate kar sakta hoon ya kuch aur try karenge.",
                 _ => "Thanks!"
             };
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, ack, ct));

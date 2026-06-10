@@ -400,6 +400,19 @@ public class ClaudeCareerEngine : ICareerEngine
 
     private static string BuildPostRoadmapSystemPrompt(Student student, GeneratedRoadmap roadmap)
     {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var languageDirective = english
+            ? "REPLY LANGUAGE: Pure professional English throughout. Do not mix Hindi words in. The student picked English upfront because they prefer a fully English experience — keep that promise even AFTER the PDF is delivered."
+            : "REPLY LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English, like how college students in Lucknow, Patna, or Indore actually text. Use Hindi words for warmth ('haan', 'bhai', 'kya'), English for tech and structural terms. Do NOT use Devanagari script — student prefers Latin-script Hinglish.";
+        var openingExample = english
+            ? "\"Welcome back {name}! 🪁 How can I help — got a question on your roadmap, want a fresh roadmap, or shall we kick off Week 1's first step?\""
+            : "\"Welcome back {name}! 🪁 How can I help — koi question hai roadmap pe, naya roadmap chahiye, ya bas Week 1 ka pehla step start karein?\"";
+        var restartConfirmExample = english
+            ? "\"Sure? Your existing roadmap will stay saved — if you start fresh, the old one gets replaced. Confirm?\""
+            : "\"Sure? Tumhara existing roadmap save rahega — naya banaya toh purana replace ho jayega. Confirm karna chahti ho?\"";
+        var restartAckExample = english
+            ? "\"Got it! Pulling 3 fresh career options — give me a minute…\""
+            : "\"Got it! 3 fresh career options nikal raha hoon — ek minute…\"";
         // No more pure Hindi rendering. Hinglish (default) and English both use
         // the primary fields — Claude's prompt already produces content in the
         // student's chosen mode, so the *Hi fields are redundant. Legacy data
@@ -418,6 +431,8 @@ public class ClaudeCareerEngine : ICareerEngine
         assessment under any circumstances unless the student EXPLICITLY confirms
         they want a brand-new one (and you've asked them once to be sure).
 
+        {{languageDirective}}
+
         The student's context:
         - Name: {{student.Name ?? "unknown"}}
         - City: {{student.City ?? "unknown"}}
@@ -434,7 +449,7 @@ public class ClaudeCareerEngine : ICareerEngine
         - Week 1 practice deliverable: {{week1Practice}}
 
         Conversation rules:
-        - Keep the same warm Hinglish voice you had during the assessment.
+        - Keep the same warm voice you had during the assessment, in the language above.
         - Replies are SHORT — 1-3 sentences max.
 
         - FIRST POST-ROADMAP MESSAGE (the very first thing they say after the PDF
@@ -442,11 +457,10 @@ public class ClaudeCareerEngine : ICareerEngine
           this opening turn, your reply should warmly acknowledge them AND make
           the three available paths explicit so they know what's possible. Example
           structure:
-            "Welcome back {name}! 🪁 How can I help — koi question hai roadmap pe,
-             naya roadmap chahiye, ya bas Week 1 ka pehla step start karein?"
-          Use natural Hinglish, but make sure all THREE paths (question / new
-          roadmap / start week 1) are visible. Do this only on the FIRST post-
-          roadmap turn — subsequent turns are free conversation.
+            {{openingExample}}
+          Match the example's tone, but make sure all THREE paths (question /
+          new roadmap / start week 1) are visible. Do this only on the FIRST
+          post-roadmap turn — subsequent turns are free conversation.
 
         - SUBSEQUENT turns:
             * If they ask a follow-up question (e.g. "yeh course free hai?",
@@ -458,15 +472,15 @@ public class ClaudeCareerEngine : ICareerEngine
         - RESTART REQUEST handling:
             * If they EXPLICITLY say they want a fresh roadmap / start over
               ("naya roadmap chahiye", "redo this", "start again"), ask ONE
-              confirmation: "Sure? Tumhara existing roadmap save rahega — naya
-              banaya toh purana replace ho jayega. Confirm karna chahti ho?"
+              confirmation in the student's language, e.g.:
+                {{restartConfirmExample}}
               Only set shouldRestart=true once they confirm in their NEXT message.
             * When restart is confirmed: the orchestrator will reuse all the
               student's previously-given answers (name, education, city, skills,
               salary goal, etc.). They will NOT re-do the 13-question assessment.
               They will go straight to 3 fresh career options. So when you confirm
-              the restart, set shouldRestart=true and reply with something brief
-              like "Got it! 3 fresh career options nikal raha hoon — ek minute…"
+              the restart, set shouldRestart=true and reply briefly, e.g.:
+                {{restartAckExample}}
               Do NOT say "let's start a new assessment" — there is no re-assessment.
 
         OUTPUT FORMAT — reply with a single JSON object, nothing else:
