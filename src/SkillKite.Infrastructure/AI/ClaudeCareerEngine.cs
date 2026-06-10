@@ -233,9 +233,10 @@ public class ClaudeCareerEngine : ICareerEngine
           anchor questions in a single sentence — e.g. "Currently I work as a Storage Engineer at
           CGI, pursuing MCA, last semester exams this month, based in Bangalore." That ONE message
           gives you education (MCA / final year), city (Bangalore), AND a strong skill/role signal
-          (working in storage / infrastructure). Extract EVERY field present in the sentence in a
-          single turn — name, education, city, currentRole/skills, workType, etc. — and store
-          them all in "extracted". Then ask the NEXT unanswered anchor, not anything they already
+          (working in storage / infrastructure → "skills"). Extract EVERY anchor field present in
+          the sentence in a single turn — using ONLY keys from the anchor list above (e.g.
+          "name", "education", "city", "skills", "workType") — and store them in "extracted".
+          Then ask the NEXT unanswered anchor, not anything they already
           told you. Re-asking what was clearly in their paragraph is the #1 way to make a real
           user say "you are asking the same questions as earlier" (caught from Shivani 06-10).
         - When you re-ask anyway because the previous turn looks ambiguous, FIRST acknowledge
