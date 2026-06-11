@@ -17,7 +17,9 @@ public class WhatsAppParsingTests
             PhoneNumberId = "1",
             VerifyToken = "v"
         });
-        return new WhatsAppService(new HttpClient(), opts, NullLogger<WhatsAppService>.Instance);
+        return new WhatsAppService(
+            new HttpClient(), opts, Options.Create(new PdfOptions()),
+            NullLogger<WhatsAppService>.Instance);
     }
 
     [Fact]

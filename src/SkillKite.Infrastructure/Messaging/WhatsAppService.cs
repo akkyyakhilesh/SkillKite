@@ -16,12 +16,16 @@ public class WhatsAppService : IMessagingService
 {
     private readonly HttpClient _http;
     private readonly WhatsAppOptions _opts;
+    private readonly PdfOptions _pdfOpts;
     private readonly ILogger<WhatsAppService> _log;
 
-    public WhatsAppService(HttpClient http, IOptions<WhatsAppOptions> opts, ILogger<WhatsAppService> log)
+    public WhatsAppService(
+        HttpClient http, IOptions<WhatsAppOptions> opts, IOptions<PdfOptions> pdfOpts,
+        ILogger<WhatsAppService> log)
     {
         _http = http;
         _opts = opts.Value;
+        _pdfOpts = pdfOpts.Value;
         _log = log;
 
         _http.BaseAddress = new Uri($"https://graph.facebook.com/{_opts.GraphApiVersion}/");
@@ -42,14 +46,72 @@ public class WhatsAppService : IMessagingService
 
     public async Task SendDocumentAsync(string toPhone, string url, string caption, string filename, CancellationToken ct = default)
     {
-        var payload = new
+        // Prefer uploading the binary and sending by media id. The link-based
+        // path makes Meta fetch our URL at send time — that fetch has silently
+        // dropped deliveries twice (Shivani 06-09, Shristi 06-11: a transient
+        // 404 got cached on Meta's side and every later link-send of the same
+        // URL returned a wamid but never reached the phone).
+        var localPath = Path.Combine(_pdfOpts.OutputDirectory, Path.GetFileName(new Uri(url).LocalPath));
+        if (File.Exists(localPath))
+        {
+            try
+            {
+                var mediaId = await UploadMediaAsync(localPath, "application/pdf", ct);
+                var byId = new
+                {
+                    messaging_product = "whatsapp",
+                    to = toPhone,
+                    type = "document",
+                    document = new { id = mediaId, caption, filename }
+                };
+                await PostAsync(byId, ct);
+                return;
+            }
+            catch (Exception ex)
+            {
+                _log.LogWarning(ex, "Media upload failed for {File}; falling back to link send", localPath);
+            }
+        }
+        else
+        {
+            _log.LogWarning("PDF not found locally at {Path}; falling back to link send", localPath);
+        }
+
+        var byLink = new
         {
             messaging_product = "whatsapp",
             to = toPhone,
             type = "document",
             document = new { link = url, caption, filename }
         };
-        await PostAsync(payload, ct);
+        await PostAsync(byLink, ct);
+    }
+
+    /// <summary>
+    /// Uploads a file to Meta's media endpoint and returns the media id.
+    /// Media ids stay valid for 30 days; each PDF is sent once so no caching.
+    /// </summary>
+    private async Task<string> UploadMediaAsync(string filePath, string mimeType, CancellationToken ct)
+    {
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent("whatsapp"), "messaging_product");
+        content.Add(new StringContent(mimeType), "type");
+
+        var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath, ct));
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+        content.Add(fileContent, "file", Path.GetFileName(filePath));
+
+        using var resp = await _http.PostAsync($"{_opts.PhoneNumberId}/media", content, ct);
+        if (!resp.IsSuccessStatusCode)
+        {
+            var body = await resp.Content.ReadAsStringAsync(ct);
+            _log.LogError("WhatsApp media upload failed {Status}: {Body}", resp.StatusCode, body);
+            resp.EnsureSuccessStatusCode();
+        }
+
+        using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync(ct));
+        return doc.RootElement.GetProperty("id").GetString()
+               ?? throw new InvalidOperationException("Media upload response had no id");
     }
 
     /// <summary>
