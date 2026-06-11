@@ -1151,15 +1151,17 @@ public class AssessmentOrchestrator
             case "goal":
             {
                 var goal = NormaliseGoal(text);
-                session.AssessmentDataJson = WriteField(session, ("goal", goal), ("step", "generating"));
+                session.AssessmentDataJson = WriteField(session,
+                    ("goal", goal), ("step", "generating"),
+                    ("generatingAt", DateTime.UtcNow.ToString("O")));
                 await _db.SaveChangesAsync(ct);
                 await DeliverTenthGuideAsync(student, session, ct);
                 return;
             }
             default:
-                // Already generating or post-complete — just acknowledge.
-                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                // Generating (in flight or stuck) — wait or auto-retry delivery.
+                await HandleGeneratingStepAsync(student, session,
+                    () => DeliverTenthGuideAsync(student, session, ct), ct);
                 return;
         }
     }
@@ -1411,7 +1413,8 @@ public class AssessmentOrchestrator
                 {
                     // Skip Q4 — no direction needed if they're not studying further.
                     session.AssessmentDataJson = WriteField(session,
-                        ("goal", goal), ("direction", "not_sure"), ("step", "generating"));
+                        ("goal", goal), ("direction", "not_sure"), ("step", "generating"),
+                        ("generatingAt", DateTime.UtcNow.ToString("O")));
                     await _db.SaveChangesAsync(ct);
                     await DeliverTwelfthGuideAsync(student, session, ct);
                     return;
@@ -1427,14 +1430,16 @@ public class AssessmentOrchestrator
                 var stream = ReadField(session, "stream") ?? "not_sure";
                 var direction = NormaliseDirection(stream, text);
                 session.AssessmentDataJson = WriteField(session,
-                    ("direction", direction), ("step", "generating"));
+                    ("direction", direction), ("step", "generating"),
+                    ("generatingAt", DateTime.UtcNow.ToString("O")));
                 await _db.SaveChangesAsync(ct);
                 await DeliverTwelfthGuideAsync(student, session, ct);
                 return;
             }
             default:
-                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                // Generating (in flight or stuck) — wait or auto-retry delivery.
+                await HandleGeneratingStepAsync(student, session,
+                    () => DeliverTwelfthGuideAsync(student, session, ct), ct);
                 return;
         }
     }
@@ -1802,14 +1807,17 @@ public class AssessmentOrchestrator
             case "goal":
             {
                 var goal = NormaliseUpskillGoal(text);
-                session.AssessmentDataJson = WriteField(session, ("goal", goal), ("step", "generating"));
+                session.AssessmentDataJson = WriteField(session,
+                    ("goal", goal), ("step", "generating"),
+                    ("generatingAt", DateTime.UtcNow.ToString("O")));
                 await _db.SaveChangesAsync(ct);
                 await DeliverSkillUpgradeGuideAsync(student, session, ct);
                 return;
             }
             default:
-                await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                    "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+                // Generating (in flight or stuck) — wait or auto-retry delivery.
+                await HandleGeneratingStepAsync(student, session,
+                    () => DeliverSkillUpgradeGuideAsync(student, session, ct), ct);
                 return;
         }
     }
@@ -1987,6 +1995,49 @@ public class AssessmentOrchestrator
     // ============================================================================
 
     private static string? ReadFlowType(ChatSession session) => ReadField(session, "flowType");
+
+    /// <summary>
+    /// Called when a student messages while their session sits in step=generating.
+    /// Normal case (entered generating less than 5 min ago): generation is genuinely
+    /// in flight — ask them to wait. Stuck case (stamp older than 5 min, or missing
+    /// for legacy sessions): a deploy/crash killed the in-flight Claude call and the
+    /// guide will never arrive — re-trigger delivery instead of telling them to wait
+    /// forever. Caught from Shivani 2026-06-10: deploy restart mid-generation left
+    /// her session in "generating" permanently.
+    /// </summary>
+    private async Task HandleGeneratingStepAsync(
+        Student student, ChatSession session,
+        Func<Task> redeliver, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        var stampRaw = ReadField(session, "generatingAt");
+        var stuck = !DateTime.TryParse(
+                        stampRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var stamp)
+                    || DateTime.UtcNow - stamp.ToUniversalTime() > TimeSpan.FromMinutes(5);
+
+        if (!stuck)
+        {
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                english ? "Your guide is being prepared 🪁 one moment…"
+                        : "Aapki guide ban rahi hai 🪁 thoda ruko…", ct));
+            return;
+        }
+
+        _log.LogWarning(
+            "Session {SessionId} stuck in step=generating (generatingAt={Stamp}); re-triggering delivery",
+            session.Id, stampRaw ?? "missing");
+
+        // Re-stamp so a second ping during the retry waits instead of double-firing.
+        session.AssessmentDataJson = WriteField(session, ("generatingAt", DateTime.UtcNow.ToString("O")));
+        await _db.SaveChangesAsync(ct);
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+            english ? "Sorry, that took longer than it should have — making your guide again right now 🙏"
+                    : "Sorry yaar, kuch zyada hi time lag gaya — dobara bana raha hoon abhi 🙏", ct));
+
+        await redeliver();
+    }
 
     private static string? ReadField(ChatSession session, string key)
     {
