@@ -13,10 +13,25 @@ namespace SkillKite.Infrastructure.PDF;
 
 public class RoadmapPdfGenerator : IRoadmapGenerator
 {
-    // Font family names we use throughout the document. The first one is the
-    // primary (Latin) face; the second is registered as a glyph fallback so
-    // Devanagari characters render correctly when mixed with English.
     private const string LatinFont = "Noto Sans";
+
+    // Warm Indian Earth palette (spec §1)
+    private static class Palette
+    {
+        public const string Saffron     = "E97B27";
+        public const string SaffronDark = "B45309";
+        public const string Indigo      = "3949AB";
+        public const string Forest      = "2E7D32";
+        public const string LinkBlue    = "1976D2";
+        public const string CardTitle   = "1F2937";
+        public const string FieldLabel  = "4B5563";
+        public const string Body        = "374151";
+        public const string TldrGrey    = "6B7280";
+        public const string FooterGrey  = "6B7280";
+        public const string PageBg      = "FAF9F6";
+        public const string CardBg      = "FFFFFF";
+        public const string DividerLine = "E5E7EB";
+    }
 
     private readonly PdfOptions _opts;
 
@@ -34,17 +49,131 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
 
     private static void RegisterFonts()
     {
-        // Fonts/ folder is copied next to the app DLL by the .csproj.
-        var baseDir = AppContext.BaseDirectory;
-        var fontDir = Path.Combine(baseDir, "Fonts");
+        var fontDir = Path.Combine(AppContext.BaseDirectory, "Fonts");
         if (!Directory.Exists(fontDir)) return;
-
         foreach (var path in Directory.EnumerateFiles(fontDir, "*.ttf"))
         {
             using var stream = File.OpenRead(path);
             FontManager.RegisterFont(stream);
         }
     }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    private static (string Color, string Icon) SectionStyle(int index, string title)
+    {
+        var t = title.ToLowerInvariant();
+        if (t.Contains("skill"))       return (Palette.Saffron, "🎓");
+        if (t.Contains("role"))        return (Palette.Indigo,   "🎯");
+        if (t.Contains("side") || t.Contains("move")) return (Palette.Forest, "🔀");
+        return (index % 3) switch
+        {
+            0 => (Palette.Saffron, "🎓"),
+            1 => (Palette.Indigo,  "🎯"),
+            _ => (Palette.Forest,  "🔀"),
+        };
+    }
+
+    // Appends text to an open TextDescriptor, hyperlinking any known resource spans.
+    // QuestPDF 2024.10 API: TextDescriptor.Hyperlink(url, text) → TextSpanDescriptor
+    private static void AppendWithLinks(TextDescriptor t, string text)
+    {
+        foreach (var (seg, url) in KnownResourceUrls.Segment(text))
+        {
+            if (url != null)
+                t.Hyperlink(url, seg).FontColor(Palette.LinkBlue).Underline();
+            else
+                t.Span(seg);
+        }
+    }
+
+    // Renders a single icon-prefixed field line inside a card.
+    private static void IconField(ColumnDescriptor col, string icon, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        col.Item().PaddingTop(3).Text(t =>
+        {
+            t.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont).FontColor(Palette.Body));
+            t.Span($"{icon} ");
+            AppendWithLinks(t, value);
+        });
+    }
+
+    // Section header row: "🎓 SKILLS TO BUILD" in section colour + optional TLDR.
+    private static void RenderSectionHeader(
+        ColumnDescriptor col, string icon, string title, string color,
+        string? tldr, bool isContinuation)
+    {
+        var label = $"{icon} {title.ToUpperInvariant()}{(isContinuation ? " (continued)" : "")}";
+        col.Item().Text(label)
+            .FontSize(14).Bold().FontFamily(LatinFont).FontColor(color);
+
+        if (!isContinuation && !string.IsNullOrWhiteSpace(tldr))
+            col.Item().PaddingTop(2).Text(tldr!)
+                .FontSize(11).Italic().FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+
+        col.Item().PaddingTop(4).PaddingBottom(6).LineHorizontal(0.5f).LineColor(Palette.DividerLine);
+    }
+
+    // One option card with left colour border (spec §4 / §7).
+    private static void RenderGuideCard(
+        ColumnDescriptor col, GuideOption opt, string borderColor, string sectionIcon)
+    {
+        col.Item()
+            .BorderLeft(4).BorderColor(borderColor)
+            .Background(Palette.CardBg)
+            .Padding(10).PaddingLeft(12)
+            .Column(oc =>
+            {
+                // Card title: section emoji + option name
+                oc.Item().Text($"{sectionIcon} {opt.Name}")
+                    .FontSize(13).SemiBold().FontFamily(LatinFont).FontColor(Palette.CardTitle);
+
+                IconField(oc, "❓", opt.WhatIsIt);
+                IconField(oc, "👤", opt.WhoFor);
+                IconField(oc, "➡️", opt.LeadsTo);
+                IconField(oc, "📜", opt.KeyExams);
+                IconField(oc, "⏱️", opt.TimeCommitment);
+            });
+    }
+
+    private static void RenderDisclaimer(ColumnDescriptor col)
+    {
+        col.Item().PaddingTop(16).Text(
+            "Disclaimer: Yeh AI-generated guidance hai, professional counseling ki jagah nahi. " +
+            "Final decision apne teachers aur family ke saath milke lein.")
+            .FontSize(9).Italic().FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+    }
+
+    private static void RenderPageHeader(PageDescriptor p, string tagline)
+    {
+        p.Header().Column(col =>
+        {
+            col.Item().Row(r =>
+            {
+                r.RelativeItem().Text("🪁 SkillKite")
+                    .FontSize(18).Bold().FontFamily(LatinFont).FontColor(Palette.SaffronDark);
+                r.AutoItem().AlignRight().AlignMiddle().Text(tagline)
+                    .FontSize(11).FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+            });
+            col.Item().PaddingTop(6).LineHorizontal(1.5f).LineColor(Palette.SaffronDark);
+        });
+    }
+
+    private static void RenderPageFooter(PageDescriptor p, string prefix)
+    {
+        p.Footer().AlignCenter().Text(t =>
+        {
+            t.Span($"{prefix} • Generated ").FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.Span("   ").FontSize(9);
+            t.CurrentPageNumber().FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.Span(" / ").FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.TotalPages().FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+        });
+    }
+
+    // ── Public API ──────────────────────────────────────────────────────────
 
     public Task<string> GenerateAsync(Student student, GeneratedRoadmap roadmap, CancellationToken ct = default)
     {
@@ -57,83 +186,106 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
             {
                 p.Size(PageSizes.A4);
                 p.Margin(36);
-
-                // Primary font is Noto Sans (Latin). Noto Sans Devanagari is
-                // also registered via FontManager — QuestPDF 2024.10+ resolves
-                // missing glyphs automatically by walking registered fonts, so
-                // Devanagari characters render with matching weight/style.
+                p.Background().Background(Palette.PageBg);
                 p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
 
-                // No more pure-Hindi mode. The student's choice now is Hinglish
-                // (default) or English, and Claude generates the content in
-                // whichever they picked — so we just use the primary fields.
-                // The schema's *Hi fields are vestigial but kept for legacy
-                // sessions; PDF render no longer reads them.
-                string PickLang(string en, string h) => en;
-
-                p.Header().Column(col =>
-                {
-                    col.Item().Text("SkillKite").FontSize(24).Bold().FontColor(Colors.Orange.Darken2);
-                    col.Item().Text("Right skills. Higher reach.").Italic().FontColor(Colors.Grey.Darken1);
-                    col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Orange.Lighten2);
-                });
+                RenderPageHeader(p, $"Career roadmap · {roadmap.TotalWeeks} weeks");
 
                 p.Content().PaddingVertical(12).Column(col =>
                 {
-                    col.Spacing(10);
+                    col.Spacing(0);
 
-                    // Structural chrome stays in English — short, recognizable, doesn't compete
-                    // with the substantive content. Same pattern as BHIM / Tally / Paytm:
-                    // English navigation, Hindi body.
-                    col.Item().Text($"Personal Roadmap for {student.Name ?? "Student"}").FontSize(16).Bold();
-                    col.Item().Text($"Career path: {PickLang(roadmap.CareerTitle, roadmap.CareerTitleHi)}").Bold();
-                    col.Item().Text(PickLang(roadmap.Summary, roadmap.SummaryHi));
-                    col.Item().Text($"Duration: {roadmap.TotalWeeks} weeks  •  Expected salary: ₹{roadmap.ExpectedSalaryMin:N0}–₹{roadmap.ExpectedSalaryMax:N0}/month");
+                    // Title block
+                    col.Item().PaddingBottom(4).Text(
+                        $"Personal Roadmap for {student.Name ?? "Student"}")
+                        .FontSize(16).Bold().FontColor(Palette.CardTitle);
 
-                    col.Item().PaddingTop(10).Text("Week-by-week plan").FontSize(14).Bold();
+                    col.Item().Text(roadmap.CareerTitle)
+                        .FontSize(13).SemiBold().FontColor(Palette.Saffron);
 
-                    foreach (var w in roadmap.Weeks)
+                    col.Item().PaddingTop(2).Text(roadmap.Summary)
+                        .FontSize(11).FontColor(Palette.Body);
+
+                    // Salary — visual heavyweight per spec §2
+                    col.Item().PaddingTop(6).PaddingBottom(10).Text(t =>
                     {
-                        col.Item().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(wc =>
+                        t.Span("💰 Expected: ").FontSize(11).FontColor(Palette.FieldLabel).SemiBold();
+                        t.Span($"₹{roadmap.ExpectedSalaryMin:N0} – ₹{roadmap.ExpectedSalaryMax:N0}/month")
+                            .FontSize(14).Bold().FontColor(Palette.CardTitle);
+                    });
+
+                    col.Item().PaddingBottom(10).Text("📅 Week-by-week plan")
+                        .FontSize(14).Bold().FontColor(Palette.Saffron);
+
+                    // 3 week-cards per page (spec §5)
+                    var weeks = roadmap.Weeks;
+                    var chunks = weeks.Chunk(3).ToArray();
+                    for (int ci = 0; ci < chunks.Length; ci++)
+                    {
+                        foreach (var w in chunks[ci])
                         {
-                            wc.Item().Text($"Week {w.WeekNumber}: {PickLang(w.Theme, w.ThemeHi)}").Bold();
+                            col.Item().PaddingBottom(8)
+                                .BorderLeft(4).BorderColor(Palette.Saffron)
+                                .Background(Palette.CardBg)
+                                .Padding(10).PaddingLeft(12)
+                                .Column(wc =>
+                                {
+                                    wc.Item().Text($"Week {w.WeekNumber}: {w.Theme}")
+                                        .FontSize(13).SemiBold().FontColor(Palette.CardTitle);
 
-                            wc.Item().PaddingTop(4).Text("Goals:").SemiBold();
-                            foreach (var g in w.Goals)
-                                wc.Item().Text($"• {g}");
+                                    wc.Item().PaddingTop(4).Text("Goals:").FontSize(11).SemiBold().FontColor(Palette.FieldLabel);
+                                    foreach (var g in w.Goals)
+                                        wc.Item().Text($"• {g}").FontSize(11).FontColor(Palette.Body);
 
-                            if (w.Resources.Count > 0)
-                            {
-                                wc.Item().PaddingTop(4).Text("Resources:").SemiBold();
-                                foreach (var r in w.Resources)
-                                    wc.Item().Text($"→ {r.Title} ({r.Platform}) — {r.Url}").FontSize(9);
-                            }
+                                    if (w.Resources.Count > 0)
+                                    {
+                                        wc.Item().PaddingTop(4);
+                                        foreach (var r in w.Resources)
+                                        {
+                                            // Prefer a verified URL; fall back to Claude's URL
+                                            var resolvedUrl = KnownResourceUrls.LookupFirst(r.Title) ?? r.Url;
+                                            wc.Item().Text(t =>
+                                            {
+                                                t.DefaultTextStyle(x => x.FontSize(10).FontFamily(LatinFont));
+                                                t.Span("🔗 ");
+                                                if (!string.IsNullOrEmpty(resolvedUrl))
+                                                    t.Hyperlink(resolvedUrl, $"{r.Title} ({r.Platform})")
+                                                        .FontColor(Palette.LinkBlue).Underline();
+                                                else
+                                                    t.Span($"{r.Title} ({r.Platform})")
+                                                        .FontColor(Palette.Body);
+                                            });
+                                        }
+                                    }
 
-                            if (!string.IsNullOrWhiteSpace(w.Practice))
-                                wc.Item().PaddingTop(4).Text($"Practice: {w.Practice}");
-                        });
+                                    if (!string.IsNullOrWhiteSpace(w.Practice))
+                                    {
+                                        wc.Item().PaddingTop(4).Text(t =>
+                                        {
+                                            t.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
+                                            t.Span("🛠️ Practice: ").SemiBold().FontColor(Palette.FieldLabel);
+                                            t.Span(w.Practice).FontColor(Palette.Body);
+                                        });
+                                    }
+                                });
+                        }
+
+                        bool isLastChunk = ci == chunks.Length - 1;
+                        if (!isLastChunk)
+                            col.Item().PageBreak();
                     }
+
+                    // Disclaimer on last page only (spec §5)
+                    RenderDisclaimer(col);
                 });
 
-                p.Footer().AlignCenter().Text(t =>
-                {
-                    t.Span("SkillKite • Generated ").FontSize(9).FontColor(Colors.Grey.Darken1);
-                    t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontColor(Colors.Grey.Darken1);
-                });
+                RenderPageFooter(p, "SkillKite");
             });
         }).GeneratePdf(path);
 
-        var publicUrl = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}";
-        return Task.FromResult(publicUrl);
+        return Task.FromResult($"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}");
     }
 
-    /// <summary>
-    /// Renders the 10th/12th comprehensive guide PDF. Same SkillKite header/footer
-    /// styling as the roadmap PDF but a much flatter layout — heading, greeting,
-    /// then for each section: section title + intro, followed by a card per
-    /// option with the five labelled blurbs (Kya hai / Kaun le / Iske baad /
-    /// Exams / Time).
-    /// </summary>
     public Task<string> GenerateGuideAsync(Student student, StudentGuide guide, CancellationToken ct = default)
     {
         var filename = $"guide_{guide.FlowLabel}_{student.Id:N}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
@@ -145,76 +297,72 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
             {
                 p.Size(PageSizes.A4);
                 p.Margin(36);
+                p.Background().Background(Palette.PageBg);
                 p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
 
-                p.Header().Column(col =>
-                {
-                    col.Item().Text("SkillKite").FontSize(24).Bold().FontColor(Colors.Orange.Darken2);
-                    col.Item().Text("Right skills. Higher reach.").Italic().FontColor(Colors.Grey.Darken1);
-                    col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Orange.Lighten2);
-                });
+                RenderPageHeader(p, $"{guide.FlowLabel} guide");
 
                 p.Content().PaddingVertical(12).Column(col =>
                 {
-                    col.Spacing(10);
+                    col.Spacing(0);
 
-                    col.Item().Text(guide.Heading).FontSize(16).Bold();
+                    col.Item().PaddingBottom(4).Text(guide.Heading)
+                        .FontSize(16).Bold().FontColor(Palette.CardTitle);
+
                     if (!string.IsNullOrWhiteSpace(guide.Greeting))
-                        col.Item().Text(guide.Greeting);
+                        col.Item().PaddingBottom(10).Text(guide.Greeting)
+                            .FontSize(11).FontColor(Palette.Body);
 
-                    foreach (var section in guide.Sections)
+                    for (int si = 0; si < guide.Sections.Count; si++)
                     {
-                        col.Item().PaddingTop(10).Text(section.Title).FontSize(14).Bold().FontColor(Colors.Orange.Darken1);
-                        if (!string.IsNullOrWhiteSpace(section.Intro))
-                            col.Item().Text(section.Intro!).Italic().FontColor(Colors.Grey.Darken2);
+                        var section = guide.Sections[si];
+                        var (sectionColor, sectionIcon) = SectionStyle(si, section.Title);
 
-                        foreach (var opt in section.Options)
+                        if (si > 0)
+                            col.Item().PaddingTop(22);
+
+                        // 3 options per page; continuation pages re-show the section header
+                        var chunks = section.Options.Chunk(3).ToArray();
+                        for (int ci = 0; ci < chunks.Length; ci++)
                         {
-                            col.Item().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(8).Column(oc =>
+                            RenderSectionHeader(col, sectionIcon, section.Title, sectionColor,
+                                section.Intro, isContinuation: ci > 0);
+
+                            foreach (var opt in chunks[ci])
                             {
-                                oc.Item().Text(opt.Name).Bold();
+                                col.Item().PaddingBottom(8);
+                                RenderGuideCard(col, opt, sectionColor, sectionIcon);
+                            }
 
-                                void Field(string label, string value)
-                                {
-                                    if (string.IsNullOrWhiteSpace(value)) return;
-                                    oc.Item().PaddingTop(3).Text(t =>
-                                    {
-                                        t.Span($"{label}: ").SemiBold();
-                                        t.Span(value);
-                                    });
-                                }
-
-                                Field("Kya hai", opt.WhatIsIt);
-                                Field("Kaun le", opt.WhoFor);
-                                Field("Iske baad", opt.LeadsTo);
-                                Field("Exams", opt.KeyExams);
-                                Field("Time", opt.TimeCommitment);
-                            });
+                            bool isLastChunk = ci == chunks.Length - 1;
+                            bool isLastSection = si == guide.Sections.Count - 1;
+                            if (!isLastChunk || !isLastSection)
+                            {
+                                if (!isLastChunk)
+                                    col.Item().PageBreak();
+                            }
                         }
                     }
 
                     if (!string.IsNullOrWhiteSpace(guide.ClosingMessage))
                     {
-                        col.Item().PaddingTop(14).Border(1).BorderColor(Colors.Orange.Lighten2)
-                            .Padding(10).Text(guide.ClosingMessage);
+                        col.Item().PaddingTop(16)
+                            .BorderLeft(4).BorderColor(Palette.Saffron)
+                            .Background(Palette.CardBg)
+                            .Padding(10).PaddingLeft(12)
+                            .Text(guide.ClosingMessage)
+                            .FontSize(11).FontColor(Palette.Body);
                     }
 
-                    col.Item().PaddingTop(8).Text(
-                        "Disclaimer: Yeh AI-generated guidance hai, professional counseling ki jagah nahi. " +
-                        "Final decision apne teachers aur family ke saath milke lein.")
-                        .FontSize(9).Italic().FontColor(Colors.Grey.Darken1);
+                    // Disclaimer on last page only (spec §5)
+                    RenderDisclaimer(col);
                 });
 
-                p.Footer().AlignCenter().Text(t =>
-                {
-                    t.Span($"SkillKite • {guide.FlowLabel} guide • Generated ").FontSize(9).FontColor(Colors.Grey.Darken1);
-                    t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontColor(Colors.Grey.Darken1);
-                });
+                RenderPageFooter(p, $"SkillKite · {guide.FlowLabel}");
             });
         }).GeneratePdf(path);
 
-        var publicUrl = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}";
-        return Task.FromResult(publicUrl);
+        return Task.FromResult($"{_opts.PublicBaseUrl.TrimEnd('/')}/{filename}");
     }
 
     public Task DeletePdfsForStudentAsync(Guid studentId, CancellationToken ct = default)
@@ -222,15 +370,11 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         var dir = _opts.OutputDirectory;
         if (!Directory.Exists(dir)) return Task.CompletedTask;
 
-        // Both roadmap PDFs (roadmap_<studentId>_<ts>.pdf) and guide PDFs
-        // (guide_<flow>_<studentId>_<ts>.pdf) embed the student id in their
-        // filename, written via Guid.ToString("N") — 32 hex chars, no dashes.
         var idTag = studentId.ToString("N");
-
         foreach (var file in Directory.EnumerateFiles(dir, $"*{idTag}*.pdf"))
         {
             try { File.Delete(file); }
-            catch { /* best-effort — DB row goes away regardless */ }
+            catch { /* best-effort */ }
         }
         return Task.CompletedTask;
     }
@@ -242,13 +386,11 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
 
         var idTag = studentId.ToString("N");
         var latest = Directory.EnumerateFiles(dir, $"*{idTag}*.pdf")
-            .Select(p => new FileInfo(p))
+            .Select(f => new FileInfo(f))
             .OrderByDescending(fi => fi.LastWriteTimeUtc)
             .FirstOrDefault();
 
         if (latest is null) return null;
-
-        var url = $"{_opts.PublicBaseUrl.TrimEnd('/')}/{latest.Name}";
-        return (url, latest.Name);
+        return ($"{_opts.PublicBaseUrl.TrimEnd('/')}/{latest.Name}", latest.Name);
     }
 }
