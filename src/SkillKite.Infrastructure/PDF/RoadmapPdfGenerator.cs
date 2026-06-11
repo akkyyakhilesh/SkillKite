@@ -14,6 +14,14 @@ namespace SkillKite.Infrastructure.PDF;
 public class RoadmapPdfGenerator : IRoadmapGenerator
 {
     private const string LatinFont = "Noto Sans";
+    private const string EmojiFont = "Noto Emoji";
+    private const string DevanagariFont = "Noto Sans Devanagari";
+
+    // Explicit fallback chain: Latin first, then emoji glyphs, then Devanagari.
+    // QuestPDF's automatic glyph fallback only walks system fonts on some
+    // platforms — the Linux VM has no emoji font installed, so icons rendered
+    // as tofu until this chain made the registered Noto Emoji explicit.
+    private static readonly string[] FontChain = [LatinFont, EmojiFont, DevanagariFont];
 
     // Warm Indian Earth palette (spec §1)
     private static class Palette
@@ -93,7 +101,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         if (string.IsNullOrWhiteSpace(value)) return;
         col.Item().PaddingTop(3).Text(t =>
         {
-            t.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont).FontColor(Palette.Body));
+            t.DefaultTextStyle(x => x.FontSize(12).FontFamily(FontChain).FontColor(Palette.Body));
             t.Span($"{icon} ");
             AppendWithLinks(t, value);
         });
@@ -106,11 +114,11 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
     {
         var label = $"{icon} {title.ToUpperInvariant()}{(isContinuation ? " (continued)" : "")}";
         col.Item().Text(label)
-            .FontSize(14).Bold().FontFamily(LatinFont).FontColor(color);
+            .FontSize(15).Bold().FontFamily(FontChain).FontColor(color);
 
         if (!isContinuation && !string.IsNullOrWhiteSpace(tldr))
             col.Item().PaddingTop(2).Text(tldr!)
-                .FontSize(11).Italic().FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+                .FontSize(12).Italic().FontFamily(FontChain).FontColor(Palette.TldrGrey);
 
         col.Item().PaddingTop(4).PaddingBottom(6).LineHorizontal(0.5f).LineColor(Palette.DividerLine);
     }
@@ -119,7 +127,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
     private static void RenderGuideCard(
         ColumnDescriptor col, GuideOption opt, string borderColor, string sectionIcon)
     {
-        col.Item()
+        col.Item().ShowEntire()
             .BorderLeft(4).BorderColor(borderColor)
             .Background(Palette.CardBg)
             .Padding(10).PaddingLeft(12)
@@ -127,7 +135,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
             {
                 // Card title: section emoji + option name
                 oc.Item().Text($"{sectionIcon} {opt.Name}")
-                    .FontSize(13).SemiBold().FontFamily(LatinFont).FontColor(Palette.CardTitle);
+                    .FontSize(14).SemiBold().FontFamily(FontChain).FontColor(Palette.CardTitle);
 
                 IconField(oc, "❓", opt.WhatIsIt);
                 IconField(oc, "👤", opt.WhoFor);
@@ -142,7 +150,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
         col.Item().PaddingTop(16).Text(
             "Disclaimer: Yeh AI-generated guidance hai, professional counseling ki jagah nahi. " +
             "Final decision apne teachers aur family ke saath milke lein.")
-            .FontSize(9).Italic().FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+            .FontSize(10).Italic().FontFamily(FontChain).FontColor(Palette.TldrGrey);
     }
 
     private static void RenderPageHeader(PageDescriptor p, string tagline)
@@ -152,9 +160,9 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
             col.Item().Row(r =>
             {
                 r.RelativeItem().Text("🪁 SkillKite")
-                    .FontSize(18).Bold().FontFamily(LatinFont).FontColor(Palette.SaffronDark);
+                    .FontSize(18).Bold().FontFamily(FontChain).FontColor(Palette.SaffronDark);
                 r.AutoItem().AlignRight().AlignMiddle().Text(tagline)
-                    .FontSize(11).FontFamily(LatinFont).FontColor(Palette.TldrGrey);
+                    .FontSize(11).FontFamily(FontChain).FontColor(Palette.TldrGrey);
             });
             col.Item().PaddingTop(6).LineHorizontal(1.5f).LineColor(Palette.SaffronDark);
         });
@@ -164,12 +172,12 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
     {
         p.Footer().AlignCenter().Text(t =>
         {
-            t.Span($"{prefix} • Generated ").FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
-            t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.Span($"{prefix} • Generated ").FontSize(9).FontFamily(FontChain).FontColor(Palette.FooterGrey);
+            t.Span(DateTime.UtcNow.ToString("yyyy-MM-dd")).FontSize(9).FontFamily(FontChain).FontColor(Palette.FooterGrey);
             t.Span("   ").FontSize(9);
-            t.CurrentPageNumber().FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
-            t.Span(" / ").FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
-            t.TotalPages().FontSize(9).FontFamily(LatinFont).FontColor(Palette.FooterGrey);
+            t.CurrentPageNumber().FontSize(9).FontFamily(FontChain).FontColor(Palette.FooterGrey);
+            t.Span(" / ").FontSize(9).FontFamily(FontChain).FontColor(Palette.FooterGrey);
+            t.TotalPages().FontSize(9).FontFamily(FontChain).FontColor(Palette.FooterGrey);
         });
     }
 
@@ -187,7 +195,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 p.Size(PageSizes.A4);
                 p.Margin(36);
                 p.Background().Background(Palette.PageBg);
-                p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
+                p.DefaultTextStyle(x => x.FontSize(12).FontFamily(FontChain));
 
                 RenderPageHeader(p, $"Career roadmap · {roadmap.TotalWeeks} weeks");
 
@@ -198,81 +206,75 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                     // Title block
                     col.Item().PaddingBottom(4).Text(
                         $"Personal Roadmap for {student.Name ?? "Student"}")
-                        .FontSize(16).Bold().FontColor(Palette.CardTitle);
+                        .FontSize(17).Bold().FontColor(Palette.CardTitle);
 
                     col.Item().Text(roadmap.CareerTitle)
-                        .FontSize(13).SemiBold().FontColor(Palette.Saffron);
+                        .FontSize(14).SemiBold().FontColor(Palette.Saffron);
 
                     col.Item().PaddingTop(2).Text(roadmap.Summary)
-                        .FontSize(11).FontColor(Palette.Body);
+                        .FontSize(12).FontColor(Palette.Body);
 
                     // Salary — visual heavyweight per spec §2
                     col.Item().PaddingTop(6).PaddingBottom(10).Text(t =>
                     {
-                        t.Span("💰 Expected: ").FontSize(11).FontColor(Palette.FieldLabel).SemiBold();
+                        t.Span("💰 Expected: ").FontSize(12).FontColor(Palette.FieldLabel).SemiBold();
                         t.Span($"₹{roadmap.ExpectedSalaryMin:N0} – ₹{roadmap.ExpectedSalaryMax:N0}/month")
-                            .FontSize(14).Bold().FontColor(Palette.CardTitle);
+                            .FontSize(15).Bold().FontColor(Palette.CardTitle);
                     });
 
                     col.Item().PaddingBottom(10).Text("📅 Week-by-week plan")
-                        .FontSize(14).Bold().FontColor(Palette.Saffron);
+                        .FontSize(15).Bold().FontColor(Palette.Saffron);
 
-                    // 3 week-cards per page (spec §5)
-                    var weeks = roadmap.Weeks;
-                    var chunks = weeks.Chunk(3).ToArray();
-                    for (int ci = 0; ci < chunks.Length; ci++)
+                    // Cards flow naturally to fill each page; ShowEntire keeps a
+                    // card from splitting across a page boundary, so pages end
+                    // evenly without forced breaks (which left dead space when
+                    // the title block offset the rhythm on page 1).
+                    foreach (var w in roadmap.Weeks)
                     {
-                        foreach (var w in chunks[ci])
-                        {
-                            col.Item().PaddingBottom(8)
-                                .BorderLeft(4).BorderColor(Palette.Saffron)
-                                .Background(Palette.CardBg)
-                                .Padding(10).PaddingLeft(12)
-                                .Column(wc =>
+                        col.Item().PaddingBottom(8).ShowEntire()
+                            .BorderLeft(4).BorderColor(Palette.Saffron)
+                            .Background(Palette.CardBg)
+                            .Padding(10).PaddingLeft(12)
+                            .Column(wc =>
+                            {
+                                wc.Item().Text($"Week {w.WeekNumber}: {w.Theme}")
+                                    .FontSize(14).SemiBold().FontColor(Palette.CardTitle);
+
+                                wc.Item().PaddingTop(4).Text("Goals:").FontSize(12).SemiBold().FontColor(Palette.FieldLabel);
+                                foreach (var g in w.Goals)
+                                    wc.Item().Text($"• {g}").FontSize(12).FontColor(Palette.Body);
+
+                                if (w.Resources.Count > 0)
                                 {
-                                    wc.Item().Text($"Week {w.WeekNumber}: {w.Theme}")
-                                        .FontSize(13).SemiBold().FontColor(Palette.CardTitle);
-
-                                    wc.Item().PaddingTop(4).Text("Goals:").FontSize(11).SemiBold().FontColor(Palette.FieldLabel);
-                                    foreach (var g in w.Goals)
-                                        wc.Item().Text($"• {g}").FontSize(11).FontColor(Palette.Body);
-
-                                    if (w.Resources.Count > 0)
+                                    wc.Item().PaddingTop(4);
+                                    foreach (var r in w.Resources)
                                     {
-                                        wc.Item().PaddingTop(4);
-                                        foreach (var r in w.Resources)
+                                        // Prefer a verified URL; fall back to Claude's URL
+                                        var resolvedUrl = KnownResourceUrls.LookupFirst(r.Title) ?? r.Url;
+                                        wc.Item().Text(t =>
                                         {
-                                            // Prefer a verified URL; fall back to Claude's URL
-                                            var resolvedUrl = KnownResourceUrls.LookupFirst(r.Title) ?? r.Url;
-                                            wc.Item().Text(t =>
-                                            {
-                                                t.DefaultTextStyle(x => x.FontSize(10).FontFamily(LatinFont));
-                                                t.Span("🔗 ");
-                                                if (!string.IsNullOrEmpty(resolvedUrl))
-                                                    t.Hyperlink(resolvedUrl, $"{r.Title} ({r.Platform})")
-                                                        .FontColor(Palette.LinkBlue).Underline();
-                                                else
-                                                    t.Span($"{r.Title} ({r.Platform})")
-                                                        .FontColor(Palette.Body);
-                                            });
-                                        }
-                                    }
-
-                                    if (!string.IsNullOrWhiteSpace(w.Practice))
-                                    {
-                                        wc.Item().PaddingTop(4).Text(t =>
-                                        {
-                                            t.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
-                                            t.Span("🛠️ Practice: ").SemiBold().FontColor(Palette.FieldLabel);
-                                            t.Span(w.Practice).FontColor(Palette.Body);
+                                            t.DefaultTextStyle(x => x.FontSize(11).FontFamily(FontChain));
+                                            t.Span("🔗 ");
+                                            if (!string.IsNullOrEmpty(resolvedUrl))
+                                                t.Hyperlink(resolvedUrl, $"{r.Title} ({r.Platform})")
+                                                    .FontColor(Palette.LinkBlue).Underline();
+                                            else
+                                                t.Span($"{r.Title} ({r.Platform})")
+                                                    .FontColor(Palette.Body);
                                         });
                                     }
-                                });
-                        }
+                                }
 
-                        bool isLastChunk = ci == chunks.Length - 1;
-                        if (!isLastChunk)
-                            col.Item().PageBreak();
+                                if (!string.IsNullOrWhiteSpace(w.Practice))
+                                {
+                                    wc.Item().PaddingTop(4).Text(t =>
+                                    {
+                                        t.DefaultTextStyle(x => x.FontSize(12).FontFamily(FontChain));
+                                        t.Span("🛠️ Practice: ").SemiBold().FontColor(Palette.FieldLabel);
+                                        t.Span(w.Practice).FontColor(Palette.Body);
+                                    });
+                                }
+                            });
                     }
 
                     // Disclaimer on last page only (spec §5)
@@ -298,7 +300,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                 p.Size(PageSizes.A4);
                 p.Margin(36);
                 p.Background().Background(Palette.PageBg);
-                p.DefaultTextStyle(x => x.FontSize(11).FontFamily(LatinFont));
+                p.DefaultTextStyle(x => x.FontSize(12).FontFamily(FontChain));
 
                 RenderPageHeader(p, $"{guide.FlowLabel} guide");
 
@@ -307,11 +309,11 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                     col.Spacing(0);
 
                     col.Item().PaddingBottom(4).Text(guide.Heading)
-                        .FontSize(16).Bold().FontColor(Palette.CardTitle);
+                        .FontSize(17).Bold().FontColor(Palette.CardTitle);
 
                     if (!string.IsNullOrWhiteSpace(guide.Greeting))
                         col.Item().PaddingBottom(10).Text(guide.Greeting)
-                            .FontSize(11).FontColor(Palette.Body);
+                            .FontSize(12).FontColor(Palette.Body);
 
                     for (int si = 0; si < guide.Sections.Count; si++)
                     {
@@ -321,26 +323,15 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                         if (si > 0)
                             col.Item().PaddingTop(22);
 
-                        // 3 options per page; continuation pages re-show the section header
-                        var chunks = section.Options.Chunk(3).ToArray();
-                        for (int ci = 0; ci < chunks.Length; ci++)
+                        RenderSectionHeader(col, sectionIcon, section.Title, sectionColor,
+                            section.Intro, isContinuation: false);
+
+                        // Cards flow naturally; ShowEntire keeps each card whole
+                        // so pages fill evenly without forced breaks.
+                        foreach (var opt in section.Options)
                         {
-                            RenderSectionHeader(col, sectionIcon, section.Title, sectionColor,
-                                section.Intro, isContinuation: ci > 0);
-
-                            foreach (var opt in chunks[ci])
-                            {
-                                col.Item().PaddingBottom(8);
-                                RenderGuideCard(col, opt, sectionColor, sectionIcon);
-                            }
-
-                            bool isLastChunk = ci == chunks.Length - 1;
-                            bool isLastSection = si == guide.Sections.Count - 1;
-                            if (!isLastChunk || !isLastSection)
-                            {
-                                if (!isLastChunk)
-                                    col.Item().PageBreak();
-                            }
+                            col.Item().PaddingBottom(8);
+                            RenderGuideCard(col, opt, sectionColor, sectionIcon);
                         }
                     }
 
@@ -351,7 +342,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                             .Background(Palette.CardBg)
                             .Padding(10).PaddingLeft(12)
                             .Text(guide.ClosingMessage)
-                            .FontSize(11).FontColor(Palette.Body);
+                            .FontSize(12).FontColor(Palette.Body);
                     }
 
                     // Disclaimer on last page only (spec §5)
