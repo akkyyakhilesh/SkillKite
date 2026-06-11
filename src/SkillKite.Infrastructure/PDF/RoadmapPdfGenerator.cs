@@ -83,13 +83,14 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
     }
 
     // Appends text to an open TextDescriptor, hyperlinking any known resource spans.
-    // QuestPDF 2024.10 API: TextDescriptor.Hyperlink(url, text) → TextSpanDescriptor
+    // QuestPDF signature is Hyperlink(text, url) — display text FIRST, target second.
+    // Reversed args ship a relative URI that viewers resolve as a local file path.
     private static void AppendWithLinks(TextDescriptor t, string text)
     {
         foreach (var (seg, url) in KnownResourceUrls.Segment(text))
         {
             if (url != null)
-                t.Hyperlink(url, seg).FontColor(Palette.LinkBlue).Underline();
+                t.Hyperlink(seg, url).FontColor(Palette.LinkBlue).Underline();
             else
                 t.Span(seg);
         }
@@ -256,7 +257,7 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                                             t.DefaultTextStyle(x => x.FontSize(11).FontFamily(FontChain));
                                             t.Span("🔗 ");
                                             if (!string.IsNullOrEmpty(resolvedUrl))
-                                                t.Hyperlink(resolvedUrl, $"{r.Title} ({r.Platform})")
+                                                t.Hyperlink($"{r.Title} ({r.Platform})", resolvedUrl)
                                                     .FontColor(Palette.LinkBlue).Underline();
                                             else
                                                 t.Span($"{r.Title} ({r.Platform})")
