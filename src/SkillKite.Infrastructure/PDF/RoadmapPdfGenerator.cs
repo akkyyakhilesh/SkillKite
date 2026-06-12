@@ -252,6 +252,13 @@ public class RoadmapPdfGenerator : IRoadmapGenerator
                                     {
                                         // Prefer a verified URL; fall back to Claude's URL
                                         var resolvedUrl = KnownResourceUrls.LookupFirst(r.Title) ?? r.Url;
+
+                                        // Hard guard: a specific-video YouTube URL is almost
+                                        // certainly hallucinated (Claude can't know live video
+                                        // ids) — rewrite to the named channel or a title search
+                                        // so no dead video link ever reaches a student's PDF.
+                                        if (KnownYouTubeChannels.IsVideoUrl(resolvedUrl))
+                                            resolvedUrl = KnownYouTubeChannels.RewriteVideoUrl(r.Title);
                                         wc.Item().Text(t =>
                                         {
                                             t.DefaultTextStyle(x => x.FontSize(11).FontFamily(FontChain));

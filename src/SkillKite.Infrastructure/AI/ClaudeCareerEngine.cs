@@ -405,6 +405,25 @@ public class ClaudeCareerEngine : ICareerEngine
         - Hindi-first? Prioritize Hindi-language resources.
         - Salary ranges must be realistic for Tier 2/3 India entry-level.
         - Output JSON ONLY. No markdown, no commentary.
+
+        YOUTUBE URL RULES (critical — broken links destroy student trust):
+        - NEVER output youtube.com/watch?v=... or youtu.be/... URLs. You cannot know live video
+          IDs; invented ones lead students to deleted/wrong videos.
+        - YouTube resource URLs must be CHANNEL-level (https://www.youtube.com/@handle) only.
+        - Keep "title" specific ("Class 10 Physics Full Course") — the student searches the
+          channel for it. The URL just lands them on the right channel.
+        - Preferred channels (use when the subject fits; otherwise name any well-known channel
+          you are CERTAIN exists, channel-level URL only):
+          * @freecodecamp — programming, web dev, data (English)
+          * @PhysicsWallah — 10th/12th science, NEET/JEE (Hindi)
+          * @CodeWithHarry — programming, web dev (Hindi)
+          * @ApnaCollegeOfficial — DSA, placement prep (Hindi)
+          * @khanacademy — maths, science fundamentals (English)
+          * @nptelhrd — engineering, university-level courses (English)
+          * @studyiq — UPSC, SSC, banking, govt exams (Hindi)
+          * @Adda247 — banking, SSC exam prep (Hindi)
+          * @Telusko — Java, Python (English)
+          * @TechnicalGuruji — tech awareness, gadgets (Hindi)
         """;
     }
 
