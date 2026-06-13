@@ -1,0 +1,147 @@
+{
+  "category": "after-10th",
+  "stream": "science",
+  "streamLabel": "Science",
+  "seoTitle": "Science after 10th — courses, exams & careers | SkillKite",
+  "seoDescription": "After 10th Science — streams, PCM/PCB, polytechnic, paramedical & more",
+  "guide": {
+    "heading": "SkillKite — 10th ke baad aapke options",
+    "greeting": "Hi! Aapne bataya ki aapko Science & Maths mein interest hai aur aap study bhi karna chahte ho aur earning bhi start karna chahte ho. Neeche aapke liye best options pehle diye hain — saare options bhi neeche hain taaki aap compare kar sako.",
+    "sections": [
+      {
+        "title": "Padhai ke options",
+        "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
+        "options": [
+          {
+            "name": "12th Science with Maths (PCM)",
+            "whatIsIt": "Physics, Chemistry, Maths ke saath 12th karo. Engineering, architecture, defence, aur tech fields ke liye yeh sabse popular aur direct path hai.",
+            "whoFor": "Jo student maths mein strong ho, logical thinking enjoy karta ho, aur engineering ya tech mein career banana chahta ho.",
+            "leadsTo": "B.Tech / BE (IIT, NIT, private colleges), Architecture (B.Arch), BCA, B.Sc Maths/Physics/CS, Defence (NDA), Merchant Navy, aur bahut kuch.",
+            "keyExams": "JEE Main (NIT/state colleges ke liye), JEE Advanced (IIT ke liye), NDA (defence), NATA (architecture). JEE Main competitive hai — serious preparation chahiye.",
+            "timeCommitment": "2 saal (12th) + 4 saal engineering = 6 saal total. Preparation intense hoti hai."
+          },
+          {
+            "name": "12th Science with Maths + Biology (PCMB)",
+            "whatIsIt": "Physics, Chemistry, Maths aur Biology — chaaron subjects ek saath. Maximum options khulte hain but workload zyada hota hai.",
+            "whoFor": "Jo student abhi decide nahi kar paya ki engineering karun ya medical — PCMB dono doors open rakhta hai. But honest warning: yeh bahut heavy syllabus hai.",
+            "leadsTo": "MBBS (NEET), B.Tech (JEE), B.Sc Biotech, Pharmacy, Nursing, Agriculture — almost every science stream option.",
+            "keyExams": "JEE Main, JEE Advanced, NEET UG. Dono exams ek saath crack karna extremely difficult hai — most students ek pe focus karte hain.",
+            "timeCommitment": "2 saal (12th). Warning: stress level high hota hai agar dono exams simultaneously prepare karo."
+          },
+          {
+            "name": "Polytechnic Diploma (3 years, direct after 10th)",
+            "whatIsIt": "Engineering diploma course directly after 10th. Civil, Mechanical, Electrical, Computer Science, Electronics jaise trades available hain. Government aur private polytechnic colleges hote hain.",
+            "whoFor": "Jo student jaldi practical skills seekhna chahta ho, 12th ka time bachana chahta ho, ya job/earn jaldi shuru karna chahta ho. Maths mein reasonable ho.",
+            "leadsTo": "Junior Engineer (government/private), ITI instructor, apna business, ya lateral entry mein B.Tech 2nd year (padhai continue karna chahte ho to). Government jobs bhi hain.",
+            "keyExams": "State-level Polytechnic Entrance Exam (har state ka alag hota hai — e.g., Delhi CET, UP JEECUP, Maharashtra DTE). Admission seats limited hain popular branches mein.",
+            "timeCommitment": "3 saal diploma. 12th se 1 saal jaldi complete hota hai."
+          },
+          {
+            "name": "12th Science with Biology (PCB)",
+            "whatIsIt": "Physics, Chemistry, Biology ke saath 12th karo — medical aur healthcare fields ke liye standard path.",
+            "whoFor": "Jo student doctor, nurse, pharmacist, ya allied health professional banna chahta ho. Maths weak ho to bhi ye stream accessible hai.",
+            "leadsTo": "MBBS, BDS, BAMS, Nursing, Pharmacy, Physiotherapy, Biotech, Agriculture.",
+            "keyExams": "NEET UG — yeh India ka most competitive exam hai. 2024 mein 24 lakh se zyada students ne diya, government MBBS seats bahut limited hain. Realistic expectations rakhna zaroori hai.",
+            "timeCommitment": "2 saal (12th) + 5.5 saal MBBS = 7.5 saal minimum. Other courses 3-4 saal."
+          },
+          {
+            "name": "12th Commerce",
+            "whatIsIt": "Accounts, Business Studies, Economics, aur optionally Maths ke saath 12th karo. Business aur finance world ka gateway.",
+            "whoFor": "Jo student business, banking, finance, ya CA banna chahta ho. Science mein interest kam ho aur numbers/business mein interest zyada ho.",
+            "leadsTo": "CA (Chartered Accountant), BBA, B.Com, Economics Honours, Banking/Finance jobs, MBA later.",
+            "keyExams": "CA Foundation (after 12th), CUET (central universities ke liye), various BBA entrance exams.",
+            "timeCommitment": "2 saal (12th). CA banne mein 4-5 saal aur lagte hain."
+          },
+          {
+            "name": "12th Arts / Humanities",
+            "whatIsIt": "History, Political Science, Geography, Psychology, Sociology, Literature jaise subjects. Broad thinking aur communication skills develop hoti hain.",
+            "whoFor": "Jo student civil services (IAS/IPS), law, journalism, social work, ya creative fields mein jaana chahta ho. Science se alag path chahiye.",
+            "leadsTo": "UPSC Civil Services (IAS/IPS/IFS), LLB (Law), Journalism, Teaching, Psychology, Social Work, Design, MBA bhi possible hai later.",
+            "keyExams": "CLAT (law), CUET (central universities), UPSC (after graduation — highly competitive).",
+            "timeCommitment": "2 saal (12th) + 3-5 saal graduation/professional course."
+          },
+          {
+            "name": "Paramedical Diploma after 10th (DMLT, ANM, X-Ray Tech, etc.)",
+            "whatIsIt": "Medical support field mein short diploma courses — jaise DMLT (lab technician), ANM (nursing), X-Ray Technician, Operation Theatre Tech. Government aur private institutes dono mein available.",
+            "whoFor": "Jo student healthcare mein jaana chahta ho but NEET nahi dena ya time/resources limited ho. Jaldi job chahiye medical sector mein.",
+            "leadsTo": "Hospital jobs, diagnostic lab work, government health department, private clinics. Salary modest hoti hai initially — growth slow but stable.",
+            "keyExams": "Most institutes direct admission dete hain 10th marks ke basis pe. Kuch states mein entrance test hota hai. Quality of institute check karna zaroori hai — bahut fake institutes bhi hain.",
+            "timeCommitment": "1-2 saal diploma + 6 months internship typically."
+          }
+        ]
+      },
+      {
+        "title": "Earning ke options",
+        "intro": "Science & Maths background ke saath yeh skills aur extra income ke raaste realistic hain — part-time ya freelance basis pe. Padhai ke saath balance karna possible hai agar time manage karo.",
+        "options": [
+          {
+            "name": "Graphic Design (Canva / Figma)",
+            "whatIsIt": "Logo, poster, social media creatives, YouTube thumbnails banao. Canva free hai aur 1-2 hafte mein seekha ja sakta hai. Freelance kaam Fiverr, Instagram ya local businesses se milta hai.",
+            "whoFor": "Jo student thoda creative ho aur phone/laptop use karna jaanta ho. Science background wale bhi easily seekh sakte hain.",
+            "leadsTo": "Freelance income Rs. 3,000–20,000/month part-time possible hai. Long term — UI/UX designer, digital marketing professional.",
+            "keyExams": "",
+            "timeCommitment": "2-4 hafte basic seekhne mein, phir practice se improve hota hai."
+          },
+          {
+            "name": "Content Creation (YouTube / Instagram / Shorts)",
+            "whatIsIt": "Science facts, maths tricks, study tips ya koi bhi interesting topic pe videos banao. Starting mein phone hi kaafi hai.",
+            "whoFor": "Jo student comfortable ho camera ke saamne ya voice-over se, aur regularly content de sake. Patience chahiye — results 6-12 mahine mein aate hain.",
+            "leadsTo": "AdSense income, brand sponsorships, paid courses. Honest warning: most creators 1 saal mein significant income nahi karte — supplementary option samjho, main plan nahi.",
+            "keyExams": "",
+            "timeCommitment": "Ongoing — 5-10 hours/week minimum for consistency."
+          },
+          {
+            "name": "Data Entry / Typing Work",
+            "whatIsIt": "Online ya offline data entry, form filling, transcription kaam. Typing speed acchi honi chahiye (30+ WPM). Platforms: Fiverr, Upwork, local offices.",
+            "whoFor": "Jo student computer access rakhta ho aur reliable, straightforward kaam dhundhta ho. Glamorous nahi hai but genuine income hai.",
+            "leadsTo": "Rs. 5,000–12,000/month part-time. Gateway to virtual assistant work later.",
+            "keyExams": "",
+            "timeCommitment": "1-2 hafte typing practice, phir immediately apply kar sakte ho."
+          },
+          {
+            "name": "Mobile Phone Repair",
+            "whatIsIt": "Phones ki screen, battery, charging port repair karna seekho. Maths/science background wale hardware-software logic quickly samajhte hain. YouTube se free mein seekha ja sakta hai, ya short paid course se.",
+            "whoFor": "Jo student hands-on technical kaam enjoy karta ho. Small town mein bhi demand high hai.",
+            "leadsTo": "Rs. 8,000–25,000/month apni service se possible. Apna repair shop kholne ka option bhi hai.",
+            "keyExams": "",
+            "timeCommitment": "1-3 mahine basic training. ITI Electronics course bhi consider kar sakte ho formally."
+          },
+          {
+            "name": "Meesho / Reselling",
+            "whatIsIt": "Meesho ya GlowRoad app se products share karo WhatsApp/Instagram pe — har sale pe commission milta hai. Zero investment se shuru kar sakte ho.",
+            "whoFor": "Jo student active social network rakhta ho aur sales/communication mein comfortable ho.",
+            "leadsTo": "Rs. 2,000–10,000/month part-time. Business understanding develop hoti hai — useful for commerce/entrepreneurship path.",
+            "keyExams": "",
+            "timeCommitment": "Flexible — 1-2 hours/day. Results consistent effort ke saath aate hain."
+          },
+          {
+            "name": "Photography / Videography",
+            "whatIsIt": "Events, products, ya portraits shoot karo. Phone camera se bhi start kar sakte ho. Editing Capcut ya VN se seekho — free apps hain.",
+            "whoFor": "Jo student visually creative ho aur local events (shaadi, birthday, school events) access kar sake.",
+            "leadsTo": "Rs. 500–3,000 per event locally. Long-term — professional photographer, video editor, cinematographer.",
+            "keyExams": "",
+            "timeCommitment": "2-4 hafte basics seekhne mein, phir practice se portfolio banao."
+          },
+          {
+            "name": "Tally / Basic Accounting",
+            "whatIsIt": "Tally software seekho — local shops aur businesses ko bookkeeping mein help karo. Maths strong hai to yeh quickly seekha ja sakta hai.",
+            "whoFor": "Jo student numbers mein comfortable ho aur local business network ho. Commerce interest ho to extra useful.",
+            "leadsTo": "Part-time accounting help Rs. 3,000–8,000/month. Long-term — accountant, CA foundation ka base banta hai.",
+            "keyExams": "",
+            "timeCommitment": "1 mahine Tally basic course (Rs. 1,000–3,000 mein available)."
+          },
+          {
+            "name": "Tailoring / Stitching",
+            "whatIsIt": "Stitching aur alteration work seekho — local training centers ya YouTube se. Ghar se hi kaam shuru kar sakte ho.",
+            "whoFor": "Jo student creative ho aur ghar se stable income chahta ho. Family support bhi helpful hota hai is field mein.",
+            "leadsTo": "Rs. 5,000–15,000/month possible ghar se. Boutique ya fashion designing mein bhi grow kar sakte ho.",
+            "keyExams": "",
+            "timeCommitment": "2-3 mahine basic stitching seekhne mein."
+          }
+        ]
+      }
+    ],
+    "closingMessage": "Yeh guide save kar lo aur apne parents/teachers se discuss karo. Jab aap 12th pass kar lo, SkillKite pe wapas aana — tab hum detailed career roadmap banake denge. Apne dost ko bhi share karo — unhe bhi help mil sakti hai. \uD83E\uDE81",
+    "flowLabel": "10th"
+  }
+}

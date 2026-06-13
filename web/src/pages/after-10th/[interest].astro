@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import GuideView from '../../components/GuideView.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides', (g) => g.data.category === 'after-10th');
+  return guides.map((g) => ({ params: { interest: g.data.stream }, props: { entry: g.data } }));
+}
+
+const { entry } = Astro.props;
+const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
+---
+
+<Base title={seoTitle} description={seoDescription} path={`/after-10th/${stream}`}>
+  <GuideView
+    eyebrow={`📚 After 10th · ${streamLabel}`}
+    heading={`After 10th — ${streamLabel}`}
+    intro={`Every stream and option after 10th, with ${streamLabel.toLowerCase()} paths first. Tap any option to see what it is, who it's for, and where it leads.`}
+    pdfWaText={`Hi SkillKite! I just finished 10th — send me the guide`}
+    backHref="/after-10th"
+    backLabel="Other interests"
+    sections={guide.sections}
+    escapePrompt="Want a plan matched to your marks and goals?"
+    escapeWaText="Hi SkillKite! I just finished 10th"
+  />
+</Base>

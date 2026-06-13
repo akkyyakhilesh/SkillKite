@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import PickerView from '../../components/PickerView.astro';
+import { TENTH_INTERESTS } from '../../config/categories';
+
+const title = 'After 10th — stream selection guide | SkillKite';
+const description =
+  'After 10th, which stream? Explore Science, Commerce, Arts — plus polytechnic, ITI and paramedical — with every option and where it leads. Free, honest, no pressure.';
+
+const items = TENTH_INTERESTS.map((s) => ({
+  href: `/after-10th/${s.slug}`,
+  emoji: s.emoji,
+  title: s.label,
+  blurb: s.blurb,
+}));
+---
+
+<Base title={title} description={description} path="/after-10th">
+  <PickerView
+    eyebrow="📚 After 10th"
+    heading="What interests you most?"
+    intro="After 10th, your big choice is your stream. Pick what pulls you — or explore everything if you're still deciding. We'll show every realistic path."
+    items={items}
+    escapePrompt="Still confused? That's completely normal at this stage."
+    escapeWaText="Hi SkillKite! Help me choose after 10th"
+  />
+</Base>

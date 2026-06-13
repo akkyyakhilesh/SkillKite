@@ -7,9 +7,10 @@ import { CATEGORIES, whatsappLink } from '../config/categories';
 // cards land in the next build step once the generic guide content is
 // generated. Routing + layout are proven here.
 export function getStaticPaths() {
-  // after-12th has its own built-out pages (stream picker + guides); the other
-  // three categories use this placeholder until their content is generated.
-  return CATEGORIES.filter((c) => c.slug !== 'after-12th').map((c) => ({
+  // after-10th and after-12th have their own built-out pages (picker + guides);
+  // the remaining categories use this placeholder until their content is generated.
+  const built = new Set(['after-10th', 'after-12th']);
+  return CATEGORIES.filter((c) => !built.has(c.slug)).map((c) => ({
     params: { category: c.slug },
     props: { category: c },
   }));

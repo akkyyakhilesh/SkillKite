@@ -1,0 +1,147 @@
+{
+  "category": "after-10th",
+  "stream": "explore",
+  "streamLabel": "Not sure yet — show everything",
+  "seoTitle": "Not sure yet — show everything after 10th — courses, exams & careers | SkillKite",
+  "seoDescription": "After 10th — every stream and option compared, if you're still deciding",
+  "guide": {
+    "heading": "SkillKite — 10th ke baad aapke options",
+    "greeting": "Hi there! You mentioned you are not sure about your interest area yet, and you want both study and earning options. That is completely okay — being confused at this stage is very normal. Neeche saare realistic options diye hain taaki aap properly compare karke decide kar sako. Koi bhi decision abhi final nahi hai — explore karo.",
+    "sections": [
+      {
+        "title": "Padhai ke options",
+        "intro": "Since you are confused about your interest, all options are shown equally — read each one carefully and notice which ones feel exciting to you. That feeling is a good clue about your interest.",
+        "options": [
+          {
+            "name": "12th Arts / Humanities",
+            "whatIsIt": "History, Geography, Political Science, Psychology, Sociology jaise subjects padhte ho. Agar abhi science ya maths clearly pasand nahi hai, Arts ek flexible aur wide-open path hai.",
+            "whoFor": "Students jo confused hain, ya jinhe reading, writing, society, current affairs, ya languages mein thodi bhi curiosity hai. Pressure comparatively kam hota hai.",
+            "leadsTo": "BA, Law (LLB), Journalism, Teaching (B.Ed), Civil Services (IAS/IPS), Social Work, Mass Communication, Hotel Management, Design aur bahut kuch.",
+            "keyExams": "CLAT (Law), DU/State University entrance, CUET, NID/NIFT (Design), various state-level exams",
+            "timeCommitment": "2 years 12th, phir 3–5 years graduation depending on field"
+          },
+          {
+            "name": "12th Commerce",
+            "whatIsIt": "Accounts, Business Studies, Economics padhte ho. Agar money, business, ya entrepreneurship thoda bhi interesting lagta hai, yeh ek practical aur job-friendly stream hai.",
+            "whoFor": "Students jo business, banking, finance, ya apna kaam shuru karne mein curious hain. Maths optional hota hai — Maths wala aur bina Maths wala, dono variants available hain.",
+            "leadsTo": "B.Com, BBA, CA (Chartered Accountant), CS, Banking jobs, MBA, E-commerce, Accounting, Insurance sector.",
+            "keyExams": "CA Foundation, CUET, BBA entrance exams (IPU CET, SET, etc.), various state university exams",
+            "timeCommitment": "2 years 12th, phir 3–5 years graduation/professional course"
+          },
+          {
+            "name": "Polytechnic Diploma (3 years, direct after 10th)",
+            "whatIsIt": "Engineering aur technical skills ki practical training directly 10th ke baad — college jaane ki zaroorat nahi pehle. Mechanical, Civil, Electrical, Computer Science, Electronics jaise branches hote hain.",
+            "whoFor": "Students jo hands-on technical kaam mein interest rakhte hain, ya jaldi ek stable job ya earning chahte hain. Agar you are confused but lean slightly towards practical work, yeh strong option hai.",
+            "leadsTo": "Junior Engineer (government aur private), Technician jobs, further B.Tech Lateral Entry (2nd year direct), self-employment in technical services.",
+            "keyExams": "State Polytechnic Entrance Exams — jaise UP JEECUP, AP POLYCET, MH CET (Polytechnic), Delhi CET. Admission criteria state ke hisaab se alag hote hain.",
+            "timeCommitment": "3 years full-time diploma"
+          },
+          {
+            "name": "12th Science with Maths (PCM)",
+            "whatIsIt": "Physics, Chemistry, Maths padhte ho. Engineering, architecture, ya technology mein jaana ho toh yeh standard path hai. Syllabus demanding hai — honestly bolein toh mehnat zyada lagti hai.",
+            "whoFor": "Students jinhe Maths mein genuine interest hai ya engineering/tech field clearly attract karta hai. Confusion ke bawajood agar numbers comfortable lagte hain toh consider karo.",
+            "leadsTo": "IIT/NIT (B.Tech), Engineering colleges, Architecture (B.Arch), BCA, BSc Maths/Physics, Merchant Navy, Defence exams.",
+            "keyExams": "JEE Main, JEE Advanced, MHT CET, WBJEE, BITSAT, CUET, NDA (Defence)",
+            "timeCommitment": "2 years 12th, phir 4 years B.Tech/BE or 3 years BSc"
+          },
+          {
+            "name": "12th Science with Biology (PCB)",
+            "whatIsIt": "Physics, Chemistry, Biology padhte ho. Medical field mein jaana ho — doctor, nurse, paramedic — toh yeh path hai. NEET bahut competitive hai, honestly preparation intense hoti hai.",
+            "whoFor": "Students jinhe living organisms, human body, ya healthcare genuinely fascinating lagta hai. Confused ho toh ek baar biology ka ek chapter padhke dekho — curiosity feel hoti hai ya nahi.",
+            "leadsTo": "MBBS (Doctor), BDS (Dentist), BAMS (Ayurveda), Nursing (B.Sc Nursing), Physiotherapy, Biotechnology, BSc Biology.",
+            "keyExams": "NEET-UG (very competitive — lakhs of students compete for limited seats), AIIMS, state medical entrance exams",
+            "timeCommitment": "2 years 12th, phir 4.5–5.5 years MBBS or 3–4 years other medical courses"
+          },
+          {
+            "name": "12th Science with Maths + Biology (PCMB)",
+            "whatIsIt": "PCM aur PCB dono saath padhte ho — Maths bhi, Biology bhi. Zyada subjects matlab zyada options open rehte hain, lekin workload bhi zyada hota hai.",
+            "whoFor": "Students jo confused hain between engineering aur medical — dono doors open rakhna chahte hain. Lekin honest advice: yeh combination bahut heavy hai, sirf tab lo agar aap genuinely strong student ho aur dono fields mein interest lagta ho.",
+            "leadsTo": "Both engineering AND medical paths open — JEE aur NEET dono de sakte ho. BSc, Biotech, Bioinformatics bhi option hai.",
+            "keyExams": "JEE Main, NEET-UG (dono ke liye alag-alag heavy preparation needed)",
+            "timeCommitment": "2 years 12th (intense), phir 4–5.5 years depending on field"
+          },
+          {
+            "name": "Paramedical Diploma after 10th (DMLT, ANM, X-Ray Tech, etc.)",
+            "whatIsIt": "Medical field mein supporting roles ke liye short diplomas — jaise DMLT (Lab Technician), ANM (Nursing), X-Ray Technician, OT Technician. Directly 10th ke baad ho sakte hain.",
+            "whoFor": "Students jinhe healthcare field mein interest hai lekin MBBS jitna lamba aur expensive path nahi lena — ya jo jaldi earn karna chahte hain alongside studying.",
+            "leadsTo": "Government aur private hospitals mein jobs — Lab Technician, Nursing Assistant, Radiographer. Aage B.Sc Paramedical bhi kar sakte ho.",
+            "keyExams": "Most institutions mein 10th marks ke basis pe admission — kuch mein entrance test bhi hota hai. State-wise vary karta hai.",
+            "timeCommitment": "1–2 years diploma depending on course"
+          }
+        ]
+      },
+      {
+        "title": "Earning ke options — abhi se shuru kar sakte ho",
+        "intro": "Yeh sab kaam 10th ke baad part-time ya full-time kar sakte ho — padhai ke saath bhi. Confused hona earning start karne se nahi rokta. Kuch skills seekhne mein sirf 1–3 mahine lagte hain.",
+        "options": [
+          {
+            "name": "Graphic Design (Canva / Figma)",
+            "whatIsIt": "Social media posts, logos, posters, banners design karna — clients ke liye ya freelance mein. Canva se shuru kar sakte ho, Figma se professional level pe aao.",
+            "whoFor": "Students jinhe visual cheezein pasand hain — colors, layouts, creativity. Interest clear nahi hai toh yeh ek low-risk skill hai explore karne ke liye.",
+            "leadsTo": "Freelancing on Fiverr/Internshala, social media manager, small business clients, eventually full-time design career.",
+            "keyExams": "",
+            "timeCommitment": "1–2 months basics seekhna, phir projects shuru karo"
+          },
+          {
+            "name": "Content Creation (YouTube / Instagram Reels)",
+            "whatIsIt": "Videos banao apni life ke baare mein, kisi topic pe, ya kisi skill ke baare mein. Slowly audience build hoti hai, phir brand deals ya AdSense se income aati hai.",
+            "whoFor": "Students jo camera ke saamne comfortable hain ya koi interesting topic jaante hain — cooking, study tips, gaming, travel, anything. Consistency key hai.",
+            "leadsTo": "Social media influencer, brand collaborations, YouTube monetization, eventually digital marketing career.",
+            "keyExams": "",
+            "timeCommitment": "Consistent daily effort — income aane mein 6–12 months lag sakte hain, patient rehna zaruri hai"
+          },
+          {
+            "name": "Meesho / Reselling Business",
+            "whatIsIt": "Meesho ya GlowRoad jaise apps se products apne contacts aur social media pe becho — koi investment nahi chahiye shuru mein. Commission milta hai har sale pe.",
+            "whoFor": "Students jo business aur selling mein curious hain aur apne local network use karna chahte hain. Bahut low risk, zero investment option.",
+            "leadsTo": "Side income, business skills develop hoti hain, aage apna dropshipping ya e-commerce business shuru kar sakte ho.",
+            "keyExams": "",
+            "timeCommitment": "Flexible — 1–2 ghante daily kaafi hai shuru mein"
+          },
+          {
+            "name": "Data Entry / Typing Work",
+            "whatIsIt": "Computers pe data type karna, forms fill karna, Excel mein entries karna — basic typing speed aur accuracy chahiye. Offline aur online dono options hain.",
+            "whoFor": "Students jinhe stable, simple part-time kaam chahiye padhai ke saath. Glamorous nahi hai, but honest earning hai.",
+            "leadsTo": "Office assistant jobs, BPO/data processing companies, freelance data entry on Upwork/Fiverr.",
+            "keyExams": "",
+            "timeCommitment": "Typing speed improve karne mein 3–4 weeks, phir kaam dhundh sakte ho"
+          },
+          {
+            "name": "Mobile Phone Repair",
+            "whatIsIt": "Smartphones ki screen change karna, battery replace karna, software issues fix karna — yeh skill locally seekhi ja sakti hai ek technician se.",
+            "whoFor": "Students jinhe technical / hands-on kaam pasand hai. Har mohalle mein demand hai is skill ki — bahut practical option hai.",
+            "leadsTo": "Apni mobile repair shop, service center mein job, electronics technician as a long-term career.",
+            "keyExams": "",
+            "timeCommitment": "2–3 months apprenticeship under a local technician"
+          },
+          {
+            "name": "Photography / Videography",
+            "whatIsIt": "Events, portraits, products ya reels ke liye photos aur videos lena. Shuru mein smartphone se bhi kaam chalata hai.",
+            "whoFor": "Students jo creative hain aur visual storytelling mein naturally interested feel karte hain — ya jinhone social media pe reels banane ki koshish ki hai.",
+            "leadsTo": "Freelance photographer/videographer, wedding shoots, product photography for small businesses, YouTube production.",
+            "keyExams": "",
+            "timeCommitment": "1–2 months basics, phir local clients dhundho"
+          },
+          {
+            "name": "Tailoring / Stitching",
+            "whatIsIt": "Clothes stitch karna, alterations karna, blouses ya simple garments banana — ek traditional but highly in-demand skill.",
+            "whoFor": "Students who are patient, detail-oriented, aur creative with fabric and design. Girls aur boys dono ke liye equally valid option hai.",
+            "leadsTo": "Home-based tailoring business, boutique, fashion designing further education (NIFT), or garment industry jobs.",
+            "keyExams": "",
+            "timeCommitment": "3–6 months basic training from a local tailor or government ITI"
+          },
+          {
+            "name": "Tally / Basic Accounting",
+            "whatIsIt": "Tally software seekhna — local shops, small businesses ki GST aur accounts maintain karna. Short courses available hain offline aur online dono.",
+            "whoFor": "Students jinhe numbers aur commerce thoda comfortable lagta hai. Agar Commerce 12th soch rahe ho, toh yeh parallel earning skill hai.",
+            "leadsTo": "Part-time accountant at local shops, BPO data work, aage full CA ya B.Com ke saath strong career in finance.",
+            "keyExams": "",
+            "timeCommitment": "1–2 months Tally course, phir local clients ya small businesses se kaam mil sakta hai"
+          }
+        ]
+      }
+    ],
+    "closingMessage": "Yeh guide save kar lo aur apne parents/teachers se discuss karo. Confused rehna ek stage hai — har kisi ke saath hota hai. Koi bhi ek skill try karo earning side se, aur padhai mein ek stream choose karo jo thodi bhi exciting lage — dono decisions wapas change ho sakte hain. Jab aap 12th pass kar lo, SkillKite pe wapas aana — tab hum detailed career roadmap banake denge. Apne dost ko bhi share karo — unhe bhi help mil sakti hai. \uD83E\uDE81",
+    "flowLabel": "10th"
+  }
+}

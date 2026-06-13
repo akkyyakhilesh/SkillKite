@@ -1,0 +1,85 @@
+---
+import { whatsappLink } from '../config/categories';
+
+interface Option {
+  name: string;
+  whatIsIt: string;
+  whoFor: string;
+  leadsTo: string;
+  keyExams: string;
+  timeCommitment: string;
+}
+interface Section {
+  title: string;
+  intro?: string | null;
+  options: Option[];
+}
+
+export interface Props {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  pdfWaText: string;
+  backHref: string;
+  backLabel: string;
+  sections: Section[];
+  escapePrompt: string;
+  escapeWaText: string;
+}
+
+const { eyebrow, heading, intro, pdfWaText, backHref, backLabel, sections, escapePrompt, escapeWaText } =
+  Astro.props;
+
+// Short preview line for the collapsed card — first sentence of "leads to".
+const preview = (s: string) => {
+  const first = s.split(/(?<=[.!?])\s/)[0] ?? s;
+  return first.length > 110 ? first.slice(0, 107).trimEnd() + '…' : first;
+};
+---
+
+<section class="hero hero--sub">
+  <div class="hero-inner">
+    <span class="eyebrow">{eyebrow}</span>
+    <h1>{heading}</h1>
+    <p class="sub">{intro}</p>
+    <div class="ctas">
+      <a class="btn-wa" href={whatsappLink(pdfWaText)}>💬 Get this as a PDF on WhatsApp</a>
+      <a class="btn-br" href={backHref}>← {backLabel}</a>
+    </div>
+  </div>
+</section>
+
+<section class="guide">
+  {
+    sections.map((section) => (
+      <div class="guide-section">
+        <h2 class="sec-title">{section.title}</h2>
+        {section.intro && <p class="sec-intro">{section.intro}</p>}
+
+        {section.options.map((o) => (
+          <details class="opt">
+            <summary>
+              <span class="opt-head">
+                <span class="opt-name">{o.name}</span>
+                <span class="opt-preview">{preview(o.leadsTo)}</span>
+              </span>
+              <span class="opt-chev" aria-hidden="true">▸</span>
+            </summary>
+            <div class="opt-body">
+              {o.whatIsIt && <p><span class="ic">❓</span>{o.whatIsIt}</p>}
+              {o.whoFor && <p><span class="ic">👤</span>{o.whoFor}</p>}
+              {o.leadsTo && <p><span class="ic">➡️</span>{o.leadsTo}</p>}
+              {o.keyExams && <p><span class="ic">📜</span>{o.keyExams}</p>}
+              {o.timeCommitment && <p><span class="ic">⏱️</span>{o.timeCommitment}</p>}
+            </div>
+          </details>
+        ))}
+      </div>
+    ))
+  }
+
+  <div class="escape">
+    <p>{escapePrompt}</p>
+    <a class="btn-wa" href={whatsappLink(escapeWaText)}>💬 Chat on WhatsApp</a>
+  </div>
+</section>

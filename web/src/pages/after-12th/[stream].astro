@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { whatsappLink } from '../../config/categories';
+import GuideView from '../../components/GuideView.astro';
 
 export async function getStaticPaths() {
   const guides = await getCollection('guides', (g) => g.data.category === 'after-12th');
@@ -10,66 +10,18 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
-
-// Short preview line for the collapsed card — first sentence of "leads to".
-const preview = (s: string) => {
-  const first = s.split(/(?<=[.!?])\s/)[0] ?? s;
-  return first.length > 110 ? first.slice(0, 107).trimEnd() + '…' : first;
-};
 ---
 
 <Base title={seoTitle} description={seoDescription} path={`/after-12th/${stream}`}>
-  <section class="hero hero--sub">
-    <div class="hero-inner">
-      <span class="eyebrow">🎯 After 12th · {streamLabel}</span>
-      <h1>{streamLabel} — your options</h1>
-      <p class="sub">
-        Every realistic course, entrance exam and career path after 12th {streamLabel}.
-        Tap any option to see details. Honest timelines, no hype.
-      </p>
-      <div class="ctas">
-        <a class="btn-wa" href={whatsappLink(`Hi SkillKite! I'm 12th ${streamLabel} — send me the guide`)}>
-          💬 Get this as a PDF on WhatsApp
-        </a>
-        <a class="btn-br" href="/after-12th">← Other streams</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="guide">
-    {
-      guide.sections.map((section) => (
-        <div class="guide-section">
-          <h2 class="sec-title">{section.title}</h2>
-          {section.intro && <p class="sec-intro">{section.intro}</p>}
-
-          {section.options.map((o) => (
-            <details class="opt">
-              <summary>
-                <span class="opt-head">
-                  <span class="opt-name">{o.name}</span>
-                  <span class="opt-preview">{preview(o.leadsTo)}</span>
-                </span>
-                <span class="opt-chev" aria-hidden="true">▸</span>
-              </summary>
-              <div class="opt-body">
-                {o.whatIsIt && <p><span class="ic">❓</span>{o.whatIsIt}</p>}
-                {o.whoFor && <p><span class="ic">👤</span>{o.whoFor}</p>}
-                {o.leadsTo && <p><span class="ic">➡️</span>{o.leadsTo}</p>}
-                {o.keyExams && <p><span class="ic">📜</span>{o.keyExams}</p>}
-                {o.timeCommitment && <p><span class="ic">⏱️</span>{o.timeCommitment}</p>}
-              </div>
-            </details>
-          ))}
-        </div>
-      ))
-    }
-
-    <div class="escape">
-      <p>Want this personalized to you, with free learning resources?</p>
-      <a class="btn-wa" href={whatsappLink(`Hi SkillKite! I'm 12th ${streamLabel}`)}>
-        💬 Chat on WhatsApp
-      </a>
-    </div>
-  </section>
+  <GuideView
+    eyebrow={`🎯 After 12th · ${streamLabel}`}
+    heading={`${streamLabel} — your options`}
+    intro={`Every realistic course, entrance exam and career path after 12th ${streamLabel}. Tap any option to see details. Honest timelines, no hype.`}
+    pdfWaText={`Hi SkillKite! I'm 12th ${streamLabel} — send me the guide`}
+    backHref="/after-12th"
+    backLabel="Other streams"
+    sections={guide.sections}
+    escapePrompt="Want this personalized to you, with free learning resources?"
+    escapeWaText={`Hi SkillKite! I'm 12th ${streamLabel}`}
+  />
 </Base>

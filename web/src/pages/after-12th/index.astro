@@ -1,45 +1,27 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { TWELFTH_STREAMS, whatsappLink } from '../../config/categories';
+import PickerView from '../../components/PickerView.astro';
+import { TWELFTH_STREAMS } from '../../config/categories';
 
 const title = 'After 12th — choose your stream | SkillKite';
 const description =
   'After 12th, your options depend on your stream. Pick PCM, PCB, Commerce, Arts or BBA to see every course, entrance exam and career path — honestly laid out, free.';
+
+const items = TWELFTH_STREAMS.map((s) => ({
+  href: `/after-12th/${s.slug}`,
+  emoji: s.emoji,
+  title: s.label,
+  blurb: s.blurb,
+}));
 ---
 
 <Base title={title} description={description} path="/after-12th">
-  <section class="hero hero--sub">
-    <div class="hero-inner">
-      <span class="eyebrow">🎯 After 12th</span>
-      <h1>Which stream did you take?</h1>
-      <p class="sub">
-        Your options after 12th depend on your stream. Pick yours to see every course,
-        entrance exam and career — all on one page.
-      </p>
-    </div>
-  </section>
-
-  <section class="cards-wrap">
-    <div class="picker">
-      {
-        TWELFTH_STREAMS.map((s) => (
-          <a class="pick" href={`/after-12th/${s.slug}`}>
-            <span class="pick-emoji">{s.emoji}</span>
-            <span class="pick-body">
-              <span class="pick-title">{s.label}</span>
-              <span class="pick-blurb">{s.blurb}</span>
-            </span>
-            <span class="pick-go">→</span>
-          </a>
-        ))
-      }
-    </div>
-
-    <div class="escape">
-      <p>Not sure which fits you?</p>
-      <a class="btn-wa" href={whatsappLink('Hi SkillKite! Help me choose after 12th')}>
-        💬 Chat on WhatsApp
-      </a>
-    </div>
-  </section>
+  <PickerView
+    eyebrow="🎯 After 12th"
+    heading="Which stream did you take?"
+    intro="Your options after 12th depend on your stream. Pick yours to see every course, entrance exam and career — all on one page."
+    items={items}
+    escapePrompt="Not sure which fits you?"
+    escapeWaText="Hi SkillKite! Help me choose after 12th"
+  />
 </Base>

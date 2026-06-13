@@ -79,6 +79,15 @@ export const TWELFTH_STREAMS: Stream[] = [
   { slug: 'bba', label: 'BBA', emoji: '💼', blurb: 'MBA specializations, entrepreneurship & management careers.' },
 ];
 
+/** 10th-flow interest areas — order + blurb for the after-10th picker.
+ *  Slugs match the generated guide entries (content/guides/10th-*.json). */
+export const TENTH_INTERESTS: Stream[] = [
+  { slug: 'science', label: 'Science', emoji: '🔬', blurb: 'PCM, PCB, polytechnic, paramedical — what each science path opens up.' },
+  { slug: 'commerce', label: 'Commerce', emoji: '📊', blurb: 'Accounts, CA foundation track, B.Com path & business careers.' },
+  { slug: 'arts', label: 'Arts / Humanities', emoji: '🎨', blurb: 'Law, design, journalism, government jobs & creative paths.' },
+  { slug: 'explore', label: "Not sure yet", emoji: '🤔', blurb: 'Still deciding? See every stream and option compared side by side.' },
+];
+
 /** Production WhatsApp bot number (digits only, for wa.me links). */
 export const WHATSAPP_NUMBER = '916201226351';
 export const WHATSAPP_CTA_TEXT = 'Hi SkillKite!';

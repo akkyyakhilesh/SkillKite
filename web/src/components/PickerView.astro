@@ -1,0 +1,51 @@
+---
+import { whatsappLink } from '../config/categories';
+
+interface Item {
+  href: string;
+  emoji: string;
+  title: string;
+  blurb: string;
+}
+
+export interface Props {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  items: Item[];
+  escapePrompt: string;
+  escapeWaText: string;
+}
+
+const { eyebrow, heading, intro, items, escapePrompt, escapeWaText } = Astro.props;
+---
+
+<section class="hero hero--sub">
+  <div class="hero-inner">
+    <span class="eyebrow">{eyebrow}</span>
+    <h1>{heading}</h1>
+    <p class="sub">{intro}</p>
+  </div>
+</section>
+
+<section class="cards-wrap">
+  <div class="picker">
+    {
+      items.map((it) => (
+        <a class="pick" href={it.href}>
+          <span class="pick-emoji">{it.emoji}</span>
+          <span class="pick-body">
+            <span class="pick-title">{it.title}</span>
+            <span class="pick-blurb">{it.blurb}</span>
+          </span>
+          <span class="pick-go">→</span>
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="escape">
+    <p>{escapePrompt}</p>
+    <a class="btn-wa" href={whatsappLink(escapeWaText)}>💬 Chat on WhatsApp</a>
+  </div>
+</section>
