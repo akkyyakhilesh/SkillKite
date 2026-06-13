@@ -88,6 +88,19 @@ export const TENTH_INTERESTS: Stream[] = [
   { slug: 'explore', label: "Not sure yet", emoji: '🤔', blurb: 'Still deciding? See every stream and option compared side by side.' },
 ];
 
+/** Skill-Upgrade fields — order + blurb for the skill-upgrade picker.
+ *  Slugs match the generated guide entries (content/guides/upskill-*.json). */
+export const SKILL_FIELDS: Stream[] = [
+  { slug: 'software_it', label: 'Software / IT', emoji: '💻', blurb: 'Dev, cloud, DevOps — skills to add and the next rung up.' },
+  { slug: 'data_analytics', label: 'Data & Analytics', emoji: '📊', blurb: 'SQL, Power BI, data science — certifications and roles that pay.' },
+  { slug: 'design_creative', label: 'Design & Creative', emoji: '🎨', blurb: 'UI/UX, motion, branding — skills, roles and freelance moves.' },
+  { slug: 'content_marketing', label: 'Content & Marketing', emoji: '✍️', blurb: 'SEO, performance, social — the next step in marketing.' },
+  { slug: 'banking_finance', label: 'Banking & Finance', emoji: '🏦', blurb: 'Certifications, analyst tracks and salary bands to target.' },
+  { slug: 'healthcare', label: 'Healthcare', emoji: '🩺', blurb: 'Allied-health skills, roles and ways to level up.' },
+  { slug: 'teaching_edu', label: 'Teaching & Education', emoji: '📖', blurb: 'Ed-tech, online tutoring and the next move in education.' },
+  { slug: 'ops_support', label: 'Operations & Support', emoji: '🛠️', blurb: 'Process, tools and roles to grow into beyond support.' },
+];
+
 /** Production WhatsApp bot number (digits only, for wa.me links). */
 export const WHATSAPP_NUMBER = '916201226351';
 export const WHATSAPP_CTA_TEXT = 'Hi SkillKite!';

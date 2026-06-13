@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import PickerView from '../../components/PickerView.astro';
+import { SKILL_FIELDS } from '../../config/categories';
+
+const title = 'Skill Upgrade — level up in your field | SkillKite';
+const description =
+  'Already working? Pick your field to see the skills to add now, the next roles to target with salary bands, and side moves where your experience transfers. Free.';
+
+const items = SKILL_FIELDS.map((s) => ({
+  href: `/skill-upgrade/${s.slug}`,
+  emoji: s.emoji,
+  title: s.label,
+  blurb: s.blurb,
+}));
+---
+
+<Base title={title} description={description} path="/skill-upgrade">
+  <PickerView
+    eyebrow="🌱 Skill Upgrade"
+    heading="What field are you in?"
+    intro="Pick your current field to see the skills worth adding now, the next roles to target, and side moves where your experience already counts."
+    items={items}
+    escapePrompt="Want this matched to your exact experience and goal?"
+    escapeWaText="Hi SkillKite! I want to upskill"
+  />
+</Base>

@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import GuideView from '../../components/GuideView.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides', (g) => g.data.category === 'skill-upgrade');
+  return guides.map((g) => ({ params: { field: g.data.stream }, props: { entry: g.data } }));
+}
+
+const { entry } = Astro.props;
+const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
+---
+
+<Base title={seoTitle} description={seoDescription} path={`/skill-upgrade/${stream}`}>
+  <GuideView
+    eyebrow={`🌱 Skill Upgrade · ${streamLabel}`}
+    heading={`Level up in ${streamLabel}`}
+    intro={`Skills worth adding now, the next roles to target with rough salary bands, and side moves where your ${streamLabel} experience transfers. Tap any option for details.`}
+    pdfWaText={`Hi SkillKite! I work in ${streamLabel} and want to upskill`}
+    backHref="/skill-upgrade"
+    backLabel="Other fields"
+    sections={guide.sections}
+    escapePrompt="Want this matched to your exact experience and goal?"
+    escapeWaText={`Hi SkillKite! I work in ${streamLabel}`}
+  />
+</Base>

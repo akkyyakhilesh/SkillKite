@@ -1,0 +1,145 @@
+{
+  "category": "skill-upgrade",
+  "stream": "data_analytics",
+  "streamLabel": "Data & Analytics",
+  "seoTitle": "Upskill in Data & Analytics — skills, next roles & moves | SkillKite",
+  "seoDescription": "Upskill in Data & Analytics — certifications, next roles, freelance & switch paths",
+  "guide": {
+    "heading": "SkillKite — Next career rung for you",
+    "greeting": "Hey there! You're working in data analytics and still figuring out where you want to take your career next — that's completely fine. The good news is that data analytics is one of the most versatile fields right now. Below are the highest-leverage skills and roles you should know about so you can make an informed choice when the time comes.",
+    "sections": [
+      {
+        "title": "Skills to add now",
+        "intro": "These skills give you the most salary and seniority leverage within data analytics — regardless of which direction you eventually decide to go.",
+        "options": [
+          {
+            "name": "SQL Advanced + dbt (Data Build Tool)",
+            "whatIsIt": "Beyond basic SELECT queries — window functions, CTEs, query optimization, and using dbt to build modular, version-controlled data transformation pipelines that teams can actually maintain.",
+            "whoFor": "Anyone doing reporting, dashboards, or working with a data warehouse. This is the single most under-leveraged skill among mid-level analysts in India.",
+            "leadsTo": "Analytics Engineer, Senior Data Analyst roles. Salary jump from ₹35k-50k to ₹70k-1.2L per month in Tier 2/3 cities; ₹1.2L-2L in remote/product companies.",
+            "keyExams": "dbt Fundamentals (free, dbt Learn platform) — not mandatory but adds credibility.",
+            "timeCommitment": "2-3 months to get job-ready with a portfolio project."
+          },
+          {
+            "name": "Python for Analytics (Pandas + NumPy + Matplotlib/Seaborn)",
+            "whatIsIt": "Using Python to automate repetitive data tasks, do exploratory data analysis (EDA), and build reusable scripts — moving beyond Excel and basic SQL into programmable analytics.",
+            "whoFor": "Analysts who currently rely on Excel/Google Sheets and want to handle larger datasets, automate reports, and open the door to data science roles.",
+            "leadsTo": "Data Analyst → Senior Analyst → Data Scientist track. Opens freelance projects on Upwork as well. Salary bump of 30-50% at mid-level.",
+            "keyExams": "Google Data Analytics Certificate (Coursera) covers some Python; IBM Data Analyst Professional Certificate is a solid structured option.",
+            "timeCommitment": "3-4 months for working proficiency with real projects."
+          },
+          {
+            "name": "Power BI or Tableau (Advanced, not just drag-and-drop)",
+            "whatIsIt": "Building dynamic, interactive dashboards with DAX measures (Power BI) or LOD expressions (Tableau), connecting to live data sources, and designing dashboards that non-technical stakeholders actually use to make decisions.",
+            "whoFor": "Analysts working in mid-to-large companies where leadership needs business dashboards. Also very high demand in consulting and agency setups.",
+            "leadsTo": "BI Developer, Analytics Consultant, Senior Analyst roles. Power BI / Tableau specialists in Tier 2/3 cities earn ₹50k-90k; remote/product company roles go ₹80k-1.5L.",
+            "keyExams": "Microsoft PL-300 (Power BI Data Analyst Associate) — widely recognized by Indian employers. Tableau Desktop Specialist for Tableau track.",
+            "timeCommitment": "2-3 months to get dashboard-portfolio-ready."
+          },
+          {
+            "name": "Cloud Data Basics: AWS or Azure (Data Track)",
+            "whatIsIt": "Understanding how data pipelines and warehouses run on the cloud — AWS S3 + Athena + Redshift, or Azure Data Factory + Synapse. You don't need to be a cloud engineer; you need to know enough to work alongside one and query data from cloud sources.",
+            "whoFor": "Analysts whose company has moved or is moving to cloud infrastructure. Increasingly a baseline requirement at product companies and startups.",
+            "leadsTo": "Cloud-ready analyst roles, Analytics Engineer, Data Engineer (if you want to switch). Salary premium of 20-40% over non-cloud analysts at the same experience level.",
+            "keyExams": "AWS Cloud Practitioner (foundation) + AWS Data Analytics Specialty, or Microsoft DP-900 (Azure Data Fundamentals) + DP-203.",
+            "timeCommitment": "3-4 months for foundational certification; 6 months for specialty-level."
+          },
+          {
+            "name": "Statistics & A/B Testing for Business",
+            "whatIsIt": "Practical statistics — hypothesis testing, confidence intervals, A/B test design and interpretation — applied to real business problems like product feature launches, marketing campaigns, and pricing decisions. Not theoretical; implementation in Python or even Excel.",
+            "whoFor": "Analysts working in e-commerce, fintech, edtech, or any product company where decisions are made based on experiments. Separates a junior analyst from a trusted strategic one.",
+            "leadsTo": "Product Analyst, Growth Analyst, Business Intelligence Analyst roles. Also a strong differentiator for abroad/remote applications. ₹70k-1.5L range.",
+            "keyExams": "No specific exam — a well-documented GitHub project or case study is more valuable here.",
+            "timeCommitment": "2-3 months of consistent practice with real or public datasets."
+          },
+          {
+            "name": "Storytelling with Data + Stakeholder Communication",
+            "whatIsIt": "Structuring analytical findings into a clear narrative — knowing which chart to use, how to simplify complexity for business audiences, and how to present insights that lead to decisions, not just information dumps.",
+            "whoFor": "Analysts who already have technical skills but get stuck at the 'influence' stage — where your work doesn't get acted upon. Critical for anyone eyeing lead or manager roles.",
+            "leadsTo": "Analytics Lead, Business Analyst, Product Manager transitions. This soft-technical skill is what separates ₹80k analysts from ₹1.5L ones at the same company.",
+            "keyExams": "Cole Nussbaumer Knaflic's 'Storytelling with Data' course (online) — no formal certification but very recognized in the community.",
+            "timeCommitment": "1-2 months; practice on every existing project you do."
+          }
+        ]
+      },
+      {
+        "title": "Roles to target next",
+        "intro": "Based on your analytics background, here are the most realistic next-rung roles — from lateral upgrades to meaningful jumps. All salary ranges are honest Tier 2/3 + remote-Indian-market numbers.",
+        "options": [
+          {
+            "name": "Senior Data Analyst",
+            "whatIsIt": "Leads end-to-end analysis projects, defines metrics, mentors junior analysts, builds dashboards that leadership relies on, and translates business questions into analytical frameworks — not just pulling numbers.",
+            "whoFor": "Analysts with 2+ years who are already doing strong SQL/Python work but haven't gotten the title or pay to match. Most common immediate upgrade.",
+            "leadsTo": "₹60k-1.1L/month in Tier 2/3 companies; ₹90k-1.8L in product startups or remote roles. Leads naturally into Analytics Lead or Data Science tracks.",
+            "keyExams": "No hard gatekeeping exam — a strong portfolio + advanced SQL/Python is what hiring managers look for.",
+            "timeCommitment": "6-12 months of deliberate skill-building + job search."
+          },
+          {
+            "name": "Analytics Engineer",
+            "whatIsIt": "Sits between data engineering and analytics — builds and maintains the data models (using dbt), ensures clean, reliable data pipelines, and makes sure analysts have trustworthy data to work with. Heavy SQL + dbt + warehouse work.",
+            "whoFor": "Analysts with strong SQL skills who enjoy the 'plumbing' side of data more than the dashboard/insight side. Fast-growing role globally and increasingly in Indian product companies.",
+            "leadsTo": "₹80k-1.5L/month in Indian product companies; ₹1.5L-3L+ in remote/international-facing roles. Clear path to Data Engineering or Staff Analyst.",
+            "keyExams": "dbt Fundamentals (free) + cloud certification (AWS/Azure data track) helps significantly.",
+            "timeCommitment": "6-9 months of focused skill-building."
+          },
+          {
+            "name": "Product Analyst",
+            "whatIsIt": "Works embedded within a product team — tracks user behavior (using tools like Mixpanel, Amplitude, or GA4), runs A/B tests, measures feature impact, and helps PMs prioritize the roadmap with data.",
+            "whoFor": "Analysts who enjoy working close to the product and user side rather than pure reporting. Great fit for people in edtech, fintech, SaaS, or e-commerce companies.",
+            "leadsTo": "₹70k-1.2L/month in Tier 2/3 product companies; ₹1L-2L in top-tier startups or remote roles. Also a common bridge into Product Management.",
+            "keyExams": "Google Analytics 4 certification (free) + product analytics tool certifications (Mixpanel, Amplitude both offer free courses).",
+            "timeCommitment": "4-6 months to build relevant skills + portfolio; 3-6 months job search."
+          },
+          {
+            "name": "Business Intelligence (BI) Developer",
+            "whatIsIt": "Designs and maintains the company's BI infrastructure — builds complex dashboards, manages data models in BI tools, connects multiple data sources, and ensures reports are accurate and performant at scale.",
+            "whoFor": "Analysts who love Power BI or Tableau and want to go deep on the technical and architectural side of reporting. More engineering-flavored than analyst-flavored.",
+            "leadsTo": "₹60k-1.1L/month in enterprise and services companies; ₹90k-1.6L in product or consulting firms. Leads to BI Architect or Analytics Manager.",
+            "keyExams": "Microsoft PL-300 (Power BI Data Analyst Associate) is a genuine hiring differentiator. Tableau Desktop Certified Professional for Tableau path.",
+            "timeCommitment": "4-6 months with certification prep."
+          },
+          {
+            "name": "Data Scientist (Junior to Mid)",
+            "whatIsIt": "Builds predictive models, runs statistical analyses, and works on ML-assisted decision making — forecasting, churn prediction, recommendation systems, etc. Requires Python, ML libraries (scikit-learn, XGBoost), and statistical thinking.",
+            "whoFor": "Analysts who already have Python and statistics skills and want to move into the modeling/prediction space. Realistic target if you invest 6-9 months in ML fundamentals.",
+            "leadsTo": "₹80k-1.5L/month in Tier 2/3 cities; ₹1.2L-3L in top product companies or remote roles. One of the higher-paying tracks from analytics.",
+            "keyExams": "IBM Data Science Professional Certificate or Google Advanced Data Analytics Certificate as structured learning paths. No single exam gates hiring — portfolio projects matter more.",
+            "timeCommitment": "9-12 months of serious skill-building to be competitive."
+          }
+        ]
+      },
+      {
+        "title": "Side moves",
+        "intro": "Your analytics skills transfer well into these adjacent fields. Worth knowing — especially if you're not sure about your direction yet.",
+        "options": [
+          {
+            "name": "Business Analyst (BA)",
+            "whatIsIt": "Works between technology teams and business stakeholders — gathers requirements, maps processes, and uses data to recommend solutions. Less coding, more structured thinking and documentation (BRDs, user stories, process flows).",
+            "whoFor": "Analysts who enjoy the business-strategy side more than deep technical work. Great lateral move that often comes with a title and salary bump.",
+            "leadsTo": "BA roles pay ₹50k-1.1L in Tier 2/3; senior BA/Product Owner roles pay ₹90k-1.8L. Also a natural path toward Product Management.",
+            "keyExams": "CBAP (Certified Business Analysis Professional) for senior profiles; ECBA for those starting the transition. IIBA certifications are internationally recognized.",
+            "timeCommitment": "3-6 months to bridge skill gaps; transition realistic within 6-9 months."
+          },
+          {
+            "name": "Product Management",
+            "whatIsIt": "Owns the roadmap and strategy of a digital product — defines what gets built, why, and measures impact. Data analysts who understand metrics, user behavior, and A/B testing are among the strongest PM candidates in the market.",
+            "whoFor": "Analysts with 3+ years of experience who want ownership and broader business impact. Requires developing product intuition and stakeholder management skills on top of existing data skills.",
+            "leadsTo": "Associate PM/PM roles in Tier 2/3 product companies pay ₹80k-1.5L; senior PM roles at funded startups pay ₹1.5L-4L. High ceiling, high competition.",
+            "keyExams": "No mandatory exam, but PM certifications (PMI-ACP, Product School courses) and a structured case study portfolio help a lot.",
+            "timeCommitment": "6-12 months of deliberate PM skill-building; first PM role typically takes 1-2 years of positioning."
+          },
+          {
+            "name": "Digital Marketing Analytics / Growth",
+            "whatIsIt": "Applies data skills specifically to marketing — tracking campaign performance, building attribution models, running growth experiments, optimizing ad spend using Google Analytics 4, Meta Ads Manager, and marketing data warehouses.",
+            "whoFor": "Analysts interested in the consumer/marketing side of business. Freelance and consulting demand is high in this niche, especially for D2C and e-commerce brands.",
+            "leadsTo": "Growth Analyst, Marketing Data Analyst, or freelance consultant roles. Tier 2/3 company salaries: ₹45k-90k; agency/freelance: ₹30k-80k/month depending on clients.",
+            "keyExams": "Google Analytics 4 (GA4) certification (free) + Google Ads certification. Meta Blueprint certifications for paid social analytics.",
+            "timeCommitment": "2-3 months to pick up domain-specific tools on top of existing analytics skills."
+          }
+        ]
+      }
+    ],
+    "closingMessage": "You're in one of the best fields to be uncertain in — data analytics genuinely branches into data science, product, engineering, business strategy, and freelance consulting. The smartest move right now is to pick ONE skill from the list above that aligns with the type of work you enjoy most day-to-day, go deep on it over the next 3 months, and build one solid portfolio project around it. That clarity will make your next direction obvious. Come back to SkillKite when you're ready for a specific role roadmap. Share this with your colleagues — everyone on your team probably needs it too. \uD83E\uDE81",
+    "flowLabel": "Upskill"
+  }
+}

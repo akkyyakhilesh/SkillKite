@@ -1,0 +1,145 @@
+{
+  "category": "skill-upgrade",
+  "stream": "content_marketing",
+  "streamLabel": "Content & Marketing",
+  "seoTitle": "Upskill in Content & Marketing — skills, next roles & moves | SkillKite",
+  "seoDescription": "Upskill in Content & Marketing — SEO, performance, next roles & side moves",
+  "guide": {
+    "heading": "SkillKite — Next career rung for you",
+    "greeting": "Hey there! You're working in content marketing and you're still figuring out which direction to take next — that's completely fine, actually. Content is one of the most versatile fields out there, and the options are genuinely wide. Below is a clear map of the highest-leverage skills to pick up now, the roles worth targeting, and the adjacent fields where your existing skills carry real weight.",
+    "sections": [
+      {
+        "title": "Skills to add now",
+        "intro": "These skills have the highest salary and seniority leverage for someone already working in content marketing. Each one either deepens your current value or opens a new income lane.",
+        "options": [
+          {
+            "name": "SEO + Technical Content Strategy (Ahrefs / Semrush / Search Console)",
+            "whatIsIt": "Moving beyond writing into keyword architecture, content clustering, and on-page + off-page SEO. Technical SEO covers site structure, crawl issues, and Core Web Vitals enough to brief developers.",
+            "whoFor": "Content writers and editors who want to own traffic outcomes, not just word counts. Especially useful if you're at a product, SaaS, or D2C company.",
+            "leadsTo": "SEO Content Strategist, Head of Content, Growth Marketing Manager — salary band ₹60k–1.4L/month in remote-Indian or metro roles.",
+            "keyExams": "Semrush SEO Certification (free), HubSpot Content Marketing Certification (free), Google Search Central documentation (no exam but must-read).",
+            "timeCommitment": "2–3 months to get competent enough to show measurable traffic results in a portfolio."
+          },
+          {
+            "name": "Content Analytics + Performance Reporting (GA4, Looker Studio, Hotjar)",
+            "whatIsIt": "Understanding GA4 funnels, setting up conversion events, building dashboards in Looker Studio, and translating content metrics into business impact for leadership.",
+            "whoFor": "Anyone tired of being judged only on publish counts. If you can tie your content to pipeline or revenue, your negotiating power jumps significantly.",
+            "leadsTo": "Content Analyst, Growth Content Manager, Digital Marketing Analyst — ₹55k–1.1L/month. Also makes you a strong candidate for product marketing roles.",
+            "keyExams": "Google Analytics 4 Certification (free via Skillshop), Looker Studio has no formal cert but a strong dashboard in your portfolio is the proof.",
+            "timeCommitment": "1.5–2 months to build working dashboards and interpret data confidently."
+          },
+          {
+            "name": "AI-Augmented Content Production (ChatGPT / Claude workflows, Jasper, Surfer SEO)",
+            "whatIsIt": "Building repeatable content production systems using AI tools — prompt engineering for brand voice, AI + human editing workflows, scaling output without scaling headcount. This is not about replacing your writing; it's about running a content engine.",
+            "whoFor": "Content leads, solo marketers, or anyone managing a content calendar at a startup or agency. Immediately valuable if you freelance.",
+            "leadsTo": "Content Ops Manager, AI Content Strategist (emerging title), freelance retainer clients — ₹50k–1.2L/month depending on the engagement.",
+            "keyExams": "No formal cert that matters yet. Portfolio proof — show a workflow, show the output quality, show turnaround time improvement.",
+            "timeCommitment": "4–6 weeks to build a documented workflow. The skill is in the system, not the tool."
+          },
+          {
+            "name": "Video Script Writing + Short-Form Content Strategy (YouTube, Reels, LinkedIn Video)",
+            "whatIsIt": "Structuring video scripts for retention, writing hooks, CTAs, and descriptions optimized for YouTube search + suggested. Includes understanding platform algorithms at a working level.",
+            "whoFor": "Writers who want to move into brand content, creator economy, or edtech. High demand at D2C brands and personal brand consultancies.",
+            "leadsTo": "Video Content Strategist, Brand Content Lead, YouTube Channel Manager — ₹45k–90k/month in-house; ₹20k–60k/month per client as a freelancer.",
+            "keyExams": "No exam. A live channel or 2–3 client projects with view/retention stats is the portfolio.",
+            "timeCommitment": "2–3 months to write, publish, and optimize enough content to show results."
+          },
+          {
+            "name": "Email Marketing + Marketing Automation (Mailchimp, Klaviyo, HubSpot, Brevo)",
+            "whatIsIt": "Building drip sequences, segmentation logic, A/B testing subject lines and CTAs, and automating nurture workflows. High-ROI skill that most content marketers ignore because it feels too 'technical.'",
+            "whoFor": "Content marketers at SaaS, edtech, D2C, or B2B companies where the email list is a real asset. Also very freelance-able.",
+            "leadsTo": "Email Marketing Specialist, CRM Content Manager, Marketing Automation Manager — ₹55k–1.1L/month. Freelance retainers run ₹15k–40k/client/month.",
+            "keyExams": "HubSpot Email Marketing Certification (free), Klaviyo Product Certification (free for Klaviyo users).",
+            "timeCommitment": "2 months to get hands-on with one platform and show open rate / click rate improvements."
+          },
+          {
+            "name": "Product Marketing Fundamentals (Positioning, Messaging Frameworks, GTM Strategy)",
+            "whatIsIt": "Understanding how to write positioning documents, competitive battle cards, launch messaging, and personas — the bridge between product teams and content/demand gen. Uses your writing instinct but in a more strategic, revenue-tied context.",
+            "whoFor": "Senior content marketers (3+ years) who feel like their writing chops are strong but want a seat in strategy conversations. Natural next step toward ₹1L+ roles.",
+            "leadsTo": "Product Marketing Manager, Brand Strategist, GTM Lead — ₹80k–1.6L/month at Series A+ startups and mid-market SaaS companies.",
+            "keyExams": "Pragmatic Institute PMC Level 1 (paid, ~$250 but recognized internationally), Product Marketing Alliance certifications (PMM Certified).",
+            "timeCommitment": "3–4 months to learn frameworks and shadow or contribute to one product launch to build proof."
+          }
+        ]
+      },
+      {
+        "title": "Roles to target next",
+        "intro": "These are the realistic next-rung roles for a content marketing professional with 1–10 years of experience. Mapped honestly to Indian market salaries — both in-office Tier 2/3 and remote-Indian-market rates.",
+        "options": [
+          {
+            "name": "Content Strategist",
+            "whatIsIt": "Owns the content calendar, editorial strategy, SEO framework, and distribution plan. Reviews and briefs writers rather than producing all content personally. Reports to marketing head or CMO.",
+            "whoFor": "Content writers or editors with 2–4 years of experience who have started thinking about why a piece is published, not just how it reads.",
+            "leadsTo": "₹55k–1.1L/month in remote-Indian-market roles; ₹40k–70k/month in Tier 2/3 in-office roles. Leads naturally to Head of Content.",
+            "keyExams": "HubSpot Content Marketing Certification adds credibility. Semrush certification for the SEO angle.",
+            "timeCommitment": "3–6 months to transition if you start owning strategy outcomes in your current role and document the results."
+          },
+          {
+            "name": "SEO Manager / Organic Growth Manager",
+            "whatIsIt": "Drives organic traffic growth through content strategy, technical SEO audits, link building oversight, and data-driven publishing decisions. Manages a small team of writers and an SEO tool stack.",
+            "whoFor": "Content marketers who enjoy analytics and have seen how search works firsthand. More systems-oriented than creative.",
+            "leadsTo": "₹65k–1.3L/month at funded startups and digital agencies in remote-Indian market. Can move into VP Growth or Head of Marketing track.",
+            "keyExams": "Semrush SEO Toolkit Certification, Google Analytics 4 Certification, Ahrefs has free training (no formal cert but widely recognized).",
+            "timeCommitment": "4–6 months of deliberate skill-building plus 1 case study showing traffic growth you owned."
+          },
+          {
+            "name": "Product Marketing Manager (PMM)",
+            "whatIsIt": "Owns the messaging, positioning, and go-to-market strategy for a product. Writes launch copy, sales enablement docs, and competitive intel. Works closely with product, sales, and demand gen.",
+            "whoFor": "Senior content marketers (3+ years) who are curious about product and business strategy. Requires comfort with ambiguity and cross-functional communication.",
+            "leadsTo": "₹80k–1.6L/month at B2B SaaS, edtech, fintech companies. One of the highest-paying IC roles in marketing in India right now.",
+            "keyExams": "Pragmatic Institute PMC, Product Marketing Alliance PMM Certified. An MBA helps for larger companies but is not mandatory.",
+            "timeCommitment": "4–8 months of prep plus ideally one internal project or freelance engagement that proves PMM thinking."
+          },
+          {
+            "name": "Email Marketing / CRM Manager",
+            "whatIsIt": "Manages the full lifecycle email program — acquisition sequences, onboarding drips, re-engagement flows, and promotional campaigns. Owns the metrics: open rate, CTR, revenue attributed to email.",
+            "whoFor": "Content marketers who enjoy writing with clear conversion goals and are comfortable with tools and light data work. Often underestimated as a career path but pays very well.",
+            "leadsTo": "₹55k–1.0L/month in-house at D2C, SaaS, or edtech. Freelance retainers can stack up to ₹50k–80k/month across 2–3 clients.",
+            "keyExams": "HubSpot Email Marketing Certification, Klaviyo Product Certification. Brevo (formerly Sendinblue) has free training.",
+            "timeCommitment": "2–3 months to platform proficiency. Another 3 months to have a measurable campaign track record."
+          },
+          {
+            "name": "Head of Content / Content Lead",
+            "whatIsIt": "Owns the entire content function — strategy, team, budget, distribution, and reporting to C-suite. Sets editorial standards, manages writers and designers, and ties content to business KPIs.",
+            "whoFor": "Content marketers with 4–7 years of experience who have managed at least one other person or agency vendor, and who understand SEO and analytics.",
+            "leadsTo": "₹90k–1.8L/month at funded startups and mid-size companies. This is the senior IC ceiling in content; above this is VP Marketing or CMO track.",
+            "keyExams": "No specific exam gates this role. A strong portfolio of measurable outcomes (traffic growth, lead gen, brand awareness campaigns) is the real requirement.",
+            "timeCommitment": "Depends heavily on current seniority. For someone at 3–4 years: 12–18 months of deliberately owning outcomes and building a management track record."
+          }
+        ]
+      },
+      {
+        "title": "Side moves",
+        "intro": "Your content marketing experience is more portable than most people realize. These adjacent fields give you a strong head start without starting from zero.",
+        "options": [
+          {
+            "name": "UX Writing / Content Design",
+            "whatIsIt": "Writing for digital products — button labels, onboarding flows, error messages, tooltips, and in-app copy. Requires understanding user psychology and working with design and product teams.",
+            "whoFor": "Content marketers who enjoy clarity, brevity, and have some exposure to product teams or app/website content. If you've ever rewritten a confusing CTA, you've done UX writing.",
+            "leadsTo": "UX Writer, Content Designer, Product Content Strategist — ₹60k–1.4L/month. Strong international remote demand. Companies like Razorpay, Swiggy, and Zepto all hire for this.",
+            "keyExams": "Google UX Design Certificate covers UX fundamentals. Nielsen Norman Group UX Writing course is well-regarded. Portfolio of product copy samples matters more than any cert.",
+            "timeCommitment": "3–4 months to learn the frameworks and build a product copy portfolio (can be redesigns of real apps — doesn't need to be paid work)."
+          },
+          {
+            "name": "Brand Strategy / Communications Consulting",
+            "whatIsIt": "Helping companies define their brand voice, messaging architecture, and communication strategy. Often works with the founding team at early-stage startups or as a consultant for mid-size companies doing rebrands.",
+            "whoFor": "Content marketers with 4+ years who have developed strong brand instincts and enjoy the strategy layer more than execution. Good for those leaning toward freelance or consulting.",
+            "leadsTo": "Brand Strategist (in-house: ₹70k–1.3L/month), independent brand consultant (₹20k–80k per project depending on scope and brand size).",
+            "keyExams": "No formal exam. Case studies and a strong personal brand (LinkedIn, portfolio site) are the entry ticket.",
+            "timeCommitment": "The skill is largely transferable already. 2–3 months to formalize frameworks and package your thinking into a consultable offer."
+          },
+          {
+            "name": "Edtech Content / Instructional Design",
+            "whatIsIt": "Creating course curricula, learning journeys, explainer scripts, and educational content for platforms like Unacademy, Upgrad, Coursera India, or corporate L&D teams. Combines writing with learning science basics.",
+            "whoFor": "Content marketers who enjoy teaching, simplifying complex topics, or have a background in a specific knowledge domain (finance, tech, design, etc.).",
+            "leadsTo": "Instructional Designer, Curriculum Lead, Learning Content Manager — ₹40k–85k/month in-house. Freelance curriculum projects run ₹15k–50k per course.",
+            "keyExams": "ATD Instructional Design Certificate (recognized in L&D circles), Articulate Storyline / Rise certification (tool-specific but industry-standard for e-learning builds).",
+            "timeCommitment": "2–3 months to learn instructional design principles and build one sample course or module as portfolio proof."
+          }
+        ]
+      }
+    ],
+    "closingMessage": "You're in one of the most versatile fields in the market right now — content marketing skills stack well whether you go deeper (SEO, product marketing), go sideways (UX writing, brand strategy), or eventually go independent. Since you're still figuring out direction, the smartest move is to pick ONE skill from the first section that genuinely excites you, spend 6–8 weeks going deep, and let the results tell you which lane to double down on. Don't wait for clarity before starting — the clarity comes from doing. Come back to SkillKite when you're ready for a specific role roadmap or interview prep plan. Share this with a colleague who's in the same boat — you're probably not the only one on your team wondering what's next. \uD83E\uDE81",
+    "flowLabel": "Upskill"
+  }
+}
