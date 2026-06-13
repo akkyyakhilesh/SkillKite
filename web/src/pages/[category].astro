@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import { CATEGORIES, whatsappLink } from '../config/categories';
+
+// One static page per category slug (/after-10th, /after-12th, …).
+// Placeholder for now — the full option lists + progressive-disclosure
+// cards land in the next build step once the generic guide content is
+// generated. Routing + layout are proven here.
+export function getStaticPaths() {
+  // after-12th has its own built-out pages (stream picker + guides); the other
+  // three categories use this placeholder until their content is generated.
+  return CATEGORIES.filter((c) => c.slug !== 'after-12th').map((c) => ({
+    params: { category: c.slug },
+    props: { category: c },
+  }));
+}
+
+const { category } = Astro.props;
+const title = `${category.title} — options & guidance | SkillKite`;
+const description = category.blurb;
+---
+
+<Base title={title} description={description} path={`/${category.slug}`}>
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">{category.emoji} {category.title}</span>
+      <h1>{category.title}</h1>
+      <p class="sub">{category.blurb}</p>
+      <div class="ctas">
+        <a class="btn-wa" href={whatsappLink(`Hi SkillKite! I want guidance: ${category.title}`)}>
+          💬 Get a personalized plan
+        </a>
+        <a class="btn-br" href="/">← All stages</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards-wrap">
+    <div class="cards-head">
+      <h2>Options coming soon</h2>
+      <p>
+        We're laying out every {category.title.toLowerCase()} path with downloadable guides.
+        Meanwhile, chat on WhatsApp for a personalized version now.
+      </p>
+    </div>
+  </section>
+</Base>

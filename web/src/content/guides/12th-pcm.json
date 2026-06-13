@@ -1,0 +1,123 @@
+{
+  "category": "after-12th",
+  "stream": "pcm",
+  "streamLabel": "Science (PCM)",
+  "seoTitle": "Science (PCM) after 12th — courses, exams & careers | SkillKite",
+  "seoDescription": "Science with Maths after 12th — B.Tech, B.Sc, BCA, B.Arch, NDA & more",
+  "guide": {
+    "heading": "SkillKite — 12th PCM ke baad aapke options",
+    "greeting": "Hi! You've completed 12th with PCM and you're open to exploring all directions — great mindset! Since you're not locked into one path yet, we've laid out every strong option below, starting with the most popular ones. Read each carefully before deciding anything.",
+    "sections": [
+      {
+        "title": "Padhai ke options",
+        "intro": "PCM is one of the most versatile streams out there. You can go into engineering, pure science, computing, architecture, defence, and more. Here's a complete breakdown of every major path.",
+        "options": [
+          {
+            "name": "B.Tech / BE (Bachelor of Technology / Engineering)",
+            "whatIsIt": "A 4-year undergraduate engineering degree — the most popular path for PCM students in India. You pick a branch at admission time, and that shapes your entire career direction. Key branches to consider: CSE (Computer Science) — software, AI, coding jobs, highest placement demand right now; IT (Information Technology) — similar to CSE, slightly more networking focus; ECE (Electronics & Communication) — hardware, telecom, embedded systems, ISRO/DRDO type roles; EE (Electrical Engineering) — power sector, core electrical jobs, PSU roles; ME (Mechanical Engineering) — manufacturing, automobile, design, PSU roles; Civil Engineering — infrastructure, construction, government projects, UPSC ESE; Chemical Engineering — process industries, petroleum, pharma plants; Biotech Engineering — biotech research, pharma R&D, a bridge between biology and engineering.",
+            "whoFor": "Anyone from PCM who enjoys problem-solving and wants strong campus placement opportunities. CSE/IT is ideal if you like computers; Mechanical/Civil if you like physical systems; ECE if electronics fascinates you.",
+            "leadsTo": "Software engineer, hardware engineer, product manager, core engineering roles in PSUs (ONGC, BHEL, NTPC), GATE for M.Tech/PSU, MBA after B.Tech, research, startups.",
+            "keyExams": "JEE Main (for NITs, IIITs, Government colleges — very competitive, lakhs appear every year); JEE Advanced (for IITs — top ~2.5 lakh from JEE Main qualify, only ~17,000 seats); State CETs like MHT-CET, WBJEE, KCET, UPSEE (less competition, still good colleges); Private university exams like VITEEE, SRM JEE, BITSAT, MET.",
+            "timeCommitment": "4 years degree. JEE preparation typically needs 1-2 years of serious effort. Be honest with yourself — JEE Advanced is extremely tough; JEE Main is achievable with consistent preparation."
+          },
+          {
+            "name": "B.Sc (Pure Science — Physics / Chemistry / Mathematics / Statistics / Computer Science)",
+            "whatIsIt": "A 3-year undergraduate science degree where you study your chosen subjects deeply. Far less competitive admission than engineering, but opens doors to research, teaching, and further studies. You can do B.Sc regular or B.Sc Honours from good central universities and DU colleges.",
+            "whoFor": "Students who genuinely love science as a subject, are interested in research or teaching, or want a lower-pressure degree with strong post-grad options. Also a great fallback if JEE preparation doesn't go as planned.",
+            "leadsTo": "M.Sc then PhD for research/academia; B.Ed after B.Sc for teaching career; government jobs via SSC/UPSC with a science background; data science/analytics roles after B.Sc Mathematics/Statistics + certifications.",
+            "keyExams": "CUET (for central universities like DU, BHU, JNU — moderate competition); state university entrance exams; some colleges give direct admission on 12th marks.",
+            "timeCommitment": "3 years for B.Sc; 2 more for M.Sc if you pursue it."
+          },
+          {
+            "name": "BCA (Bachelor of Computer Applications)",
+            "whatIsIt": "A 3-year degree focused specifically on computers, coding, software development, and IT. Not as heavy on core engineering theory as B.Tech CSE, but very practical and job-oriented. Many BCA graduates land solid IT jobs or pursue MCA (Master of Computer Applications) for higher roles.",
+            "whoFor": "PCM students who are interested in computers and coding but either didn't crack competitive engineering entrances or want a more focused, less intense degree. Also good if you want to enter IT industry faster.",
+            "leadsTo": "Software developer, web developer, app developer, IT support, database administrator; MCA for higher roles; MBA IT; directly eligible for many IT company campus recruitments.",
+            "keyExams": "CUET for central university BCA; many private colleges admit on 12th marks directly; IPU CET, UPSEE for state colleges.",
+            "timeCommitment": "3 years."
+          },
+          {
+            "name": "B.Arch (Bachelor of Architecture)",
+            "whatIsIt": "A 5-year professional degree that trains you to design buildings, spaces, cities, and structures. Combines creativity with technical drawing, structural knowledge, and computer-aided design. A niche but rewarding field — India has fewer architects per capita than most countries, so demand exists.",
+            "whoFor": "PCM students who are creative, love drawing/sketching, find both art and mathematics interesting, and can imagine becoming a designer of physical spaces. You need Mathematics in 12th (compulsory for this course).",
+            "leadsTo": "Licensed architect, urban planner, interior designer, real estate consultant, government architect roles, design studios.",
+            "keyExams": "NATA (National Aptitude Test in Architecture) — conducted by COA, tests drawing ability and mathematical aptitude; JEE Paper 2 (AAT) for IIT architecture seats; state architecture entrance tests.",
+            "timeCommitment": "5 years — longer than most degrees, but it's a complete professional qualification."
+          },
+          {
+            "name": "NDA (National Defence Academy)",
+            "whatIsIt": "One of the most prestigious career paths in India. After clearing NDA exam, you join the Indian Army, Navy, or Air Force as an officer-level cadet. You study at NDA Pune for 3 years (BA/B.Sc integrated), then respective service academy for 1 year. It's a government job + degree + respect + adventure — all combined.",
+            "whoFor": "PCM students who are physically fit, disciplined, love the idea of serving the nation, and want a stable, respected career from a young age. Must be unmarried male (or female for SSC entry after graduation). Age: 16.5 to 19.5 years at time of applying.",
+            "leadsTo": "Commissioned officer in Indian Army / Navy / Indian Air Force (IAF pilot option available). Pension, government housing, career growth through ranks.",
+            "keyExams": "NDA & NA Examination by UPSC — held twice a year (April and September). Two stages: written exam (Mathematics + General Ability) then SSB Interview (personality, leadership, physical tests). Competition is high but the exam is fair and structured.",
+            "timeCommitment": "3 years at NDA + 1 year at respective academy = 4 years total training before commissioning."
+          },
+          {
+            "name": "Merchant Navy",
+            "whatIsIt": "A career at sea — you work on commercial ships carrying cargo, oil, or passengers across the world. It's one of the highest-paying careers accessible right after 12th PCM. Salaries for experienced officers can reach lakhs per month in USD/Euro. You sail for months, then get months off — unique lifestyle.",
+            "whoFor": "PCM students who are adventurous, don't mind being away from home for 4-6 months at a time, are physically healthy (eyesight and fitness criteria apply), and want very high earning potential without a traditional office job.",
+            "leadsTo": "Deck Officer, Marine Engineer, Nautical Officer, Captain (Master Mariner) over years of experience. Progression is rank-based and internationally recognized.",
+            "keyExams": "IMU CET (Indian Maritime University Common Entrance Test) for B.Sc Nautical Science, B.Tech Marine Engineering, B.Sc Maritime Science — government maritime universities; also private institutes like HIMT, Tolani, SCI. Physical and medical fitness tests are mandatory.",
+            "timeCommitment": "3-4 years degree + mandatory sea training (pre-sea and on-the-job). First sailing contract usually after 12-18 months of training."
+          },
+          {
+            "name": "Polytechnic Lateral Entry (Diploma to Degree)",
+            "whatIsIt": "If you completed a Polytechnic Diploma (3 years after 10th), you can directly enter the 2nd year of B.Tech/BE through Lateral Entry — skipping the 1st year. BUT even if you haven't done Diploma yet, this path is relevant: you could do a 1-year Diploma after 12th in a technical trade, then join B.Tech 2nd year via lateral entry. This saves time and is less competitive than JEE. Many state governments run lateral entry schemes.",
+            "whoFor": "Students who want to enter engineering without facing JEE-level competition, or who want to learn a practical technical skill first and then upgrade to a full degree. Also useful if family needs you to start earning sooner — Diploma holders can get entry-level technical jobs.",
+            "leadsTo": "Same as B.Tech ultimately — junior engineer, technician roles initially; after lateral entry degree, engineering graduate roles.",
+            "keyExams": "State Lateral Entry Exams (LEET/DET — different names in different states like Punjab LEET, AP ECET, Maharashtra, etc.); mostly based on your Diploma marks. Far less competitive than JEE.",
+            "timeCommitment": "1-year Diploma (post 12th) + 3-year B.Tech via lateral entry = 4 years total, same as regular B.Tech but with a skill certificate along the way."
+          }
+        ]
+      },
+      {
+        "title": "Job / Earning options (since your goal includes earning)",
+        "intro": "Since you want to earn while studying or start earning soon, here are realistic options that don't require waiting 4-5 years. Many students combine these with their degree preparation.",
+        "options": [
+          {
+            "name": "Freelance Coding / Web Development",
+            "whatIsIt": "Learn HTML, CSS, JavaScript, and basic web frameworks through free/low-cost online courses (freeCodeCamp, The Odin Project, YouTube). Once you can build simple websites, you can take freelance projects on Fiverr, Upwork, or through local contacts. No degree required to start.",
+            "whoFor": "PCM students who are curious about computers and willing to self-learn consistently for 3-6 months before landing first paid work.",
+            "leadsTo": "Freelance income while studying, then full-time developer role, or your own web/app agency over time.",
+            "keyExams": "No formal exam — build a portfolio of projects. Certifications from freeCodeCamp or Google (free) add credibility.",
+            "timeCommitment": "3-6 months of self-learning to get first freelance client. Ongoing skill building."
+          },
+          {
+            "name": "Data Entry / Back-Office Jobs",
+            "whatIsIt": "Entry-level office jobs where you enter, organize, or process data using computers. Available at BPOs, small businesses, banks, and government contractors. 12th pass is the minimum qualification. Salary: Rs. 8,000–15,000/month to start.",
+            "whoFor": "Students who need immediate income and have basic computer skills (MS Office, typing speed). Can be done part-time in some cases while pursuing correspondence/distance education.",
+            "leadsTo": "Stable income while you study further; can move up to data analyst roles with additional Excel/SQL skills.",
+            "keyExams": "Usually a basic typing test and interview. No entrance exam.",
+            "timeCommitment": "Immediate — you can apply right after 12th result."
+          },
+          {
+            "name": "ITI / Short Technical Diploma (Electrician, Fitter, Draughtsman, etc.)",
+            "whatIsIt": "Industrial Training Institute courses are 1-2 year government-recognized vocational training programs in trades like Electrician, Plumber, Fitter, Draughtsman (Civil/Mechanical), Welder, COPA (computer operator). For PCM students, Draughtsman and COPA trades are particularly relevant. After ITI, you can find jobs, do apprenticeships under companies, or use it for Polytechnic lateral entry.",
+            "whoFor": "Students who want a practical skill, want to earn within 1-2 years, and are comfortable with hands-on technical work.",
+            "leadsTo": "Government apprenticeships (Railways, PSUs hire ITI holders regularly), private manufacturing jobs, self-employment (electrician/plumber business), or further education via Polytechnic.",
+            "keyExams": "NCVT / SCVT ITI admission — state-level merit list based on 10th/12th marks. Very easy admission process.",
+            "timeCommitment": "1-2 years depending on the trade."
+          },
+          {
+            "name": "Content Writing / Blogging / YouTube",
+            "whatIsIt": "If you write well or are comfortable on camera, you can start creating content — writing articles for websites, running a niche blog, or starting a YouTube channel on topics like science, tech, study tips, or anything you're passionate about. Income starts slow but builds over time. Pair with freelance platforms for faster income.",
+            "whoFor": "PCM students who have good communication skills in English or Hindi, enjoy explaining things, and are patient with building something over 6-12 months.",
+            "leadsTo": "Freelance content writing income (Rs. 500–2000 per article initially), affiliate income, AdSense revenue, social media brand deals eventually.",
+            "keyExams": "No exam. Portfolio of written samples or video views matter.",
+            "timeCommitment": "Ongoing — the more consistent you are, the faster it grows."
+          },
+          {
+            "name": "Government Part-Time / Exam Prep with Work",
+            "whatIsIt": "Many students prepare for SSC CHSL (12th pass government job exam) or Railway NTPC/Group D while doing part-time work or pursuing their degree. SSC CHSL specifically allows 12th pass candidates to apply for Lower Division Clerk, Postal Assistant, and other central government posts — reasonable salary, job security, and growth.",
+            "whoFor": "PCM students who want a stable government job without waiting for a 4-year degree, and are willing to study for competitive exams alongside their current preparation.",
+            "leadsTo": "Central government clerk/assistant roles (SSC CHSL), Railway jobs, state-level Group C/D posts.",
+            "keyExams": "SSC CHSL (Staff Selection Commission — Higher Secondary Level); Railway NTPC 12th Pass posts; State government exams vary by state.",
+            "timeCommitment": "6-12 months of dedicated exam preparation. Can be done alongside college if you manage time well."
+          }
+        ]
+      }
+    ],
+    "closingMessage": "Yeh guide save karke parents/teachers se discuss karo. Jab apna course start ho jaye ya final year mein ho, SkillKite pe wapas aana — week-by-week career roadmap milega with free resources. Dost ko bhi share karo. \uD83E\uDE81",
+    "flowLabel": "12th"
+  }
+}

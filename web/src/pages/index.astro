@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import { CATEGORIES, whatsappLink } from '../config/categories';
+
+const title = 'SkillKite — Free AI career guidance for Indian students';
+const description =
+  'From choosing a stream after 10th to landing your first job after a degree — get a clear, personalized plan you can actually follow. Free, in Hindi + English.';
+---
+
+<Base title={title} description={description} path="/">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">Free · AI-powered · Hindi + English</span>
+      <h1>
+        <span class="brandline">Right skills. Higher reach.</span>
+        Your career, figured out.
+      </h1>
+      <p class="sub">
+        Tell us where you are. Get a personalized plan — stream, course, or full career
+        roadmap — with free resources to follow.
+      </p>
+      <div class="ctas">
+        <a class="btn-wa" href={whatsappLink()}>💬 Chat on WhatsApp</a>
+        <a class="btn-br" href="#browse">Browse guidance →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category cards -->
+  <section class="cards-wrap" id="browse">
+    <div class="cards-head">
+      <h2>Pick your stage</h2>
+      <p>Four paths. One clear next step for each — read your options and download a guide.</p>
+    </div>
+    <div class="grid">
+      {
+        CATEGORIES.map((c) => (
+          <a class={`card ${c.card}`} href={`/${c.slug}`}>
+            <div class="emoji">{c.emoji}</div>
+            <h3>{c.title}</h3>
+            <p>{c.blurb}</p>
+            <div class="go">{c.cta}</div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Base>

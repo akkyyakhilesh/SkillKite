@@ -19,8 +19,10 @@ appsettings.Local.json
 # Local tooling (cloudflared.exe is 54 MB — download per the README instead)
 tools/
 
-# Personal marketing / content drafts (LinkedIn posts, etc.) — stay local
-content/
+# Personal marketing / content drafts (LinkedIn posts, etc.) — stay local.
+# Anchored to repo root so it doesn't also swallow web/src/content/ (the
+# Astro content collections, which ARE tracked).
+/content/
 
 # Logs and scratch files
 *.log

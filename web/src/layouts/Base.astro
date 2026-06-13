@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import { whatsappLink } from '../config/categories';
+
+export interface Props {
+  title: string;
+  description: string;
+  /** Path for canonical + OG url, e.g. "/after-12th". Defaults to "/". */
+  path?: string;
+  /** Optional OG image override (absolute or root-relative). */
+  ogImage?: string;
+}
+
+const { title, description, path = '/', ogImage = '/og-image.png' } = Astro.props;
+const canonical = new URL(path, Astro.site).href;
+const ogUrl = new URL(ogImage, Astro.site).href;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0F1834" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+    <!-- Fonts: Noto Sans (Latin) + Noto Sans Devanagari (Hindi) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800;900&family=Noto+Sans+Devanagari:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body>
+    <header>
+      <nav class="nav">
+        <a href="/" class="logo"><span class="kite">🪁</span> SkillKite</a>
+        <div class="links">
+          <a href="/after-10th">After 10th</a>
+          <a href="/after-12th">After 12th</a>
+          <a href="/after-graduation">Careers</a>
+          <a href="/skill-upgrade">Skill Upgrade</a>
+          {/* /blog route reserved (Phase 5) — nav slot intentionally present but hidden until posts exist. */}
+          {/* <a href="/blog">Blog</a> */}
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div>SkillKite 🪁 · Free AI career guidance · Hindi + English</div>
+      <div class="row">
+        <a href={whatsappLink()}>Chat on WhatsApp</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </div>
+      <div style="margin-top:10px;opacity:.7;">
+        Your data, your call: type "reset" on WhatsApp any time to delete everything we have on you.
+      </div>
+    </footer>
+  </body>
+</html>
