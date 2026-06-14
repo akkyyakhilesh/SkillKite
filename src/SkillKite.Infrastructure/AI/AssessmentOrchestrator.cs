@@ -1038,7 +1038,7 @@ public class AssessmentOrchestrator
                 $"SkillKite_Roadmap_{student.Name ?? "student"}.pdf",
                 ct));
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
-                english
+                lang == PreferredLanguage.English
                     ? "🌐 Want to explore more career paths? Browse all options at *skillkite.in*"
                     : "🌐 Aur options dekhne ke liye — *skillkite.in* pe sabhi career paths browse karo",
                 ct));
