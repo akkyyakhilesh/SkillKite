@@ -10,7 +10,7 @@
     "sections": [
       {
         "title": "Study options",
-        "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
+        "intro": "Most relevant option is listed first — but read all options before deciding.",
         "options": [
           {
             "name": "12th Arts / Humanities",
@@ -72,7 +72,7 @@
       },
       {
         "title": "Job & earning options",
-        "intro": "Yeh sab 10th ke baad start ho sakti hain — study ke saath bhi kar sakte ho part-time. Arts background wale students ke liye kuch options bohot well suited hain.",
+        "intro": "All of these can be started after 10th — many work part-time alongside study. Some are especially well-suited for Arts students.",
         "options": [
           {
             "name": "Content Creation (YouTube / Instagram / Writing)",

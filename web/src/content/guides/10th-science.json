@@ -10,7 +10,7 @@
     "sections": [
       {
         "title": "Study options",
-        "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
+        "intro": "Most relevant option is listed first — but read all options before deciding.",
         "options": [
           {
             "name": "12th Science with Maths (PCM)",
@@ -72,7 +72,7 @@
       },
       {
         "title": "Job & earning options",
-        "intro": "Science & Maths background ke saath yeh skills aur extra income ke raaste realistic hain — part-time ya freelance basis pe. Padhai ke saath balance karna possible hai agar time manage karo.",
+        "intro": "With a Science background, these skills and income paths are realistic — part-time or freelance. Balancing with study is possible with good time management.",
         "options": [
           {
             "name": "Graphic Design (Canva / Figma)",

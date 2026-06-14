@@ -10,7 +10,7 @@
     "sections": [
       {
         "title": "Study options",
-        "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai. Koi bhi decision lene se pehle poora list padho.",
+        "intro": "Most relevant option is listed first — read the full list before making any decision.",
         "options": [
           {
             "name": "12th Commerce",
@@ -72,7 +72,7 @@
       },
       {
         "title": "Job & earning options",
-        "intro": "Aapne kaha ki aap study ke saath earning bhi start karna chahte ho — yeh bilkul possible hai. Yeh saare options 10th pass students ke liye realistic hain. Kisi ek mein serious ho jao — thoda seekhne ke baad income shuru ho sakti hai.",
+        "intro": "Earning alongside study is completely possible. All these options are realistic for a 10th pass student. Pick one and go deep — income can start within a few months.",
         "options": [
           {
             "name": "Tally / Basic Accounting",
