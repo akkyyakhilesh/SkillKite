@@ -1037,6 +1037,11 @@ public class AssessmentOrchestrator
                 "Your SkillKite roadmap 🪁",
                 $"SkillKite_Roadmap_{student.Name ?? "student"}.pdf",
                 ct));
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                english
+                    ? "🌐 Want to explore more career paths? Browse all options at *skillkite.in*"
+                    : "🌐 Aur options dekhne ke liye — *skillkite.in* pe sabhi career paths browse karo",
+                ct));
 
             // PDF delivered — park session in AwaitingFeedback and send the
             // 3-button rating prompt. Old behaviour (immediately marking
@@ -1265,6 +1270,11 @@ public class AssessmentOrchestrator
                 student.Phone, pdfUrl,
                 "Your SkillKite 10th guide 🪁",
                 $"SkillKite_10th_Guide_{student.Name ?? "student"}.pdf",
+                ct));
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                english
+                    ? "🌐 Want to explore more options? Browse all paths at *skillkite.in/after-10th*"
+                    : "🌐 Aur options dekhne ke liye — *skillkite.in/after-10th* pe sabhi paths dekho",
                 ct));
 
             _db.ChatMessages.Add(new ChatMessage
@@ -1603,6 +1613,11 @@ public class AssessmentOrchestrator
                 "Your SkillKite 12th guide 🪁",
                 $"SkillKite_12th_Guide_{student.Name ?? "student"}.pdf",
                 ct));
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                english
+                    ? "🌐 Want to explore more options? Browse all paths at *skillkite.in/after-12th*"
+                    : "🌐 Aur options dekhne ke liye — *skillkite.in/after-12th* pe sabhi paths dekho",
+                ct));
 
             _db.ChatMessages.Add(new ChatMessage
             {
@@ -1937,6 +1952,11 @@ public class AssessmentOrchestrator
                 student.Phone, pdfUrl,
                 "Your SkillKite upskill guide 🪁",
                 $"SkillKite_Upskill_Guide_{student.Name ?? "professional"}.pdf",
+                ct));
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone,
+                english
+                    ? "🌐 Want to explore more skill paths? Browse all options at *skillkite.in/skill-upgrade*"
+                    : "🌐 Aur skill paths dekhne ke liye — *skillkite.in/skill-upgrade* pe sabhi options dekho",
                 ct));
 
             _db.ChatMessages.Add(new ChatMessage
