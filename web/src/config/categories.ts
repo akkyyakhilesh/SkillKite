@@ -101,6 +101,24 @@ export const SKILL_FIELDS: Stream[] = [
   { slug: 'ops_support', label: 'Operations & Support', emoji: '🛠️', blurb: 'Process, tools and roles to grow into beyond support.' },
 ];
 
+/** After-Graduation career groupings (CareerPath.Category enum → display).
+ *  Order = display order on the browse page. */
+export const CAREER_CATEGORIES: { key: string; label: string; emoji: string }[] = [
+  { key: 'Tech', label: 'Tech & IT', emoji: '💻' },
+  { key: 'Creative', label: 'Creative & Design', emoji: '🎨' },
+  { key: 'Government', label: 'Government & Banking', emoji: '🏛️' },
+  { key: 'Gig', label: 'Gig & Freelance', emoji: '🚀' },
+  { key: 'Trades', label: 'Skilled Trades', emoji: '🔧' },
+  { key: 'Emerging', label: 'Emerging Fields', emoji: '🌐' },
+];
+
+/** URL-safe slug from a career title. Titles are unique, so slugs are too. */
+export const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+/** ₹ formatting for salary bands (Indian digit grouping). */
+export const inr = (n: number) => '₹' + n.toLocaleString('en-IN');
+
 /** Production WhatsApp bot number (digits only, for wa.me links). */
 export const WHATSAPP_NUMBER = '916201226351';
 export const WHATSAPP_CTA_TEXT = 'Hi SkillKite!';

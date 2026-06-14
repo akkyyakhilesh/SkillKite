@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import { whatsappLink, CAREER_CATEGORIES, slugify, inr } from '../../config/categories';
+import careers from '../../data/careers.json';
+
+const title = 'After Graduation — 27 career paths & roadmaps | SkillKite';
+const description =
+  'Explore 27 realistic career paths after graduation — tech, government, creative, freelance and more. See salary bands, demand and time to job-ready, then get a free week-by-week roadmap.';
+
+// Group careers by their category, in the display order we define.
+const grouped = CAREER_CATEGORIES.map((cat) => ({
+  ...cat,
+  items: careers.filter((c) => c.Category === cat.key),
+})).filter((g) => g.items.length > 0);
+---
+
+<Base title={title} description={description} path="/after-graduation">
+  <section class="hero hero--sub">
+    <div class="hero-inner">
+      <span class="eyebrow">💼 After Graduation</span>
+      <h1>Find your career path</h1>
+      <p class="sub">
+        27 realistic paths with honest salary bands and timelines. Pick one to see what it
+        takes — then get a free, personalized week-by-week roadmap on WhatsApp.
+      </p>
+    </div>
+  </section>
+
+  <section class="careers">
+    {
+      grouped.map((group) => (
+        <div class="career-group">
+          <h2 class="sec-title">{group.emoji} {group.label}</h2>
+          <div class="career-grid">
+            {group.items.map((c) => (
+              <a class="career-card" href={`/after-graduation/${slugify(c.Title)}`}>
+                <span class="career-name">{c.Title}</span>
+                <span class="career-meta">
+                  <span class="pay">{inr(c.SalaryRangeMin)}–{inr(c.SalaryRangeMax)}/mo</span>
+                  {c.RemoteFriendly && <span class="tag">Remote-friendly</span>}
+                  <span class="tag tag--demand">{c.DemandLevel} demand</span>
+                </span>
+                <span class="career-blurb">{c.Description}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+
+    <div class="escape">
+      <p>Not sure which path fits your degree and goals?</p>
+      <a class="btn-wa" href={whatsappLink('Hi SkillKite! Help me find a career path')}>
+        💬 Chat on WhatsApp
+      </a>
+    </div>
+  </section>
+</Base>

@@ -275,6 +275,75 @@ main { flex: 1; }
 }
 .opt-body .ic { position: absolute; left: 0; top: 1px; }
 
+/* ---------- After-Graduation: career browse + profile ---------- */
+.careers { max-width: 860px; margin: 0 auto; padding: 6px 38px 50px; }
+.career-group { margin-bottom: 32px; }
+.career-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+.career-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--saffron);
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+.career-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+  border-left-color: var(--saffron-light);
+}
+.career-name { font-size: 16px; font-weight: 800; color: #fff; }
+.career-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.career-meta .pay { font-size: 13px; font-weight: 800; color: var(--saffron-light); }
+.career-meta .tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.career-meta .tag--demand { color: var(--muted-dim); }
+.career-blurb { font-size: 13px; color: var(--muted-dim); line-height: 1.45; }
+
+/* Career profile — stat grid + roadmap CTA */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto 28px;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.stat-label { font-size: 12px; font-weight: 700; color: var(--muted-dim); text-transform: uppercase; letter-spacing: 0.4px; }
+.stat-value { font-size: 20px; font-weight: 900; color: #fff; }
+.stat-value small { font-size: 13px; font-weight: 600; color: var(--muted-dim); }
+.roadmap-cta {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 26px 24px;
+  border-radius: 16px;
+  background: rgba(255, 138, 61, 0.08);
+  border: 1px solid rgba(255, 138, 61, 0.2);
+}
+.roadmap-cta p { color: var(--muted); line-height: 1.6; margin: 8px 0 16px; }
+
 /* ---------- Escape-hatch CTA block ---------- */
 .escape {
   max-width: 600px;
@@ -312,4 +381,7 @@ main { flex: 1; }
   .hero--sub h1 { font-size: 28px; }
   .guide { padding: 6px 22px 44px; }
   .sec-title { font-size: 20px; }
+  .careers { padding: 6px 22px 44px; }
+  .career-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
 }
