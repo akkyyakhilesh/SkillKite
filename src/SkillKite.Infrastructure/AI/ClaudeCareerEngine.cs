@@ -774,7 +774,7 @@ public class ClaudeCareerEngine : ICareerEngine
         each section so the most relevant option for the student's interest
         comes first):
 
-        1. "Padhai ke options" — study paths. Include EVERY one of:
+        1. "Study options" — study paths. Include EVERY one of:
            - 12th Science with Maths (PCM)
            - 12th Science with Biology (PCB)
            - 12th Science with Maths + Biology (PCMB)
@@ -783,39 +783,39 @@ public class ClaudeCareerEngine : ICareerEngine
            - Polytechnic Diploma (3 years, direct after 10th)
            - Paramedical Diploma after 10th (DMLT, ANM, X-Ray Tech, etc.)
 
-        2. "Earning ke options" — include this section ALWAYS if goal is
-           "earn" or "both"; INCLUDE A SHORT VERSION even if goal is "study"
-           (titled "Agar earning start karni ho to..."). Realistic 10th-pass
-           earning paths: Content creation, Graphic design (Canva/Figma),
-           Data entry/typing, Mobile phone repair, Meesho/reselling,
+        2. "Job & earning options" — include this section ALWAYS if goal is
+           "earn" or "both"; INCLUDE A SHORT VERSION even if goal is "study".
+           Realistic 10th-pass earning paths: Content creation, Graphic design
+           (Canva/Figma), Data entry/typing, Mobile phone repair, Meesho/reselling,
            Tailoring/stitching, Photography/videography, Tally/basic accounting.
 
         For EVERY option fill in all 5 fields:
-        - whatIsIt: 1-2 line Hinglish description
+        - whatIsIt: 1-2 line description (follow the OUTPUT LANGUAGE directive above)
         - whoFor: which type of student this suits
         - leadsTo: career or next step it opens
         - keyExams: entrance exams (or "" if none)
         - timeCommitment: duration
 
-        Language: Hinglish (mix of Hindi and English). Simple, encouraging,
-        15-16 year old reading level. Be HONEST about difficulty (NEET is
-        very competitive, polytechnic admission varies by state, etc.) —
-        do NOT oversell any path. Do NOT decide for the student.
+        Tone: Simple, encouraging, 15-16 year old reading level. Be HONEST about
+        difficulty (NEET is very competitive, polytechnic admission varies by state)
+        — do NOT oversell any path. Do NOT decide for the student.
+        CRITICAL: Follow the OUTPUT LANGUAGE directive at the top — do not mix
+        languages if English is specified.
 
         Output JSON in this EXACT shape — no markdown fences, no prose:
         {
-          "heading": "SkillKite — 10th ke baad aapke options",
-          "greeting": "Hi <Name>, aapne bataya ki aapko <interest> mein interest hai aur aap <goal> chahte ho. Neeche aapke liye best options pehle diye hain — saare options bhi neeche hain taaki aap compare kar sako.",
+          "heading": "Your options after 10th — SkillKite",
+          "greeting": "Hi <Name>! You told us you are interested in <interest> and want to <goal>. The most relevant options for you are listed first — read through all of them before deciding.",
           "sections": [
             {
-              "title": "Padhai ke options",
-              "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
+              "title": "Study options",
+              "intro": "Most relevant option is listed first — but read all options before deciding.",
               "options": [
                 { "name": "...", "whatIsIt": "...", "whoFor": "...", "leadsTo": "...", "keyExams": "...", "timeCommitment": "..." }
               ]
             }
           ],
-          "closingMessage": "Yeh guide save kar lo aur apne parents/teachers se discuss karo. Jab aap 12th pass kar lo, SkillKite pe wapas aana — tab hum detailed career roadmap banake denge. Apne dost ko bhi share karo — unhe bhi help mil sakti hai. 🪁",
+          "closingMessage": "Save this guide and discuss it with your parents or teachers. When you finish 12th, come back to SkillKite — we'll build you a detailed career roadmap. Share it with a friend who needs it too. 🪁",
           "flowLabel": "10th"
         }
         """;
