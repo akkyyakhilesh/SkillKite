@@ -23,6 +23,9 @@ const grouped = CAREER_CATEGORIES.map((cat) => ({
         27 realistic paths with honest salary bands and timelines. Pick one to see what it
         takes — then get a free, personalized week-by-week roadmap on WhatsApp.
       </p>
+      <div class="ctas" style="margin-top:20px;">
+        <a class="btn-br" href="/">← All categories</a>
+      </div>
     </div>
   </section>
 
@@ -34,13 +37,18 @@ const grouped = CAREER_CATEGORIES.map((cat) => ({
           <div class="career-grid">
             {group.items.map((c) => (
               <a class="career-card" href={`/after-graduation/${slugify(c.Title)}`}>
-                <span class="career-name">{c.Title}</span>
-                <span class="career-meta">
-                  <span class="pay">{inr(c.SalaryRangeMin)}–{inr(c.SalaryRangeMax)}/mo</span>
-                  {c.RemoteFriendly && <span class="tag">Remote-friendly</span>}
-                  <span class="tag tag--demand">{c.DemandLevel} demand</span>
+                <span class="career-card-top">
+                  <span class="career-card-body">
+                    <span class="career-name">{c.Title}</span>
+                    <span class="career-meta">
+                      <span class="pay">{inr(c.SalaryRangeMin)}–{inr(c.SalaryRangeMax)}/mo</span>
+                      {c.RemoteFriendly && <span class="tag">Remote-friendly</span>}
+                      <span class="tag tag--demand">{c.DemandLevel} demand</span>
+                    </span>
+                    <span class="career-blurb">{c.Description}</span>
+                  </span>
+                  <span class="pick-go">→</span>
                 </span>
-                <span class="career-blurb">{c.Description}</span>
               </a>
             ))}
           </div>

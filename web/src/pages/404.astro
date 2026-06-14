@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import { whatsappLink } from '../config/categories';
+---
+
+<Base title="Page not found — SkillKite" description="This page doesn't exist. Let SkillKite help you find the right career path." path="/404">
+  <section class="hero" style="padding-top:80px;">
+    <div class="hero-inner">
+      <span class="eyebrow">404</span>
+      <h1 style="margin-top:20px;">Page not found</h1>
+      <p class="sub" style="margin-top:16px;">This page doesn't exist. But your career path does — let's find it.</p>
+      <div class="ctas" style="margin-top:28px;">
+        <a class="btn-wa" href={whatsappLink()}>💬 Chat on WhatsApp</a>
+        <a class="btn-br" href="/">← Back home</a>
+      </div>
+    </div>
+  </section>
+</Base>

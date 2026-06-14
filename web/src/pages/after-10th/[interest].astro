@@ -17,11 +17,11 @@ const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
     eyebrow={`📚 After 10th · ${streamLabel}`}
     heading={`After 10th — ${streamLabel}`}
     intro={`Every stream and option after 10th, with ${streamLabel.toLowerCase()} paths first. Tap any option to see what it is, who it's for, and where it leads.`}
-    pdfWaText={`Hi SkillKite! I just finished 10th — send me the guide`}
+    pdfWaText={`Hi SkillKite! I just finished 10th, interested in ${streamLabel} — send me the guide`}
     backHref="/after-10th"
     backLabel="Other interests"
     sections={guide.sections}
     escapePrompt="Want a plan matched to your marks and goals?"
-    escapeWaText="Hi SkillKite! I just finished 10th"
+    escapeWaText={`Hi SkillKite! I just finished 10th, interested in ${streamLabel}`}
   />
 </Base>

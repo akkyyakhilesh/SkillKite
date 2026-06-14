@@ -9,7 +9,7 @@
     "greeting": "Hi there! Aapne bataya ki aapko Arts mein interest hai aur aap study bhi karna chahte ho aur earning bhi start karna chahte ho. Neeche aapke liye best options pehle diye hain — saare options bhi neeche hain taaki aap compare kar sako.",
     "sections": [
       {
-        "title": "Padhai ke options",
+        "title": "Study options",
         "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
         "options": [
           {
@@ -71,7 +71,7 @@
         ]
       },
       {
-        "title": "Earning ke options",
+        "title": "Job & earning options",
         "intro": "Yeh sab 10th ke baad start ho sakti hain — study ke saath bhi kar sakte ho part-time. Arts background wale students ke liye kuch options bohot well suited hain.",
         "options": [
           {

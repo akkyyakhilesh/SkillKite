@@ -9,7 +9,7 @@
     "greeting": "Hi there! You mentioned you are not sure about your interest area yet, and you want both study and earning options. That is completely okay — being confused at this stage is very normal. Neeche saare realistic options diye hain taaki aap properly compare karke decide kar sako. Koi bhi decision abhi final nahi hai — explore karo.",
     "sections": [
       {
-        "title": "Padhai ke options",
+        "title": "Study options",
         "intro": "Since you are confused about your interest, all options are shown equally — read each one carefully and notice which ones feel exciting to you. That feeling is a good clue about your interest.",
         "options": [
           {
@@ -71,7 +71,7 @@
         ]
       },
       {
-        "title": "Earning ke options — abhi se shuru kar sakte ho",
+        "title": "Job & earning options",
         "intro": "Yeh sab kaam 10th ke baad part-time ya full-time kar sakte ho — padhai ke saath bhi. Confused hona earning start karne se nahi rokta. Kuch skills seekhne mein sirf 1–3 mahine lagte hain.",
         "options": [
           {

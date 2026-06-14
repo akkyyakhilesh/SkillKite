@@ -9,7 +9,7 @@
     "greeting": "Hi there! Aapne bataya ki aapko commerce mein interest hai aur aap study bhi karna chahte ho aur earning bhi start karna chahte ho. Neeche aapke liye sabse relevant options pehle diye hain — saare options bhi hain taaki aap properly compare kar sako.",
     "sections": [
       {
-        "title": "Padhai ke options",
+        "title": "Study options",
         "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai. Koi bhi decision lene se pehle poora list padho.",
         "options": [
           {
@@ -71,7 +71,7 @@
         ]
       },
       {
-        "title": "Earning ke options",
+        "title": "Job & earning options",
         "intro": "Aapne kaha ki aap study ke saath earning bhi start karna chahte ho — yeh bilkul possible hai. Yeh saare options 10th pass students ke liye realistic hain. Kisi ek mein serious ho jao — thoda seekhne ke baad income shuru ho sakti hai.",
         "options": [
           {

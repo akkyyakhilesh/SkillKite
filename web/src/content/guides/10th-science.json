@@ -9,7 +9,7 @@
     "greeting": "Hi! Aapne bataya ki aapko Science & Maths mein interest hai aur aap study bhi karna chahte ho aur earning bhi start karna chahte ho. Neeche aapke liye best options pehle diye hain — saare options bhi neeche hain taaki aap compare kar sako.",
     "sections": [
       {
-        "title": "Padhai ke options",
+        "title": "Study options",
         "intro": "Sabse relevant option upar hai — but baaki options bhi padhna important hai.",
         "options": [
           {
@@ -71,7 +71,7 @@
         ]
       },
       {
-        "title": "Earning ke options",
+        "title": "Job & earning options",
         "intro": "Science & Maths background ke saath yeh skills aur extra income ke raaste realistic hain — part-time ya freelance basis pe. Padhai ke saath balance karna possible hai agar time manage karo.",
         "options": [
           {

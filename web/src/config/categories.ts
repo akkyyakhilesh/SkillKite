@@ -74,9 +74,8 @@ export interface Stream {
 export const TWELFTH_STREAMS: Stream[] = [
   { slug: 'pcm', label: 'Science (PCM)', emoji: '🔬', blurb: 'Physics, Chemistry, Maths — B.Tech, B.Sc, BCA, B.Arch, NDA & more.' },
   { slug: 'pcb', label: 'Science (PCB)', emoji: '🧬', blurb: 'Physics, Chemistry, Biology — MBBS, BDS, paramedical, B.Pharm & more.' },
-  { slug: 'commerce', label: 'Commerce', emoji: '📊', blurb: 'CA, CS, CMA, B.Com, BBA, B.Com LLB & more.' },
+  { slug: 'commerce', label: 'Commerce', emoji: '📊', blurb: 'CA, CS, CMA, B.Com, BBA, B.Com LLB, MBA track & more.' },
   { slug: 'arts', label: 'Arts / Humanities', emoji: '🎨', blurb: 'BA LLB, BA, BJMC, B.Des, government-exam prep & more.' },
-  { slug: 'bba', label: 'BBA', emoji: '💼', blurb: 'MBA specializations, entrepreneurship & management careers.' },
 ];
 
 /** 10th-flow interest areas — order + blurb for the after-10th picker.

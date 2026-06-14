@@ -49,10 +49,18 @@ const preview = (s: string) => {
   </div>
 </section>
 
+<nav class="sec-nav">
+  {sections.map((section) => (
+    <a class="sec-pill" href={`#${section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+      {section.title}
+    </a>
+  ))}
+</nav>
+
 <section class="guide">
   {
     sections.map((section) => (
-      <div class="guide-section">
+      <div class="guide-section" id={section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>
         <h2 class="sec-title">{section.title}</h2>
         {section.intro && <p class="sec-intro">{section.intro}</p>}
 
@@ -61,7 +69,7 @@ const preview = (s: string) => {
             <summary>
               <span class="opt-head">
                 <span class="opt-name">{o.name}</span>
-                <span class="opt-preview">{preview(o.leadsTo)}</span>
+                <span class="opt-preview">{preview(o.whatIsIt || o.leadsTo)}</span>
               </span>
               <span class="opt-chev" aria-hidden="true">▸</span>
             </summary>
