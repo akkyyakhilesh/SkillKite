@@ -5,141 +5,141 @@
   "seoTitle": "Upskill in Teaching & Education — skills, next roles & moves | SkillKite",
   "seoDescription": "Upskill in Teaching & Education — ed-tech, online tutoring, next roles",
   "guide": {
-    "heading": "SkillKite — Next career rung for you",
-    "greeting": "Hi there! You're working in teaching and education, and you're still figuring out where you want to go next — which is completely fine. Teaching is one of those fields where your skills quietly transfer to a surprising number of high-paying paths. Below is a clear map of what to learn, where to move, and what doors those moves open.",
+    "heading": "Your next career move — SkillKite",
+    "greeting": "Hi there! You are working in teaching and education and are exploring your options. Here are the highest-leverage skills and next roles for your field — listed by relevance.",
     "sections": [
       {
         "title": "Skills to add now",
-        "intro": "These skills have the highest salary and seniority leverage for educators in India right now — whether you stay in teaching or pivot later.",
+        "intro": "These skills have the highest salary and seniority leverage in your current field.",
         "options": [
           {
-            "name": "Instructional Design (ID) using Articulate Storyline / Rise 360",
-            "whatIsIt": "Instructional design is the craft of building structured learning experiences — online courses, modules, and assessments — using authoring tools like Articulate Storyline 360 or Rise. It is the engine behind every corporate e-learning product.",
-            "whoFor": "Teachers with 2+ years of classroom or training experience who are comfortable explaining complex topics clearly. Especially valuable if you've ever created lesson plans, worksheets, or student assessments.",
-            "leadsTo": "Instructional Designer roles at EdTech companies (BYJU'S, Unacademy, Coursera vendors, Simplilearn), corporate L&D departments, and freelance e-learning development. Salary band: ₹40k–90k/month in-office; ₹60k–1.2L remote.",
-            "keyExams": "No mandatory certification, but ATD (Association for Talent Development) certificates or a short Articulate community certification strengthen your portfolio. A demo course/module matters more than any exam.",
-            "timeCommitment": "2–3 months to build a portfolio of 2–3 sample modules and get job-ready."
+            "name": "Instructional Design using Articulate Storyline / Rise 360",
+            "whatIsIt": "Instructional design is the craft of structuring learning content into modules, assessments, and interactive e-learning courses. Articulate Storyline and Rise 360 are the industry-standard tools used by corporate L&D teams and e-learning agencies worldwide.",
+            "whoFor": "Teachers and trainers with 2+ years of classroom or curriculum experience who want to move into corporate training or e-learning content creation.",
+            "leadsTo": "Instructional Designer, L&D Specialist, E-learning Developer roles. Salary jumps from typical school-level ₹20k-40k to ₹50k-1.2L in corporate L&D or remote/freelance roles.",
+            "keyExams": "ATD Certificate in Instructional Design (optional but valued); Articulate's own community badge is portfolio-grade.",
+            "timeCommitment": "3-4 months to build a job-ready portfolio of 2-3 sample courses."
           },
           {
-            "name": "Learning Management Systems (LMS) Administration — Moodle, Google Classroom, Canvas",
-            "whatIsIt": "LMS administration means setting up, managing, and optimising digital learning platforms used by schools, colleges, and corporate training teams. You handle course uploads, user management, analytics dashboards, and integrations.",
-            "whoFor": "Educators who already use Google Classroom or similar tools and want to formalise that knowledge. Great for teachers in schools that are going hybrid or fully online.",
-            "leadsTo": "LMS Administrator, EdTech Coordinator, Academic Technology Specialist roles. Also supports a move into EdTech startups as an implementation specialist. Salary band: ₹35k–70k/month.",
-            "keyExams": "Google Workspace for Education certification is free and recognised. Moodle has official certifications at moodle.com. Canvas offers free training through Instructure.",
-            "timeCommitment": "1–2 months to get certified and hands-on with one platform."
+            "name": "Learning Management System (LMS) Administration — Moodle / TalentLMS / Canvas",
+            "whatIsIt": "LMS administration involves setting up, managing, and optimising online learning platforms used by schools, universities, and corporate training teams. Skills include course uploading, user management, reporting, and basic customisation.",
+            "whoFor": "Teachers who are already comfortable with online tools and want a technical-adjacent role without coding. Especially useful for those in ed-tech schools or who managed online classes during COVID.",
+            "leadsTo": "LMS Administrator, Ed-Tech Coordinator, Training Coordinator roles. Salary band: ₹35k-70k in ed-tech companies and corporate HR/L&D departments.",
+            "keyExams": "Moodle Certified Educator or Moodle Associate (official Moodle certification). Canvas offers free educator credentials.",
+            "timeCommitment": "2-3 months to get hands-on with one platform and earn a credential."
           },
           {
-            "name": "Data-Driven Teaching — Excel / Google Sheets + basic student analytics",
-            "whatIsIt": "Using spreadsheet tools and simple analytics to track student performance, identify learning gaps, and present outcomes to school leadership or parents. Includes pivot tables, conditional formatting, and basic visualisation with Google Looker Studio or Power BI.",
-            "whoFor": "Teachers and academic coordinators who want to move into academic leadership, curriculum roles, or EdTech product roles that require learning analytics.",
-            "leadsTo": "Academic Coordinator, Head of Academics, Curriculum Analyst, Learning Analyst at EdTech firms. Salary band: ₹40k–80k/month. This skill also gates many school principal and K-12 leadership roles.",
-            "keyExams": "Microsoft Office Specialist (Excel) certification is low-cost and recognised. Google Data Analytics Certificate (Coursera, ~6 months) is a stronger signal if you want to go deeper.",
-            "timeCommitment": "1–2 months for Excel/Sheets basics with student-data projects; 4–6 months for the full Google Data Analytics certificate."
+            "name": "Curriculum Design and Content Writing for Ed-Tech",
+            "whatIsIt": "Structuring syllabi, lesson plans, assessments, and study material for digital platforms — from K-12 apps to competitive exam prep portals. This goes beyond classroom prep; it means writing for scale, SEO-aware content, and learner personas.",
+            "whoFor": "Subject-matter experts — especially in STEM, English, commerce, or social sciences — who can translate deep knowledge into structured, scalable digital content.",
+            "leadsTo": "Curriculum Developer, Academic Content Writer, Subject Matter Expert (SME) at ed-tech companies like BYJU's, Unacademy, Vedantu, or their competitors. Salary: ₹35k-80k depending on subject and platform.",
+            "keyExams": "",
+            "timeCommitment": "2-3 months to build a portfolio of 3-5 sample modules or lesson plans."
           },
           {
-            "name": "Curriculum Design and CBSE / IB / Cambridge Framework Knowledge",
-            "whatIsIt": "Deep understanding of how to design syllabi, learning objectives, assessment rubrics, and scope-and-sequence documents aligned to national or international frameworks like CBSE, IB PYP/MYP/DP, or Cambridge IGCSE.",
-            "whoFor": "Experienced teachers (3+ years) in any subject who want to move into curriculum writer, academic lead, or content developer roles at publishers, EdTech companies, or premium schools.",
-            "leadsTo": "Curriculum Writer (Pearson, S. Chand, NCERT vendors), Academic Head, IB Coordinator, Content Developer at EdTech. Salary band: ₹45k–1L/month. IB coordinators at international schools can earn ₹80k–1.5L.",
-            "keyExams": "IB Certificate in Teaching and Learning (IBTL) if targeting IB schools. Cambridge PDQ (Professional Development Qualification) for Cambridge-stream schools. No single exam gates curriculum writing — a portfolio of sample units is essential.",
-            "timeCommitment": "3–4 months to build a strong curriculum design portfolio; IB certification takes 6–12 months."
+            "name": "Data Literacy and Basic Analytics using Google Sheets / Excel / Power BI",
+            "whatIsIt": "The ability to track student performance data, analyse learning outcomes, build dashboards, and present insights to school leadership or corporate training heads. Power BI and advanced Excel are the tools most in demand.",
+            "whoFor": "Teachers in coordinator or senior roles who are involved in performance reviews, report cards, or training evaluation. Also valuable for those targeting L&D analytics or academic operations roles.",
+            "leadsTo": "Academic Coordinator, Training Analyst, L&D Data Analyst roles. Salary uplift of 30-50% over pure teaching roles; ₹45k-90k in mid-size ed-tech or corporate training teams.",
+            "keyExams": "Microsoft Power BI Data Analyst (PL-300) certification is highly recognised. Google Data Analytics certificate (Coursera) is a good starting point.",
+            "timeCommitment": "3-4 months to reach job-ready proficiency with a dashboard portfolio."
           },
           {
-            "name": "Public Speaking and Corporate Training Facilitation",
-            "whatIsIt": "Developing the structured facilitation skills used in corporate soft-skills training, leadership workshops, and communication bootcamps. Goes beyond classroom teaching — covers adult learning principles, workshop design, energy management, and live virtual facilitation on Zoom/Teams.",
-            "whoFor": "Teachers who are naturally engaging speakers and find corporate communication or personality development topics interesting. Also suits educators who already do coaching or tuition.",
-            "leadsTo": "Corporate Trainer, Soft Skills Trainer, Communication Coach roles at training firms, BPOs, or as a freelancer. Salary band: ₹40k–80k/month in-house; ₹800–2500/hour as a freelance trainer. Top trainers in Tier 1 cities earn ₹1.5L–3L/month.",
-            "keyExams": "Dale Carnegie certification is highly recognised. CPTM (Certified Professional in Training Management) is a stronger global credential. Toastmasters membership (low cost) builds credibility and network.",
-            "timeCommitment": "2–3 months to get your first paid workshop; 6–12 months to build a reliable client pipeline."
+            "name": "Online Teaching and Live Cohort Facilitation",
+            "whatIsIt": "Designing and delivering structured online courses — either on your own platform or via cohort-based platforms like Maven, Teachable, or Graphy (India-focused). This includes Zoom facilitation, community management, and async content delivery.",
+            "whoFor": "Teachers with a strong subject identity and some personal brand potential — those who already have students seeking them out by name or those active on LinkedIn or YouTube.",
+            "leadsTo": "Independent educator, cohort course creator, online tutor with ₹50k-2L+ per month potential at scale. Early months are modest (₹10k-30k) but ceiling is high.",
+            "keyExams": "",
+            "timeCommitment": "3-5 months to launch a first paid cohort or course with 10+ paying students."
           },
           {
-            "name": "Content Creation for EdTech — Video Scripting + Canva + Basic Video Editing",
-            "whatIsIt": "Creating educational content for YouTube channels, EdTech platforms, or school social media — includes writing clear scripts, designing slides and infographics in Canva, and basic video editing using CapCut or DaVinci Resolve.",
-            "whoFor": "Teachers who enjoy explaining concepts and want to build an audience or work as content creators for EdTech brands. Especially relevant if you teach competitive exam subjects (JEE, UPSC, SSC, NEET).",
-            "leadsTo": "Subject Matter Expert (SME) at EdTech platforms, Content Creator, Academic Content Manager, or a standalone YouTube/Instagram channel with ad and affiliate income. Salary band as employee: ₹30k–65k/month. Top subject-focused YouTubers earn ₹1L–10L/month (takes 2–3 years of consistent effort).",
-            "keyExams": "No formal certification required. A portfolio of 5–10 well-produced videos or a Canva-designed course deck is what gets you hired.",
-            "timeCommitment": "1–2 months to get tool-ready; 6–18 months to build an audience or land a content role."
+            "name": "Soft Skills Training and Corporate Facilitation",
+            "whatIsIt": "Designing and delivering communication, leadership, and behavioural skills workshops for corporate employees. Uses facilitation frameworks like ADDIE and Kirkpatrick's evaluation model alongside experiential learning techniques.",
+            "whoFor": "Teachers with strong communication skills and classroom command — especially those with a background in English, humanities, or management subjects who enjoy working with adults.",
+            "leadsTo": "Corporate Trainer, Soft Skills Facilitator, L&D Consultant roles. Salary: ₹40k-1L per month for in-house roles; ₹3k-15k per day for freelance/consulting engagements.",
+            "keyExams": "CPTD (Certified Professional in Talent Development) by ATD is top-tier but expensive. ISTD (Indian Society for Training and Development) certification is India-specific and widely recognised by HR teams.",
+            "timeCommitment": "4-6 months including practice workshops and earning an India-relevant credential."
           }
         ]
       },
       {
         "title": "Roles to target next",
-        "intro": "These are realistic next-rung roles for working educators with 1–10 years of experience in India. Salary bands reflect Tier 2/3 in-office and remote/Tier 1 ranges honestly.",
+        "intro": "These are realistic next-rung roles for your experience level in teaching and education.",
         "options": [
           {
             "name": "Instructional Designer",
-            "whatIsIt": "Designs, builds, and maintains e-learning courses and training modules for EdTech companies or corporate L&D teams. Day-to-day work involves scripting, working with subject matter experts, building modules in Articulate or Rise, and reviewing content for learning effectiveness.",
-            "whoFor": "Teachers who are detail-oriented, enjoy structured content creation, and are comfortable with software tools. Prior lesson-planning experience is a direct advantage.",
-            "leadsTo": "Senior Instructional Designer, Learning Experience Designer (LXD), L&D Manager. Salary band: ₹40k–80k/month in Tier 2/3; ₹70k–1.3L remote or Tier 1.",
-            "keyExams": "No hard-gate exam, but ATD certification or an Articulate community badge helps. Portfolio is the real gate.",
-            "timeCommitment": "3–5 months from skill-building to first job offer, assuming you build 2–3 portfolio modules."
+            "whatIsIt": "Creates structured e-learning courses, blended learning programmes, and training modules for corporate L&D teams or ed-tech companies. Day-to-day work involves storyboarding, building content in Articulate or similar tools, and collaborating with subject matter experts.",
+            "whoFor": "Teachers with 2+ years of experience who can break complex topics into learner-friendly chunks and are willing to invest 3-4 months learning Articulate Storyline.",
+            "leadsTo": "Senior Instructional Designer, L&D Manager. Salary band: ₹50k-1.1L in Tier 1 cities; ₹35k-70k in Tier 2/3 or remote roles for Indian companies.",
+            "keyExams": "ATD Instructional Design Certificate or Articulate community credentials.",
+            "timeCommitment": "4-6 months transition time from teaching with a strong portfolio."
           },
           {
             "name": "Academic Coordinator / Curriculum Lead",
-            "whatIsIt": "Oversees teaching quality, curriculum alignment, teacher training, and academic outcomes across a school or school chain. Involves less classroom teaching and more planning, reviewing, and coaching other teachers.",
-            "whoFor": "Experienced teachers (4+ years) who have informally mentored colleagues, coordinated events, or managed exam schedules. Suits those who want leadership within the school system.",
-            "leadsTo": "Vice Principal, Principal, Academic Director, Head of Curriculum at school chains like DPS, Podar, or EdTech academic ops teams. Salary band: ₹40k–85k/month.",
-            "keyExams": "B.Ed + experience is the standard gate. CTET or state TET is required for government school paths. For premium schools, IB or Cambridge credentials add significant premium.",
-            "timeCommitment": "1–2 years of deliberate positioning within your current school + certification if targeting IB/Cambridge schools."
+            "whatIsIt": "Oversees curriculum planning, teacher training, assessment design, and academic quality across a school, coaching institute, or ed-tech platform. Involves managing a team of teachers and liaising with leadership on learning outcomes.",
+            "whoFor": "Teachers with 4+ years of classroom experience who are already informally mentoring colleagues or leading subject departments.",
+            "leadsTo": "Vice Principal, Academic Head, Content Head at ed-tech. Salary: ₹35k-75k in private schools or coaching institutes; ₹50k-1L at ed-tech companies.",
+            "keyExams": "",
+            "timeCommitment": "Typically an internal promotion track — 1-2 years with deliberate visibility; or 3-6 months to land a coordinator role at a new organisation."
           },
           {
             "name": "Corporate Trainer / L&D Specialist",
-            "whatIsIt": "Delivers soft-skills, communication, leadership, or functional training to employees at companies. Designs training calendars, facilitates workshops (in-person and virtual), and tracks training effectiveness metrics.",
-            "whoFor": "Teachers with strong presentation skills and an interest in adult learning. Communication, English, and language teachers have a natural edge. Suits those who find the school environment limiting.",
-            "leadsTo": "Senior Trainer, L&D Manager, Training Manager, Chief Learning Officer track. Salary band: ₹40k–90k/month in-house; senior L&D managers in Tier 1 earn ₹1L–2L/month.",
-            "keyExams": "Dale Carnegie, CPTM, or SHRM certification strengthens applications. Not always mandatory but speeds up hiring.",
-            "timeCommitment": "3–6 months to transition; faster if you can show a facilitation video and one pro-bono corporate workshop."
+            "whatIsIt": "Designs and delivers training programmes for employees inside companies — covering onboarding, product knowledge, leadership skills, and compliance. Works closely with HR and business leaders to identify skill gaps and measure training effectiveness.",
+            "whoFor": "Teachers with strong facilitation and communication skills who prefer working with adult learners in a professional environment rather than school-age students.",
+            "leadsTo": "L&D Manager, Head of Learning, HR Business Partner. Salary: ₹40k-90k for L&D Specialist roles; ₹80k-1.5L for L&D Manager in mid-to-large corporates.",
+            "keyExams": "ISTD certification (India-specific, HR teams recognise it) or ATD CPTD.",
+            "timeCommitment": "4-8 months including credential + 2-3 facilitation practice sessions."
           },
           {
-            "name": "EdTech Content Developer / Subject Matter Expert (SME)",
-            "whatIsIt": "Creates structured written, video, or interactive content for EdTech platforms (test-prep apps, school platforms, upskilling platforms). Day-to-day: writing questions, creating explanations, reviewing content for accuracy, working with product teams.",
-            "whoFor": "Teachers who are strong in a specific subject (Math, Science, English, Economics, History) and want a less physically demanding, often remote-friendly role.",
-            "leadsTo": "Senior Content Developer, Content Manager, Academic Product Manager at EdTech firms. Salary band: ₹30k–65k/month; senior roles ₹60k–1L/month.",
-            "keyExams": "No mandatory certification. Strong subject knowledge + a writing/content portfolio is the real filter.",
-            "timeCommitment": "1–3 months to build a portfolio and apply; many platforms also hire on a freelance/contractual basis first."
+            "name": "Content Developer / Curriculum Writer at Ed-Tech",
+            "whatIsIt": "Creates structured learning content — study notes, question banks, video scripts, assessments — for platforms serving K-12, competitive exam, or upskilling markets. Work is largely remote and output-based.",
+            "whoFor": "Teachers with deep subject expertise in STEM, English, commerce, or social science who enjoy writing and structuring knowledge at scale.",
+            "leadsTo": "Senior Content Developer, Content Manager, Academic Head. Salary: ₹30k-65k full-time; ₹500-2000 per module as a freelancer.",
+            "keyExams": "",
+            "timeCommitment": "2-3 months to build a portfolio of samples and land a role or freelance contract."
           },
           {
-            "name": "Online Tutor (Premium platforms — Vedantu, Chegg, Preply, iTalki)",
-            "whatIsIt": "Teaches students 1-on-1 or in small groups on premium online platforms, often at higher per-hour rates than traditional tuition. Covers K-12, competitive exam prep, language learning, or skill-based sessions.",
-            "whoFor": "Teachers who prefer staying in direct teaching but want better income and flexibility. Especially strong for English/language teachers and STEM teachers targeting international students.",
-            "leadsTo": "Higher income per hour (₹500–2500/hour on Indian platforms; $15–50/hour on Preply/iTalki for English teaching), schedule flexibility, and a foundation for eventually launching your own course or brand.",
-            "keyExams": "TEFL/TESOL certification (120-hour course, ~₹5k–15k) is strongly recommended for English-teaching platforms targeting international students. Subject mastery and reviews are the real gate on most platforms.",
-            "timeCommitment": "2–4 weeks to onboard and get first students; 3–6 months to build consistent income."
+            "name": "Education Consultant / Academic Counsellor",
+            "whatIsIt": "Guides students and families on career paths, course selection, study abroad options, or college admissions. Works at counselling firms, study-abroad agencies, or independently. Also includes school improvement consulting for NGOs and private chains.",
+            "whoFor": "Teachers with strong interpersonal skills who enjoy one-on-one advising and have broad knowledge of education pathways — especially those who informally counsel students already.",
+            "leadsTo": "Senior Counsellor, Director of Counselling, Independent Consultant. Salary: ₹30k-70k in organisations; ₹50k-1.5L+ as an independent consultant once established.",
+            "keyExams": "GCDF (Global Career Development Facilitator) certification is well-regarded for career counselling roles.",
+            "timeCommitment": "3-6 months to credential up and build a client pipeline or land an organisational role."
           }
         ]
       },
       {
         "title": "Side moves",
-        "intro": "These adjacent fields value your teaching skills more than you might expect. Good options to explore if you want a clean break or a parallel income stream.",
+        "intro": "Your teaching experience transfers well to these adjacent fields — worth knowing even if you plan to stay in education.",
         "options": [
           {
-            "name": "Human Resources — Training & Development track",
-            "whatIsIt": "HR's L&D (Learning & Development) function is essentially corporate teaching. You'd design onboarding programs, run employee training, and manage learning platforms inside a company. Your lesson-planning and facilitation skills transfer directly.",
-            "whoFor": "Teachers who like working with adults, enjoy organisational dynamics, and want a corporate salary trajectory without starting from scratch. English teachers and communication trainers have an especially easy transition.",
-            "leadsTo": "L&D Executive → L&D Manager → Head of Learning. Salary band: ₹35k–70k early stage; ₹80k–1.5L at manager level. SHRM or SHRM-CP certification adds credibility.",
-            "keyExams": "SHRM-CP or SHRM-SCP (global), or NHRDN certifications for India. Not mandatory to start but helpful after 1–2 years in the role.",
-            "timeCommitment": "3–6 months to reframe your resume and apply; faster if you can do a short HR analytics or L&D certificate to signal the shift."
+            "name": "Human Resources — Training and Organisational Development",
+            "whatIsIt": "HR's L&D and OD functions are essentially professional education for adults inside organisations. Your facilitation, assessment design, and people-reading skills from the classroom translate directly into workshop design, onboarding programme management, and performance coaching.",
+            "whoFor": "Teachers who enjoy understanding people, behaviour, and group dynamics — and who find the corporate environment appealing.",
+            "leadsTo": "HR Generalist, L&D Executive, OD Consultant. Salary: ₹35k-90k in mid-size companies. HR is a large field with clear progression to HRBP and CHRO tracks.",
+            "keyExams": "SHRM-CP or SHRM-SCP for international credibility; NHRDN certification for India-focused roles.",
+            "timeCommitment": "4-6 months to credential + target L&D-adjacent HR roles as a lateral entry."
           },
           {
-            "name": "Content Writing and EdTech Copywriting",
-            "whatIsIt": "Writing blog posts, course descriptions, marketing copy, explainer articles, and SEO content for EdTech companies, coaching institutes, or education-focused brands. Teachers are natural explainers, which is the core skill here.",
-            "whoFor": "Teachers who enjoy writing, have strong English or Hindi/regional language skills, and want a flexible, often remote career. Good secondary income path while transitioning.",
-            "leadsTo": "Content Writer → Senior Content Writer → Content Strategist. Salary band: ₹25k–55k early stage; ₹60k–1L+ for SEO-savvy senior writers. Freelance: ₹1–4/word once established, ₹30k–1.5L/month depending on volume.",
-            "keyExams": "No formal certification needed. A portfolio of 5–10 published or sample articles is the only real requirement. HubSpot Content Marketing certification is free and widely recognised.",
-            "timeCommitment": "1–2 months to build a writing portfolio; 3–4 months to land a stable freelance or in-house role."
+            "name": "Content Marketing and EdTech Content Strategy",
+            "whatIsIt": "Your ability to explain complex topics clearly is a core content marketing skill. Roles in content writing, blog strategy, SEO content, and social media education for brands — especially ed-tech, finance, and healthcare companies that need expert explainers.",
+            "whoFor": "Teachers who enjoy writing, have a strong command of English or regional languages, and are comfortable publishing content online.",
+            "leadsTo": "Content Writer, Content Strategist, SEO Writer, Brand Educator. Salary: ₹25k-70k full-time; ₹1k-5k per article as a freelancer once established.",
+            "keyExams": "HubSpot Content Marketing Certification (free, widely recognised). Google Digital Garage for SEO basics.",
+            "timeCommitment": "2-3 months to build a writing portfolio and start landing clients or roles."
           },
           {
-            "name": "Career Counselling and Educational Consulting",
-            "whatIsIt": "Guiding students and parents on stream selection, college choices, exam strategy, and career planning. As an experienced educator you already do informal versions of this — formalising it opens a consulting or clinic-style business.",
-            "whoFor": "Teachers with 4+ years of experience who have strong student-parent relationships and are knowledgeable about the Indian exam ecosystem (JEE, NEET, CUET, CAT, UPSC, study-abroad). Also suits teachers at the senior secondary level.",
-            "leadsTo": "Independent career counsellor (₹500–3000/session), counsellor at premium schools or coaching institutes (₹40k–80k/month), or part of study-abroad consultancies. Top independent counsellors with a strong brand earn ₹1L–3L/month.",
-            "keyExams": "Global Career Development Facilitator (GCDF) certification is internationally recognised. Career Counsellor certification from iCrest or Univariety is India-specific and respected by schools. Not mandatory to start.",
-            "timeCommitment": "2–4 months to get certified and start taking paid sessions; 12–24 months to build a steady independent practice."
+            "name": "Ed-Tech Product or Customer Success",
+            "whatIsIt": "Ed-tech companies need people who understand how learners behave — for product teams shaping the learning experience, and customer success teams helping schools or students get value from the platform. Your ground-level teaching insight is genuinely rare and valued here.",
+            "whoFor": "Teachers who are tech-comfortable, curious about how products are built, and enjoy problem-solving with users rather than purely delivering content.",
+            "leadsTo": "Customer Success Manager, Product Analyst, Learning Experience Designer. Salary: ₹35k-90k in growth-stage or mid-size ed-tech companies.",
+            "keyExams": "Gainsight or HubSpot Customer Success certifications for CS roles; Product School's free certifications for product roles.",
+            "timeCommitment": "3-5 months to skill up and position your teaching experience as a product/CS asset."
           }
         ]
       }
     ],
-    "closingMessage": "You're already doing the hardest part of any career — showing up every day and being responsible for someone else's growth. That discipline, clarity of explanation, and ability to manage a room full of people are skills that most professionals spend years trying to build. Pick one skill from the list above that genuinely excites you, spend 2–3 focused months on it, and build something you can show — a portfolio module, a workshop you facilitated, a piece of content. That one artefact will change how employers and clients see you. Come back to SkillKite when you're ready for a specific roadmap for any of these roles. And if a colleague is figuring out their next move too, share this — everyone deserves a clear map. \uD83E\uDE81",
+    "closingMessage": "These are the highest-leverage skills and roles for your field. Pick one skill, go deep for 3 months, and build a portfolio — that is what changes the interview game. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. \uD83E\uDE81",
     "flowLabel": "Upskill"
   }
 }

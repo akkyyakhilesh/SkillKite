@@ -5,141 +5,141 @@
   "seoTitle": "Upskill in Operations & Support — skills, next roles & moves | SkillKite",
   "seoDescription": "Upskill in Operations & Support — process, tools, next roles & side moves",
   "guide": {
-    "heading": "SkillKite — Next career rung for you",
-    "greeting": "Hey there! You're currently working in Operations & Support, and you're still figuring out where you want to take things next — that's completely fine. Below is a clear-eyed breakdown of the highest-leverage skills, realistic next roles, and adjacent paths that professionals in your position typically benefit from most. Take what fits your situation.",
+    "heading": "Your next career move — SkillKite",
+    "greeting": "Hi there! You are working in Operations & Support and are still exploring your next move. Here are the highest-leverage skills and next roles for your field — listed by relevance.",
     "sections": [
       {
         "title": "Skills to add now",
-        "intro": "These skills have strong salary and seniority leverage for ops/support professionals — whether you stay in the same domain or eventually pivot.",
+        "intro": "These skills have the highest salary and seniority leverage in your current field.",
         "options": [
           {
-            "name": "Process Automation with Python or Power Automate",
-            "whatIsIt": "Using Python scripts or Microsoft Power Automate to automate repetitive manual tasks — report generation, data entry, email triggers, escalation workflows. No deep coding needed; workflow-level scripting is enough.",
-            "whoFor": "Operations executives and support leads who spend hours on repetitive tasks and want to show visible business impact without becoming full developers.",
-            "leadsTo": "Process Improvement Analyst, Automation Specialist, RPA roles — salary bump from ₹25k-40k to ₹50k-90k in mid-market; remote roles at ₹70k-1.2L are common.",
-            "keyExams": "Microsoft Power Automate Associate (PL-900 + PL-500), or Python for Automation on Coursera/LinkedIn Learning (no formal cert needed, portfolio matters more).",
-            "timeCommitment": "2-3 months to get job-ready with 2-3 real automation projects documented."
+            "name": "Process Improvement & Lean Six Sigma",
+            "whatIsIt": "A structured methodology (Define-Measure-Analyse-Improve-Control) used to eliminate waste and inefficiency in business processes. Tools include value stream mapping, root cause analysis, and control charts.",
+            "whoFor": "Ops professionals who are already running or auditing processes and want to move into a senior or management track. Especially valuable in manufacturing, logistics, BPO, and shared services.",
+            "leadsTo": "Process Excellence Analyst, Operations Manager, Business Process Consultant — salary band ₹50k-1.2L/month in Tier 2/3 markets.",
+            "keyExams": "Lean Six Sigma Green Belt (LSSGB) or Black Belt (LSSBB) — offered by KPMG, ASQ, or IASSC-accredited bodies. Green Belt is the entry gate; most employers accept it.",
+            "timeCommitment": "2-3 months for Green Belt study + project; 4-6 months for Black Belt."
           },
           {
-            "name": "Data Analysis with Excel (Advanced) + Power BI or Tableau",
-            "whatIsIt": "Advanced Excel means pivot tables, VLOOKUP/XLOOKUP, Power Query, and dashboards. Power BI or Tableau adds interactive reporting that managers and clients actually act on. Together they turn raw ops data into decisions.",
-            "whoFor": "Anyone in ops/support who already handles MIS reports, SLA tracking, or daily metrics — this formalises and upgrades what you already do.",
-            "leadsTo": "MIS Analyst, Operations Analyst, Business Analyst roles — ₹40k-80k in Tier 2/3 cities, ₹70k-1.2L for remote BPO/ITES roles. Very high demand.",
-            "keyExams": "Microsoft Power BI Data Analyst (PL-300) — well-recognized and reasonably achievable. Tableau Desktop Specialist is an alternative.",
-            "timeCommitment": "2-3 months for Excel + Power BI together if you practice on real data."
+            "name": "Data Analysis with Excel + Power BI",
+            "whatIsIt": "Using advanced Excel (pivot tables, Power Query, VLOOKUP/INDEX-MATCH) alongside Power BI dashboards to track KPIs, SLAs, headcount productivity, and cost metrics — the actual language ops managers speak.",
+            "whoFor": "Any ops or support professional who currently pulls reports manually or sends raw spreadsheets to leadership. This closes the visibility gap and makes you the go-to person for decision data.",
+            "leadsTo": "Operations Analyst, MIS Executive, Business Analyst — salary band ₹35k-80k/month. Adds ₹8k-15k to existing CTC at most mid-size companies.",
+            "keyExams": "Microsoft Power BI Data Analyst (PL-300) certification is well-recognised. Excel has no single mandatory cert but an online course portfolio is sufficient.",
+            "timeCommitment": "2-3 months to become job-ready for analyst-level work."
           },
           {
-            "name": "ITIL 4 Foundation (Service Management Framework)",
-            "whatIsIt": "ITIL 4 is the global standard framework for IT service management — incident management, change management, SLA design, service desk governance. It gives ops/support professionals a structured language that corporate and MNC hiring managers recognize instantly.",
-            "whoFor": "Support engineers, service desk leads, IT ops professionals, and anyone managing tickets or SLAs who wants a formal credential to back up what they already do daily.",
-            "leadsTo": "IT Service Manager, Service Desk Manager, ITSM Consultant — ₹50k-1L in India; strong in MNCs, GCCs, and BPOs. The cert alone can unlock a ₹10k-20k increment in many organizations.",
-            "keyExams": "ITIL 4 Foundation — globally recognized, costs roughly ₹8k-15k with exam, achievable in 4-6 weeks of focused study.",
-            "timeCommitment": "1-2 months to clear the exam; immediate resume impact."
+            "name": "ITIL 4 Foundation (for IT Ops / Service Desk professionals)",
+            "whatIsIt": "ITIL 4 is the globally recognised framework for IT service management — covering incident management, change management, service desk operations, and SLA governance. The Foundation certificate is the minimum hiring bar for IT ops roles.",
+            "whoFor": "Professionals in IT support, helpdesk, service delivery, or vendor management. If you are in non-IT ops, skip this and prioritise PMP or Lean instead.",
+            "leadsTo": "IT Service Delivery Manager, Service Desk Lead, ITSM Analyst — salary band ₹45k-90k/month. Global captive centres and GCCs in Tier 2 cities actively hire for this.",
+            "keyExams": "ITIL 4 Foundation — offered by PeopleCert / Axelos. One exam, ~₹10k-15k cost, widely accepted.",
+            "timeCommitment": "4-6 weeks of preparation; exam can be taken online."
           },
           {
-            "name": "Project Management Fundamentals (PMP or Google PM Certificate)",
-            "whatIsIt": "Structured project management — scope definition, stakeholder communication, risk tracking, delivery timelines using tools like Jira, Asana, or MS Project. Google's PM certificate covers agile and waterfall both in a digestible format.",
-            "whoFor": "Ops professionals who already coordinate between teams, manage vendor SLAs, or handle cross-functional tasks — this formalizes that leadership and makes you a viable PM candidate.",
-            "leadsTo": "Project Coordinator, Operations Project Manager, Program Analyst — ₹45k-90k in Tier 2/3; remote coordinator roles at ₹60k-1.2L. PMP unlocks senior PM at ₹1L+.",
-            "keyExams": "Google Project Management Certificate (Coursera, ~6 months, affordable) as entry point; PMP (PMI) for senior roles — requires 3 years experience, costs ~₹25k-35k all-in.",
-            "timeCommitment": "3-4 months for Google cert; 6-8 months for PMP prep if you have the experience eligibility."
+            "name": "Project Management (PMP / CAPM / Google PM Certificate)",
+            "whatIsIt": "Formal project management skills — scope definition, scheduling (Gantt, critical path), stakeholder communication, risk registers, and budget tracking. PMP is the gold standard; CAPM or Google's certificate is the stepping stone.",
+            "whoFor": "Ops professionals who are already coordinating between teams, vendors, or locations but have no formal PM credential. This legitimises what you are already doing and opens hiring pipelines that screen by certification.",
+            "leadsTo": "Project Coordinator, Operations Project Manager, Program Manager — salary band ₹55k-1.2L/month. PMP holders command a noticeable premium even in Tier 2 cities.",
+            "keyExams": "PMP (PMI) requires 36 months of experience — apply once eligible. Google Project Management Certificate (Coursera) is a faster 6-month credential with no experience gate. CAPM is the PMI entry-level option.",
+            "timeCommitment": "3-4 months for Google certificate; 4-6 months for CAPM; 6-9 months for PMP preparation."
           },
           {
-            "name": "Customer Success Management (CSM) Principles",
-            "whatIsIt": "Customer Success is about proactively ensuring clients derive ongoing value from a product or service — onboarding, health scoring, renewal conversations, escalation handling. It is the strategic upgrade from reactive support to revenue-impacting relationship management.",
-            "whoFor": "Support professionals with 2+ years of client interaction experience who want to move away from ticket queues into a higher-value, higher-pay client-facing role.",
-            "leadsTo": "Customer Success Manager, Account Manager (SaaS), Client Onboarding Specialist — ₹50k-1L in Indian SaaS companies; high demand in Bangalore, Pune, Hyderabad remote roles too.",
-            "keyExams": "SuccessHACKER / Gainsight Customer Success Certification, or HubSpot Customer Success certification (free). Portfolio of documented client impact cases matters more than the cert.",
-            "timeCommitment": "2-3 months to learn + build case studies; transition itself takes 3-6 months of targeted job applications."
+            "name": "CRM & Ticketing Tools — Salesforce, Zendesk, Freshdesk",
+            "whatIsIt": "Hands-on proficiency in customer relationship management and support ticketing platforms — including workflow automation, SLA configuration, escalation rules, and reporting dashboards inside these tools.",
+            "whoFor": "Customer support, service ops, and back-office professionals. Knowing one platform deeply makes you a system owner, not just a user — which is a different hiring conversation entirely.",
+            "leadsTo": "CRM Administrator, Support Operations Lead, Customer Success Ops — salary band ₹40k-85k/month. Salesforce Admin certification is one of the clearest salary-bump credentials in support ops.",
+            "keyExams": "Salesforce Certified Administrator (ADM-201) is the most valued. Zendesk and Freshdesk have free in-platform learning with completion badges.",
+            "timeCommitment": "2-3 months for Salesforce Admin certification; 4-6 weeks for Zendesk/Freshdesk proficiency."
           },
           {
-            "name": "SQL for Operations Data",
-            "whatIsIt": "Structured Query Language — writing queries to pull, filter, join, and summarize data from databases. In ops/support contexts this means extracting ticket data, SLA reports, workforce metrics, and customer data without waiting for a developer.",
-            "whoFor": "Operations analysts, support leads, and MIS professionals who rely on data but currently depend on other teams to pull reports. Even basic SQL dramatically increases your independence and perceived value.",
-            "leadsTo": "Operations Analyst, Data Analyst (Operations), Business Intelligence Associate — ₹40k-80k mid-level; pairing SQL with Power BI can push you to ₹80k-1.2L remote roles.",
-            "keyExams": "No formal cert needed — HackerRank SQL certification (free, recognized) or Google Data Analytics Certificate (Coursera) covers SQL as part of a broader curriculum.",
-            "timeCommitment": "1.5-2 months to reach job-ready SQL proficiency with daily practice."
+            "name": "SQL for Operations Reporting",
+            "whatIsIt": "Writing SQL queries to pull and clean operational data directly from databases — instead of waiting on a data team. Covers SELECT, JOIN, GROUP BY, subqueries, and basic window functions. Most ops teams use MySQL, PostgreSQL, or MS SQL Server.",
+            "whoFor": "Ops professionals in companies that have a data warehouse or ERP system (SAP, Oracle, Zoho). If your organisation runs on spreadsheets alone, deprioritise this and focus on Power BI first.",
+            "leadsTo": "Operations Analyst, Business Analyst, MIS Lead — the combination of SQL + Power BI is what most BA job descriptions actually require. Unlocks salary band ₹50k-1L/month.",
+            "keyExams": "No mandatory certification — a portfolio of 3-5 real business queries on GitHub is more convincing than any exam. Mode Analytics or HackerRank SQL certificates add credibility.",
+            "timeCommitment": "2-3 months to reach a job-useful level."
           }
         ]
       },
       {
         "title": "Roles to target next",
-        "intro": "These are realistic next-rung roles for ops/support professionals with 1-10 years of experience — ranked by accessibility and market demand.",
+        "intro": "These are the most realistic and high-leverage next-rung roles for an ops and support professional with 1-10 years of experience.",
         "options": [
           {
             "name": "Operations Analyst / MIS Analyst",
-            "whatIsIt": "Day-to-day work involves tracking operational KPIs, building dashboards, preparing performance reports, identifying inefficiencies, and presenting data-backed recommendations to management. Heavy Excel/Power BI use, some SQL.",
-            "whoFor": "Ops/support professionals who already handle any form of reporting, data reconciliation, or metrics tracking and want to make that their core job with a proper title and pay.",
-            "leadsTo": "₹35k-65k in Tier 2/3 cities; ₹60k-1L for remote roles in ITES/BPO/SaaS companies. Senior MIS/Ops Analyst roles at ₹80k-1.2L are achievable within 2-3 years.",
-            "keyExams": "PL-300 (Power BI) strengthens the profile; not mandatory but helpful for MNC hiring.",
-            "timeCommitment": "3-5 months of skill-building before a realistic job switch."
+            "whatIsIt": "Owns the numbers side of an ops team — builds dashboards, tracks SLAs and KPIs, prepares daily/weekly/monthly ops reports, and flags deviations to leadership. Uses Excel, Power BI, SQL, and sometimes Python for automation.",
+            "whoFor": "Ops professionals who already pull data informally and want to make it their primary job. Works well for people who are detail-oriented and comfortable with tools.",
+            "leadsTo": "Senior Analyst → Business Analyst → Analytics Manager. Salary band ₹35k-75k/month in Tier 2/3 cities; ₹60k-1.2L/month for remote roles with larger firms.",
+            "keyExams": "Power BI PL-300, SQL portfolio, optional Google Data Analytics certificate.",
+            "timeCommitment": "3-5 months of upskilling; transition timeline 4-8 months depending on internal move vs external application."
           },
           {
-            "name": "IT Service Desk Manager / ITSM Lead",
-            "whatIsIt": "Manages a team of service desk agents, owns SLA performance, handles escalation frameworks, vendor coordination, and process improvement. Uses tools like ServiceNow, Freshservice, or Zendesk at a governance level.",
-            "whoFor": "Support professionals with 3+ years of experience who have informally been playing a team lead or quality checker role and want that formalized with a management title.",
-            "leadsTo": "₹50k-90k in Tier 2/3; ₹80k-1.3L in GCCs and MNCs. ITIL 4 certification significantly accelerates hiring at this level.",
-            "keyExams": "ITIL 4 Foundation — near-mandatory for this role in organized companies.",
-            "timeCommitment": "2-4 months with ITIL prep; lateral move if you already have team lead experience."
+            "name": "Business Analyst (Operations / Process)",
+            "whatIsIt": "Bridges the gap between business teams and tech/project teams — documents requirements, maps current and future processes (as-is/to-be), writes user stories, and tracks delivery. In ops-heavy firms, focuses on process redesign and ERP customisation.",
+            "whoFor": "Experienced ops professionals who understand multiple business functions and can communicate clearly with both executives and developers. Best suited for people with 3+ years of cross-functional exposure.",
+            "leadsTo": "Senior BA → Product Owner → BA Manager or Pre-Sales Consultant. Salary band ₹50k-1L/month; remote roles go up to ₹1.2L-1.5L/month.",
+            "keyExams": "CBAP (for 5+ years experience) or ECBA/CCBA (entry-level) from IIBA. PMP or Agile/Scrum certifications (CSM, PSM) are also commonly listed as requirements.",
+            "timeCommitment": "4-8 months to transition; internal moves are faster if you can volunteer for a current project."
           },
           {
-            "name": "Customer Success Manager (CSM)",
-            "whatIsIt": "Owns a portfolio of clients, ensures product adoption, conducts business reviews, handles renewals, and flags churn risks. Works closely with product, sales, and support teams. Very communication-heavy, relationship-driven role.",
-            "whoFor": "Support professionals with strong client communication experience, especially in SaaS, software, or B2B service companies. Suits people who enjoy problem-solving conversations more than ticket resolution.",
-            "leadsTo": "₹45k-90k in Indian SaaS; ₹80k-1.5L for enterprise CSM roles in larger companies. High growth ceiling — Senior CSM and VP Customer Success are well-paying tracks.",
-            "keyExams": "No hard gate, but Gainsight or HubSpot CSM certifications improve credibility. Strong portfolio of client case studies matters most.",
-            "timeCommitment": "3-6 months of upskilling + targeted job applications; easier transition if you're already in a SaaS-adjacent company."
+            "name": "Operations Team Lead / Assistant Manager",
+            "whatIsIt": "Manages a small team of 5-15 ops or support executives — handles scheduling, performance reviews, escalation handling, process compliance, and reporting to senior management. This is the most natural vertical move from individual contributor.",
+            "whoFor": "Ops professionals with 3+ years who already informally mentor teammates, handle escalations, or deputise for the manager. The move is less about new skills and more about demonstrating readiness.",
+            "leadsTo": "Operations Manager → Senior Manager → VP of Operations. Salary band ₹40k-80k/month at Tier 2/3 companies; ₹70k-1.2L at larger organisations or GCCs.",
+            "keyExams": "No hard gate — but Lean Six Sigma Green Belt or PMP significantly strengthens the case for a formal promotion.",
+            "timeCommitment": "Typically 6-18 months of internal positioning; external applications are possible with a strong CV showing ownership and impact."
           },
           {
-            "name": "Project Coordinator / Junior Project Manager",
-            "whatIsIt": "Tracks project timelines, manages task assignments in Jira or Asana, prepares status updates, coordinates between technical and business teams, and flags risks. Stepping stone to full Project Manager title.",
-            "whoFor": "Ops professionals who naturally become the go-to person for coordinating multi-team work, chasing deadlines, and keeping people aligned. Suits organized, communication-strong individuals.",
-            "leadsTo": "₹35k-65k as coordinator; ₹60k-1.1L as Project Manager with PMP or 3-4 years experience. Remote PM roles for US/UK clients pay ₹80k-1.5L.",
-            "keyExams": "Google PM Certificate for entry; PMP for senior roles.",
-            "timeCommitment": "3-5 months to skill up; transition timeline depends on current company — internal moves are often faster."
+            "name": "Vendor / Procurement Operations Specialist",
+            "whatIsIt": "Manages vendor contracts, purchase orders, SLA compliance, and procurement workflows. Uses tools like SAP Ariba, Oracle Procurement, or Zoho Purchase. Increasingly a strategic role as companies push cost optimisation.",
+            "whoFor": "Ops professionals who already coordinate with vendors, raise POs, or manage contracts. Common in manufacturing, retail, logistics, FMCG, and IT services.",
+            "leadsTo": "Procurement Manager → Supply Chain Manager → Category Manager. Salary band ₹45k-90k/month; CIPS/SCM certifications unlock higher-paying MNC roles.",
+            "keyExams": "CIPS Level 4 (Chartered Institute of Procurement and Supply) is the international gold standard. ISM (Institute for Supply Management) certifications are also respected.",
+            "timeCommitment": "3-6 months to get CIPS-ready; transition timeline 4-9 months."
           },
           {
-            "name": "Process Improvement / RPA Analyst",
-            "whatIsIt": "Identifies manual, repetitive processes in operations and designs automation solutions using tools like UiPath, Automation Anywhere, or Power Automate. Documents workflows, calculates ROI of automation, and works with developers or builds bots directly.",
-            "whoFor": "Ops professionals with process knowledge who want to move into a higher-paying, more technical adjacent role without becoming a full software developer. Great fit for detail-oriented people who understand end-to-end workflows.",
-            "leadsTo": "₹50k-1L in mid-sized companies and GCCs; ₹80k-1.4L for senior RPA roles. One of the fastest-growing ops-adjacent specializations in India right now.",
-            "keyExams": "UiPath RPA Developer Foundation (free, recognized) or Automation Anywhere Certified Advanced RPA Professional.",
-            "timeCommitment": "3-5 months to get RPA tool-ready and build 2-3 automation portfolio projects."
+            "name": "Customer Success / Service Delivery Manager",
+            "whatIsIt": "Owns the end-to-end client experience for a portfolio of accounts — tracks SLAs, resolves escalations, conducts quarterly reviews, and identifies upsell or retention risks. Common in SaaS, IT services, BPO, and managed services firms.",
+            "whoFor": "Support and ops professionals who have strong communication skills and regularly interface with clients or internal stakeholders. Good fit for people who enjoy relationship management alongside process work.",
+            "leadsTo": "Senior CSM → Head of Customer Success → VP Customer Experience. Salary band ₹45k-90k/month in Tier 2/3; remote SaaS roles pay ₹80k-1.5L/month.",
+            "keyExams": "Gainsight's Customer Success certification or SuccessHACKER courses are respected in SaaS. ITIL Foundation is valued in IT service delivery roles.",
+            "timeCommitment": "2-4 months of upskilling on CS tools and frameworks; transition timeline 3-6 months."
           }
         ]
       },
       {
         "title": "Side moves",
-        "intro": "Adjacent fields where your ops/support experience transfers well — useful to know even if you're not planning a switch right now.",
+        "intro": "These adjacent fields absorb ops and support skills well — worth knowing even if you are not planning to switch right now.",
         "options": [
           {
-            "name": "Business Analysis (BA)",
-            "whatIsIt": "Business Analysts bridge the gap between business operations and technology by documenting requirements, mapping processes, and ensuring solutions actually solve real problems. Your ops experience gives you a head start on understanding real workflows.",
-            "whoFor": "Ops professionals who understand how processes break down, have communicated with both business stakeholders and technical teams, and enjoy structured problem-solving over execution.",
-            "leadsTo": "Junior BA roles at ₹45k-80k; mid-level BA at ₹80k-1.4L. High demand in IT services, GCCs, banking, and product companies. Good abroad options too.",
-            "keyExams": "IIBA ECBA (Entry Certificate in Business Analysis) — globally recognized, good starting credential. CBAP for senior level.",
-            "timeCommitment": "3-5 months to learn BA tools (JIRA, Confluence, BPMN, use case writing) and prep for ECBA."
+            "name": "Human Resources Operations (HR Ops)",
+            "whatIsIt": "Manages the back-end of HR — payroll processing, HRMS administration (Darwinbox, SAP SuccessFactors, Zoho People), compliance tracking, onboarding/offboarding workflows, and workforce data reporting.",
+            "whoFor": "Ops professionals who already handle headcount data, attendance, or coordinate with HR for their team. The process-management muscle transfers directly.",
+            "leadsTo": "HR Operations Analyst → HR Manager → HRBP. Salary band ₹35k-80k/month. HRMS tool expertise is the fastest differentiator.",
+            "keyExams": "No mandatory gate, but SHRM-CP or PHRi (HRCI) credentials strengthen senior HR Ops applications. Darwinbox or SAP SuccessFactors training courses add tool credibility.",
+            "timeCommitment": "3-5 months to upskill; lateral move is realistic within 4-6 months."
           },
           {
-            "name": "Human Resources Operations (HR Ops / HR Analytics)",
-            "whatIsIt": "HR Operations covers payroll coordination, HRMS tool management, compliance tracking, onboarding workflows, and workforce data reporting. HR Analytics adds a data layer — headcount analysis, attrition modelling, hiring funnel metrics.",
-            "whoFor": "Ops support professionals who have worked with HR systems, payroll vendors, or employee data in any capacity. Especially relevant for those in BPOs, staffing firms, or large shared services setups.",
-            "leadsTo": "HR Ops Executive to HR Ops Manager track — ₹35k-70k; HR Analytics roles pay ₹50k-1L. Steady demand across all industries.",
-            "keyExams": "No hard gate cert; SHRM-CP is internationally recognized if you want to go premium. Excel/Power BI skills matter more here.",
-            "timeCommitment": "2-3 months to bridge skill gaps if you already have ops exposure; internal lateral moves are often possible."
+            "name": "Supply Chain & Logistics Coordination",
+            "whatIsIt": "Covers demand planning, inventory management, warehouse coordination, and last-mile delivery tracking using tools like SAP ERP, Oracle SCM, or Microsoft Dynamics. High demand in e-commerce, FMCG, pharma, and auto sectors.",
+            "whoFor": "Ops professionals in manufacturing, retail, or e-commerce who already touch inventory, dispatch, or vendor coordination. The overlap with general ops work is significant.",
+            "leadsTo": "Supply Chain Analyst → Logistics Manager → SCM Lead. Salary band ₹40k-90k/month in Tier 2/3. Certification-holders in SCM are actively hired by Tier-1 companies opening satellite offices.",
+            "keyExams": "APICS CPIM (Certified in Planning and Inventory Management) or CSCP (Certified Supply Chain Professional) are the internationally recognised credentials.",
+            "timeCommitment": "4-6 months to get CPIM-ready; full transition 5-9 months."
           },
           {
-            "name": "Sales Operations / Revenue Operations (RevOps)",
-            "whatIsIt": "Sales Ops professionals manage CRM data (Salesforce, HubSpot), build sales dashboards, track pipeline health, design commission structures, and support the sales team with process and data. RevOps broadens this across marketing and customer success.",
-            "whoFor": "Ops professionals who have worked in or around sales, customer-facing, or B2B environments and have any exposure to CRM tools or sales reporting. Strong Excel/SQL skills accelerate entry.",
-            "leadsTo": "Sales Ops Analyst at ₹45k-85k; Senior Sales Ops / RevOps Manager at ₹90k-1.6L. High-paying track in SaaS, fintech, and e-commerce companies.",
-            "keyExams": "Salesforce Administrator certification (Salesforce Admin 201) — well-recognized and commands a salary premium. HubSpot Operations Hub cert (free) as a starter.",
-            "timeCommitment": "3-4 months for Salesforce Admin cert + CRM tool practice; transition takes 3-6 months of targeted applications."
+            "name": "EdTech / Training & Development Operations",
+            "whatIsIt": "Manages learning operations at companies or EdTech platforms — scheduling training cohorts, managing LMS platforms (TalentLMS, Moodle, Cornerstone), tracking learner progress, and coordinating with trainers and vendors.",
+            "whoFor": "Ops professionals who have informally trained new joiners, created SOPs, or managed onboarding programmes. Also suits people who want a lower-stress, purpose-driven environment.",
+            "leadsTo": "L&D Coordinator → Training Manager → L&D Head. Salary band ₹35k-70k/month. EdTech startups also hire for Ops roles that blend this with customer success.",
+            "keyExams": "No hard gate — but ATD (Association for Talent Development) certifications (CPTD or APTD) are respected for senior L&D roles. LMS tool certifications are practical differentiators.",
+            "timeCommitment": "2-4 months of upskilling; transition is often an internal move or into an EdTech startup within 3-6 months."
           }
         ]
       }
     ],
-    "closingMessage": "You're in a field where the right skill additions can genuinely double your salary within 18-24 months — ops/support professionals who pick up data, automation, or service management skills are in very high demand right now. You don't need to have your destination figured out yet. Pick one skill from the list above that feels closest to your current work, spend 2-3 months getting genuinely good at it, and the direction will start to become clearer. Come back to SkillKite when you're ready for a specific role-level roadmap. Share this with a colleague who's in the same boat — they'll thank you for it. \uD83E\uDE81",
+    "closingMessage": "These are the highest-leverage skills and roles for your field. Pick one skill, go deep for 3 months, and build a portfolio — that is what changes the interview game. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. \uD83E\uDE81",
     "flowLabel": "Upskill"
   }
 }

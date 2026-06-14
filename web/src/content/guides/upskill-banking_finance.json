@@ -5,141 +5,141 @@
   "seoTitle": "Upskill in Banking & Finance — skills, next roles & moves | SkillKite",
   "seoDescription": "Upskill in Banking & Finance — certifications, next roles, salary bands",
   "guide": {
-    "heading": "SkillKite — Next career rung for you",
-    "greeting": "Hey there! You're in banking and finance and still figuring out which direction to push next — that's actually a smart place to pause and audit your options. Below is a high-leverage map of skills, roles, and side moves that make the most sense for where you already are.",
+    "heading": "Your next career move — SkillKite",
+    "greeting": "Hi there! You are working in banking and finance and are still exploring where you want to go next. That is perfectly fine — here are the highest-leverage skills and next roles for your field, listed by relevance, so you can weigh your options with full clarity.",
     "sections": [
       {
         "title": "Skills to add now",
-        "intro": "These skills have strong salary and seniority pull in banking and finance right now — whether you stay in the same lane or eventually pivot.",
+        "intro": "These skills have the highest salary and seniority leverage in your current field.",
         "options": [
           {
-            "name": "Financial Modelling (Excel + Python)",
-            "whatIsIt": "Building dynamic valuation, forecasting, and scenario-analysis models — moving beyond basic spreadsheets into structured, audit-ready models. Python (pandas, openpyxl) is increasingly expected at mid-senior levels.",
-            "whoFor": "Anyone in corporate banking, credit, investment banking, or FP&A who currently does analysis manually and wants to move to an analyst or senior analyst band.",
-            "leadsTo": "Financial Analyst, Senior Analyst, FP&A Manager roles; salary jump from ₹30k-50k to ₹60k-1.2L/month at mid-level.",
-            "keyExams": "CFI FMVA (Financial Modelling & Valuation Analyst) — widely respected, costs ~$400 but worth it for the credential signal.",
-            "timeCommitment": "3-4 months to get genuinely job-ready with a portfolio of 2-3 models."
+            "name": "Financial Modelling and Valuation (Excel + Python)",
+            "whatIsIt": "Building dynamic DCF, LBO, and comparable company analysis models in Excel, and automating them with Python (pandas, openpyxl). This is the core technical language of corporate finance and investment roles.",
+            "whoFor": "Anyone in credit analysis, investment banking, corporate finance, or equity research who wants to move from execution to decision-support roles.",
+            "leadsTo": "Senior Analyst, Research Analyst, or Investment Associate roles — salary band ₹60k–1.4L/month in metro and remote-first finance firms.",
+            "keyExams": "CFI FMVA (Financial Modelling and Valuation Analyst) certification is widely recognised; CFA Level 1 as a parallel credential.",
+            "timeCommitment": "3–4 months to build a portfolio of 3 solid models; 6 months to be genuinely interview-ready for analyst roles."
           },
           {
-            "name": "Credit Risk Analysis",
-            "whatIsIt": "Assessing borrower creditworthiness using financial ratios, cash flow analysis, collateral review, and credit scoring models — the backbone of lending decisions in banks and NBFCs.",
-            "whoFor": "Professionals in retail banking, SME lending, or branch operations who want to move into risk, underwriting, or credit analyst roles at banks, NBFCs, or credit rating agencies.",
-            "leadsTo": "Credit Analyst, Underwriter, Risk Manager; salary band ₹45k-1L/month depending on institution size.",
-            "keyExams": "NISM Credit Research certification; FRM Part 1 (GARP) for more serious risk roles.",
-            "timeCommitment": "3-5 months for credit analysis fundamentals; FRM is a 6-12 month serious commitment."
+            "name": "SQL and Power BI for Banking Analytics",
+            "whatIsIt": "Writing intermediate-to-advanced SQL queries against core banking or loan-management databases, and building executive dashboards in Power BI to track NPA, portfolio health, and collection efficiency.",
+            "whoFor": "Operations, credit, and branch banking professionals who want to move into analytics, MIS, or business intelligence roles without switching industries.",
+            "leadsTo": "MIS Analyst, Credit Risk Analyst, Business Analyst (BFSI) — salary band ₹45k–90k/month; remote roles available with fintech companies.",
+            "keyExams": "Microsoft Power BI Data Analyst (PL-300) certification; no mandatory exam for SQL but a visible GitHub portfolio matters.",
+            "timeCommitment": "2–3 months for working proficiency; 4–5 months to build a convincing portfolio with real banking datasets."
           },
           {
-            "name": "Data Analytics for Finance (SQL + Power BI / Tableau)",
-            "whatIsIt": "Using SQL to query financial databases and Power BI or Tableau to build dashboards for revenue, collections, loan portfolio health, and branch performance reporting.",
-            "whoFor": "Finance ops, branch managers, MIS executives, or anyone who currently sends manual Excel reports up the chain — this makes you the go-to data person in any finance team.",
-            "leadsTo": "Finance Analyst, MIS Analyst, Business Intelligence roles; opens remote and fintech roles at ₹50k-1.1L/month.",
-            "keyExams": "Microsoft PL-300 (Power BI Data Analyst) — relatively quick, widely recognised by Indian banks and fintechs.",
-            "timeCommitment": "2-3 months to be dashboard-ready; 4-5 months for SQL + BI fluency combined."
+            "name": "Credit Risk and Underwriting Frameworks (Basel III / RBI Guidelines)",
+            "whatIsIt": "Deep working knowledge of credit appraisal methods, risk-weighted assets, ICAAP, and RBI's NBFC and bank regulatory frameworks. Goes beyond daily KYC/documentation work into policy-level risk assessment.",
+            "whoFor": "Relationship managers, credit officers, and loan operations staff at banks, NBFCs, or microfinance institutions who want to grow into risk or compliance leadership.",
+            "leadsTo": "Credit Risk Manager, Risk and Compliance Officer, Senior Credit Analyst — salary band ₹70k–1.3L/month at mid-size banks and NBFCs.",
+            "keyExams": "FRM (Financial Risk Manager) Part 1 is the gold standard; IIBF's JAIIB/CAIIB are mandatory for public sector progression.",
+            "timeCommitment": "4–6 months for FRM Part 1; JAIIB/CAIIB typically 6–12 months alongside work."
           },
           {
-            "name": "Regulatory & Compliance Knowledge (RBI, SEBI, Basel III)",
-            "whatIsIt": "Understanding India's core banking regulations — RBI guidelines, KYC/AML frameworks, SEBI norms for securities, and Basel III capital adequacy requirements — and applying them to real compliance workflows.",
-            "whoFor": "Operations, audit, or banking generalists who want to move into compliance, internal audit, or risk governance without switching fields.",
-            "leadsTo": "Compliance Officer, Regulatory Risk Analyst, Internal Auditor; salary band ₹50k-1.2L/month; compliance roles are short-supply and stable.",
-            "keyExams": "CAMS (Certified Anti-Money Laundering Specialist) for AML/KYC roles; IIBF certifications (JAIIB/CAIIB) for PSU bank promotions.",
-            "timeCommitment": "JAIIB/CAIIB: 6-9 months. CAMS: 4-6 months. Both can run alongside your job."
+            "name": "Wealth Management and Personal Financial Planning (CFP)",
+            "whatIsIt": "Structured advice delivery covering mutual funds, insurance planning, tax optimisation, and retirement planning for retail and HNI clients — framed around regulatory (SEBI/AMFI) compliance.",
+            "whoFor": "Bank RMs, insurance advisors, and DSA channel professionals who have client-facing experience and want to move into fee-based advisory or wealth management.",
+            "leadsTo": "Wealth Advisor, Financial Planner, Private Banking RM — salary band ₹50k–1.2L/month plus commissions; strong freelance and practice-building potential.",
+            "keyExams": "CFP (Certified Financial Planner) by FPSB India; NISM Series V-A (Mutual Fund Distributor) for immediate licensing.",
+            "timeCommitment": "3–4 months to clear NISM licensing; 12–18 months for full CFP certification."
           },
           {
-            "name": "Investment & Wealth Management Fundamentals",
-            "whatIsIt": "Equity research basics, mutual fund analysis, portfolio construction, and client advisory workflows — the skill set behind the private banking and wealth management segment that is growing fast in India.",
-            "whoFor": "Anyone in retail banking or insurance who interacts with customers and wants to shift toward relationship manager or wealth advisor roles at banks, brokerages, or AMCs.",
-            "leadsTo": "Relationship Manager (Wealth), Investment Advisor, Mutual Fund Distributor; salary ₹45k-1.5L/month with strong variable component.",
-            "keyExams": "NISM Series V-A (Mutual Fund Distributor) — mandatory for distribution. NISM Series XV (Research Analyst) for research roles. CFP (Certified Financial Planner) for serious wealth advisory.",
-            "timeCommitment": "NISM certifications: 1-2 months each. CFP: 8-12 months full preparation."
+            "name": "Fintech and Digital Banking Product Knowledge (APIs, UPI Stack, Lending Tech)",
+            "whatIsIt": "Understanding how core banking APIs, UPI payment rails, account aggregator frameworks, and digital lending platforms (Navi, Slice, etc.) work — enough to contribute to product decisions, vendor evaluations, or implementation projects.",
+            "whoFor": "Finance professionals in operations, product, or tech-adjacent roles at banks, NBFCs, or payment companies who want to move into fintech product or business analyst roles.",
+            "leadsTo": "Product Analyst, Business Analyst (Fintech), Implementation Manager — salary band ₹60k–1.2L/month; heavy remote-first hiring in this segment.",
+            "keyExams": "No single gate exam; RBI's regulatory sandbox documentation, NPCI whitepapers, and a product case-study portfolio are what hiring managers actually check.",
+            "timeCommitment": "2–3 months to build working knowledge; 4–5 months to have a credible portfolio for fintech BA interviews."
           },
           {
-            "name": "Fintech & Digital Banking Literacy",
-            "whatIsIt": "Understanding UPI rails, lending APIs, BNPL models, digital KYC workflows, and core banking system integrations — the layer that traditional finance professionals are urgently being asked to bridge.",
-            "whoFor": "Anyone in traditional banking or NBFCs who sees their bank accelerating its digital roadmap and wants to stay relevant — or jump to a fintech for a salary bump.",
-            "leadsTo": "Product Operations Analyst, Fintech Business Analyst, Digital Banking Specialist; fintechs pay ₹60k-1.5L/month for people who combine finance domain knowledge with digital fluency.",
-            "keyExams": "No single mandatory exam — a portfolio of real projects or a fintech-focused business analyst course (Coursera, IIM Bangalore Fintech programme) carries more weight.",
-            "timeCommitment": "2-3 months to build a working knowledge that changes how you come across in interviews."
+            "name": "Derivatives and Capital Markets Basics (NSE/NISM Certifications)",
+            "whatIsIt": "Understanding equity derivatives (F&O), fixed income instruments, and market microstructure at a level useful for broking, treasury, or fund operations roles — not just trading theory.",
+            "whoFor": "Operations, back-office, and front-office support staff at broking firms, mutual funds, or bank treasuries who want to formalise their knowledge and move into research or dealing roles.",
+            "leadsTo": "Equity Research Associate, Treasury Analyst, Fund Operations Analyst — salary band ₹40k–85k/month; higher with CFA progress.",
+            "keyExams": "NISM Series VIII (Equity Derivatives) and NISM Series XV (Research Analyst) are hiring gatekeepers in this segment.",
+            "timeCommitment": "1–2 months per NISM exam; 3–4 months to build a research sample portfolio alongside."
           }
         ]
       },
       {
         "title": "Roles to target next",
-        "intro": "These are realistic next-rung roles for someone already inside banking and finance — mapped to where the salary bands actually sit in Tier 2/3 India and in the remote Indian market.",
+        "intro": "These are realistic next-rung roles for someone already working in banking and finance, ordered from closest to your current base to furthest stretch.",
         "options": [
           {
-            "name": "Financial Analyst / Senior Financial Analyst",
-            "whatIsIt": "Day-to-day: building models, preparing MIS reports, analysing P&L and balance sheet trends, supporting budgeting cycles, and presenting findings to business heads. Common in banks, NBFCs, corporate treasury, and large enterprises.",
-            "whoFor": "Professionals in banking ops, branch banking, or accounts who have 2-5 years of exposure to numbers and want a formal analytical title with higher pay.",
-            "leadsTo": "₹50k-1L/month in Tier 2/3 cities; ₹80k-1.5L/month for remote roles at fintechs or MNC shared services. Leads to FP&A Manager or CFO track over time.",
-            "keyExams": "CFI FMVA or CFA Level 1 gives a strong signal; not always mandatory but differentiates.",
-            "timeCommitment": "3-6 months of skill-building before a confident transition."
+            "name": "Credit Risk Analyst / Senior Credit Analyst",
+            "whatIsIt": "Evaluates loan proposals, builds credit scorecards, monitors portfolio NPA trends, and prepares risk reports for senior management. Works across retail, SME, or corporate lending verticals.",
+            "whoFor": "Credit officers, relationship managers, or loan operations professionals with 2+ years of appraisal or underwriting exposure.",
+            "leadsTo": "Salary band ₹55k–1.1L/month at mid-size private banks and NBFCs; ₹90k–1.5L at large private banks with 4–6 years of experience.",
+            "keyExams": "FRM Part 1 or CFA Level 1 significantly improves shortlisting; CAIIB for PSB roles.",
+            "timeCommitment": "3–6 months of targeted upskilling to be competitive; internal transfers sometimes faster."
           },
           {
-            "name": "Credit Analyst / Underwriter",
-            "whatIsIt": "Reviewing loan applications, financial statements, and credit bureau data to recommend approval or rejection and set terms. Found at banks, NBFCs, housing finance companies, and fintech lenders.",
-            "whoFor": "Branch banking staff, relationship managers, or operations professionals who already handle loan files and want a dedicated analytical role with clear career progression.",
-            "leadsTo": "₹40k-85k/month at traditional banks; ₹60k-1.2L/month at NBFCs and fintechs where credit talent is tight. Leads to Senior Credit Manager or Portfolio Risk Manager.",
-            "keyExams": "FRM Part 1 (GARP) or NISM Credit Research for formal credentialing.",
-            "timeCommitment": "3-5 months of targeted prep; role transition typically 4-6 months."
+            "name": "Business Analyst — BFSI / Fintech",
+            "whatIsIt": "Bridges the gap between business teams and technology teams — writing BRDs, mapping loan-origination or payment workflows, and coordinating UAT for core banking or fintech product rollouts.",
+            "whoFor": "Operations, MIS, or product support professionals who understand banking processes well and have basic SQL or Excel analytical skills.",
+            "leadsTo": "Salary band ₹60k–1.2L/month; fintech companies and IT services firms (TCS, Wipro BFSI units) actively hire from banking operations backgrounds.",
+            "keyExams": "CBAP (Certified Business Analysis Professional) is a respected long-term credential; IIBA Entry Certificate in Business Analysis (ECBA) for early signalling.",
+            "timeCommitment": "4–6 months to bridge into a BA role if coming from a banking operations background."
           },
           {
-            "name": "Compliance & Risk Officer",
-            "whatIsIt": "Monitoring adherence to RBI/SEBI regulations, running internal audits, managing KYC/AML workflows, and preparing regulatory filings. One of the most stable and short-supply roles in Indian banking.",
-            "whoFor": "Operations, audit, or back-office professionals who have watched compliance processes and want to formalise that into a specialised, respected title.",
-            "leadsTo": "₹50k-1.1L/month in PSU and private banks; compliance specialists are consistently in demand and rarely downsized. Leads to Chief Compliance Officer track.",
-            "keyExams": "CAIIB (IIBF) for PSU banks; CAMS for AML-focused roles; ISO 31000 awareness for risk governance.",
-            "timeCommitment": "6-9 months for CAIIB; 4-6 months for CAMS. Transition timeline: 6-12 months."
+            "name": "Wealth Advisor / Financial Planner",
+            "whatIsIt": "Advises clients on their complete financial picture — investments, insurance, tax, and retirement — as either a salaried advisor at a bank or wealth firm, or as a fee-only independent planner.",
+            "whoFor": "RM, insurance, or investment operations professionals with strong client-handling experience and genuine interest in personal finance outcomes.",
+            "leadsTo": "Salary band ₹50k–1L/month salaried; ₹80k–2L/month realistic for fee-only practitioners after 2–3 years of practice building. Strong freelance upside.",
+            "keyExams": "CFP (FPSB India) is the primary credential; NISM Series V-A and Series X-A for regulatory compliance.",
+            "timeCommitment": "12–18 months for CFP; client base typically takes 2–3 years to generate consistent independent income."
           },
           {
-            "name": "Wealth / Relationship Manager",
-            "whatIsIt": "Managing a book of HNI or affluent clients — understanding their financial goals, recommending mutual funds, insurance, and fixed-income products, and retaining assets under management. Heavy client-interaction role.",
-            "whoFor": "Retail banking staff or insurance professionals who are good with people, enjoy selling with conviction, and want a role where their income scales with performance.",
-            "leadsTo": "₹45k-90k fixed + variable at private banks; top performers at wealth management arms (HDFC Private, ICICI Wealth, Kotak) earn ₹1.5L-3L/month with incentives.",
-            "keyExams": "NISM Series V-A mandatory; CFP for credibility at premium segment.",
-            "timeCommitment": "1-3 months for NISM certs; stepping into the role can happen within 3-4 months."
+            "name": "MIS / Reporting Analyst (Banking)",
+            "whatIsIt": "Owns the data reporting pipeline for a banking vertical — daily NPA dashboards, collection efficiency reports, branch P&L, and regulatory returns (RBI formats). Heavy SQL and Power BI usage.",
+            "whoFor": "Operations or back-office professionals with strong Excel skills who want a data-first role without fully switching out of finance.",
+            "leadsTo": "Salary band ₹40k–80k/month; leads naturally into Credit Risk Analytics or Data Analyst roles over 2–3 years.",
+            "keyExams": "PL-300 (Power BI) is a meaningful signal; no mandatory gate exam otherwise.",
+            "timeCommitment": "2–4 months upskilling; often accessible via internal transfers at existing employer."
           },
           {
-            "name": "Finance Business Analyst (Fintech / BFSI)",
-            "whatIsIt": "Bridging the gap between business requirements and tech teams — documenting workflows, writing BRDs for digital lending or payment products, and working with product managers and developers on BFSI platforms.",
-            "whoFor": "Banking professionals with 3-7 years who are comfortable with both finance logic and digital tools, and who want to work in a product-oriented environment without becoming full engineers.",
-            "leadsTo": "₹60k-1.3L/month at fintechs (Razorpay, Slice, Navi, Kissht etc.); remote roles at ₹80k-1.5L/month. Strong path into product management over 2-3 years.",
-            "keyExams": "CBAP (Certified Business Analysis Professional) for formal credentialing; not always required but useful.",
-            "timeCommitment": "4-6 months to build the BA skill set and get 1-2 case studies ready."
+            "name": "Treasury Analyst / ALM Analyst",
+            "whatIsIt": "Manages a bank or corporate's short-term liquidity, forex hedging, investment of surplus funds, and asset-liability mismatch monitoring. Involves daily interaction with money markets and fixed income.",
+            "whoFor": "Finance or accounting professionals at banks, NBFCs, or large corporates who have a strong fixed-income or accounting foundation and want a markets-facing role.",
+            "leadsTo": "Salary band ₹55k–1.1L/month at mid-size banks; ₹1L–1.8L at large private sector banks and corporates with 4–6 years of experience.",
+            "keyExams": "ACI Dealing Certificate (ACI FMA) is highly valued for dealing room roles; CFA progression accelerates growth.",
+            "timeCommitment": "4–8 months to prepare for the ACI exam and build a credible profile for treasury roles."
           }
         ]
       },
       {
         "title": "Side moves",
-        "intro": "Your banking and finance background is more transferable than most people realise. These adjacent fields let you leverage what you already know in a different context.",
+        "intro": "Your banking and finance background transfers cleanly to these adjacent fields — useful to know even if you are happy where you are.",
         "options": [
           {
-            "name": "Fintech Operations & Product",
-            "whatIsIt": "Moving from traditional banking to fintech startups in operations, product operations, or growth roles — your domain knowledge of lending, payments, or compliance is exactly what fintech companies are hiring experienced professionals for.",
-            "whoFor": "Anyone with 3+ years in banking who is comfortable with digital tools and wants faster salary growth, equity upside, and a more dynamic work environment.",
-            "leadsTo": "Operations Lead, Product Analyst, or Growth Manager at fintechs; ₹70k-1.5L/month. The switch is one of the most financially rewarding lateral moves from traditional banking right now.",
-            "keyExams": "No mandatory cert — a strong domain portfolio and familiarity with Jira, SQL, or basic data tools is enough to get interviews.",
-            "timeCommitment": "2-4 months to repackage your experience for fintech JDs and start getting callbacks."
+            "name": "Fintech Product and Operations",
+            "whatIsIt": "Working at a lending, payments, or wealthtech startup in product operations, partnerships, or implementation roles — applying your knowledge of banking workflows, RBI regulations, and customer journeys to build digital financial products.",
+            "whoFor": "Banking professionals tired of legacy environments who want faster growth, equity participation, and product ownership in a startup setting.",
+            "leadsTo": "Product Analyst, Operations Lead, or Partnerships Manager at fintech firms — salary band ₹60k–1.3L/month; equity upside at early-stage companies.",
+            "keyExams": "No hard gate exams; a well-documented case study of a banking problem you solved is worth more than any certification here.",
+            "timeCommitment": "2–4 months to reposition your resume and LinkedIn; active hiring is ongoing in the Indian fintech sector."
           },
           {
-            "name": "Corporate Finance / Treasury at Non-Banking Companies",
-            "whatIsIt": "Large manufacturing, pharma, or IT companies run their own treasury, credit, and FP&A functions. Your banking experience makes you a strong candidate for their finance teams — often with better hours and stability than banking.",
-            "whoFor": "Banking professionals tired of retail targets or branch pressure who want to use their finance skills in a corporate setting with more predictable work culture.",
-            "leadsTo": "Treasury Analyst, Corporate Finance Manager, CFO office roles; ₹55k-1.2L/month depending on company size and sector.",
-            "keyExams": "CMA (Cost and Management Accountant) or CFA Level 1 adds credibility for corporate finance roles.",
-            "timeCommitment": "The move itself can happen within 3-6 months; CMA/CFA prep is a longer 6-18 month parallel investment."
+            "name": "Finance-Focused Content and EdTech",
+            "whatIsIt": "Creating course content, explainer videos, or written material on personal finance, investing, credit, and banking regulation — for platforms like Zerodha Varsity, Unacademy, or your own YouTube or newsletter.",
+            "whoFor": "Banking professionals with genuine teaching ability and communication skills who want a creative side income or a full pivot to education and content.",
+            "leadsTo": "Course instructor, financial content writer, or finance educator — income ranges from ₹15k–40k/month as a side income to ₹60k–1.2L/month as a full-time creator or edtech employee after 12–18 months.",
+            "keyExams": "SEBI Research Analyst (NISM XV) registration if giving investment advice publicly; otherwise no mandatory exam.",
+            "timeCommitment": "3–6 months to build an initial content portfolio and audience baseline."
           },
           {
-            "name": "EdTech / Financial Literacy Training",
-            "whatIsIt": "Companies like Zerodha Varsity, Groww, INDmoney, and multiple edtech platforms are building financial literacy content and training programs — they need people who actually know banking and finance, not just content writers.",
-            "whoFor": "Banking professionals with 4+ years who can explain complex finance concepts clearly and are interested in content, training, or community roles — a good option if you've ever thought about teaching or influencing.",
-            "leadsTo": "Finance Educator, Curriculum Designer, Community Manager at fintech/edtech; ₹40k-90k/month. Also opens a side income path via YouTube, courses, or coaching independently.",
-            "keyExams": "No specific cert required — demonstrated ability to communicate finance clearly (sample content, a small YouTube channel, or a workshop) is the actual credential.",
-            "timeCommitment": "2-3 months to build a content portfolio and start approaching platforms."
+            "name": "Corporate Finance and FP&A in Non-Banking Companies",
+            "whatIsIt": "Moving from a bank to the finance function of a manufacturing, IT, or consumer goods company — working on budgeting, forecasting, investor relations, and strategic finance rather than lending or deposits.",
+            "whoFor": "Banking professionals with strong financial modelling, MIS, or treasury skills who want broader business exposure and often better work-life balance than retail banking.",
+            "leadsTo": "Financial Analyst, FP&A Analyst, or Finance Manager roles — salary band ₹55k–1.2L/month; growth into CFO-track roles over 5–8 years.",
+            "keyExams": "CFA Level 1 or CMA (Cost and Management Accountant) adds strong credibility for this lateral move.",
+            "timeCommitment": "3–6 months to reframe your banking experience in corporate finance language and build relevant model samples."
           }
         ]
       }
     ],
-    "closingMessage": "You're in one of the most stable and high-demand fields in India — banking and finance professionals with the right upskill are genuinely short supply right now. Pick one skill from the list above, go deep on it for 3 months, and build something tangible (a model, a dashboard, a cert). That single move shifts how interviewers see you. Come back to SkillKite when you're ready to map out a specific role transition or salary negotiation strategy. Share this with a colleague in your team — they probably need it too. \uD83E\uDE81",
+    "closingMessage": "These are the highest-leverage skills and roles for your field. You do not need to have a firm direction right now — pick one skill from the top of the list that genuinely interests you, go deep for 3 months, and build something tangible with it. That hands-on work will usually make your direction obvious. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. \uD83E\uDE81",
     "flowLabel": "Upskill"
   }
 }

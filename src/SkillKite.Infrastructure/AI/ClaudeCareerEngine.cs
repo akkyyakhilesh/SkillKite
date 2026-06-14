@@ -860,31 +860,33 @@ public class ClaudeCareerEngine : ICareerEngine
         MBA for BBA).
 
         If goal includes "earn" or "both", add a second section
-        "Job / earning ke options" with stream-aware realistic post-12th
+        "Job & earning options" with stream-aware realistic post-12th
         jobs (data entry, paramedical diploma jobs, Tally/accounting,
         content writing, retail mgmt trainee, etc.).
 
         For EVERY option fill in all 5 fields (whatIsIt, whoFor, leadsTo,
         keyExams, timeCommitment).
 
-        Language: Hinglish. Conversational, encouraging, 17-18 year old
-        reading level. HONEST about difficulty (JEE cutoffs, NEET competition,
-        CA pass rates). Do NOT decide for the student.
+        Tone: Conversational, encouraging, 17-18 year old reading level.
+        HONEST about difficulty (JEE cutoffs, NEET competition, CA pass rates).
+        Do NOT decide for the student.
+        CRITICAL: Follow the OUTPUT LANGUAGE directive at the top — do not mix
+        languages if English is specified.
 
         Output JSON in this EXACT shape — no markdown fences, no prose:
         {
-          "heading": "SkillKite — 12th <Stream> ke baad aapke options",
-          "greeting": "Hi <Name>, aapne 12th <stream> se kiya hai aur aapko <direction> mein interest hai. Neeche aapke best options pehle diye hain.",
+          "heading": "Your options after 12th <Stream> — SkillKite",
+          "greeting": "Hi <Name>! You completed 12th <stream> and are interested in <direction>. The most relevant options for you are listed first — read through all of them before deciding.",
           "sections": [
             {
-              "title": "Padhai ke options",
+              "title": "Study options",
               "intro": "...",
               "options": [
                 { "name": "...", "whatIsIt": "...", "whoFor": "...", "leadsTo": "...", "keyExams": "...", "timeCommitment": "..." }
               ]
             }
           ],
-          "closingMessage": "Yeh guide save karke parents/teachers se discuss karo. Jab apna course start ho jaye ya final year mein ho, SkillKite pe wapas aana — week-by-week career roadmap milega with free resources. Dost ko bhi share karo. 🪁",
+          "closingMessage": "Save this guide and discuss it with your parents or teachers. When your course starts or you reach your final year, come back to SkillKite — we'll build you a week-by-week career roadmap with free resources. Share it with a friend who needs it too. 🪁",
           "flowLabel": "12th"
         }
         """;
@@ -947,26 +949,27 @@ public class ClaudeCareerEngine : ICareerEngine
         keyExams, timeCommitment). Empty string is OK for any field that
         doesn't apply.
 
-        Language: Hinglish for working professionals — slightly more
-        English-leaning than the 10th/12th flows, but still warm and
-        not corporate. Acknowledge their current grind. Be HONEST about
-        what each path actually pays in India vs international. Do NOT
-        sell any path — list options ranked by relevance.
+        Tone: Warm and direct — not corporate, not patronising. Acknowledge
+        their current grind. Be HONEST about what each path actually pays in
+        India vs international. Do NOT sell any path — list options ranked by
+        relevance.
+        CRITICAL: Follow the OUTPUT LANGUAGE directive at the top — do not mix
+        languages if English is specified.
 
         Output JSON in this EXACT shape — no markdown fences, no prose:
         {
-          "heading": "SkillKite — Next career rung for you",
-          "greeting": "Hi <Name>, aap <field> mein kaam kar rahe ho aur aapko <goal> chahiye. Neeche aapke field ke liye sabse high-leverage skills aur next roles diye hain.",
+          "heading": "Your next career move — SkillKite",
+          "greeting": "Hi <Name>! You are working in <field> and want to <goal>. Here are the highest-leverage skills and next roles for your field — listed by relevance.",
           "sections": [
             {
               "title": "Skills to add now",
-              "intro": "Yeh skills aapke current field mein salary aur seniority dono badha sakte hain.",
+              "intro": "These skills have the highest salary and seniority leverage in your current field.",
               "options": [
                 { "name": "...", "whatIsIt": "...", "whoFor": "...", "leadsTo": "...", "keyExams": "...", "timeCommitment": "..." }
               ]
             }
           ],
-          "closingMessage": "Yeh skills/roles aapke field ke liye highest-leverage hain. 3 mahine ke andar ek skill deeply seekho aur portfolio banao — interview ka game change ho jayega. SkillKite pe wapas aana jab next role ke liye specific roadmap chahiye. Apne colleagues ko share karo — sabko need hai. 🪁",
+          "closingMessage": "These are the highest-leverage skills and roles for your field. Pick one skill, go deep for 3 months, and build a portfolio — that is what changes the interview game. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. 🪁",
           "flowLabel": "Upskill"
         }
         """;

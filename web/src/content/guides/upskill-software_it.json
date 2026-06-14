@@ -5,141 +5,141 @@
   "seoTitle": "Upskill in Software / IT — skills, next roles & moves | SkillKite",
   "seoDescription": "Upskill in Software/IT — skills to add, next roles & salary bands, side moves",
   "guide": {
-    "heading": "SkillKite — Next career rung for you",
-    "greeting": "Hey there! You're working in Software & IT and still figuring out where you want to take your career next — that's completely fine. A lot of solid engineers sit exactly here at the 2-5 year mark. Below is a practical breakdown of the highest-leverage skills and roles in your field, so you can make an informed call rather than a rushed one.",
+    "heading": "Your next career move — SkillKite",
+    "greeting": "Hi there! You are working in Software & IT and are currently exploring your options. Here are the highest-leverage skills and next roles for your field — listed by relevance.",
     "sections": [
       {
         "title": "Skills to add now",
-        "intro": "These skills have the highest salary and seniority leverage in the Software & IT space right now — whether you stay on the technical track, move into management, or eventually go freelance or abroad.",
+        "intro": "These skills have the highest salary and seniority leverage in your current field.",
         "options": [
           {
-            "name": "Cloud Infrastructure (AWS / Azure / GCP)",
-            "whatIsIt": "The ability to architect, deploy, and manage applications on cloud platforms — covering compute, storage, networking, serverless, and IAM. AWS is the dominant platform in Indian job market hiring right now.",
-            "whoFor": "Backend developers, DevOps engineers, and anyone currently managing on-premise or hybrid systems. Maximum value if you already write server-side code.",
-            "leadsTo": "Cloud Engineer, Solutions Architect, DevOps Engineer roles — salary band ₹70k-1.8L/month in Tier 2 markets; ₹1.2L-3L+ remote/product companies.",
-            "keyExams": "AWS Certified Solutions Architect – Associate (most recognized); AWS Certified Developer – Associate; Microsoft AZ-900 + AZ-204 if Azure shop",
-            "timeCommitment": "3-4 months to clear associate-level cert; 6 months to be job-ready for cloud engineer roles"
+            "name": "Cloud Platforms (AWS / Azure / GCP)",
+            "whatIsIt": "Proficiency in deploying, managing, and architecting applications on major cloud platforms — covering compute, storage, networking, and managed services.",
+            "whoFor": "Backend developers, DevOps engineers, and system admins who want to stay relevant and move into higher-paying infrastructure or solutions roles.",
+            "leadsTo": "Cloud Engineer, Solutions Architect, DevOps Engineer — salaries jump to ₹80k–1.8L/month in Tier 2/3 markets and higher for remote roles.",
+            "keyExams": "AWS Certified Solutions Architect – Associate, Microsoft Azure Fundamentals (AZ-900) then AZ-104, Google Associate Cloud Engineer",
+            "timeCommitment": "3–5 months to certification and job-ready level"
           },
           {
-            "name": "System Design (HLD + LLD)",
-            "whatIsIt": "The skill of designing scalable, fault-tolerant distributed systems — covering load balancing, caching (Redis), message queues (Kafka), database sharding, API gateways, and microservices patterns.",
-            "whoFor": "Anyone with 2+ years of coding experience who wants to crack senior engineer or tech lead interviews at product companies. This is the single biggest salary unlock at the 3-6 year mark.",
-            "leadsTo": "Senior Software Engineer, Staff Engineer, Tech Lead — salary ₹1L-2.5L/month at mid-size product firms; ₹2L-5L+ at FAANG/unicorns (remote-first too).",
-            "keyExams": "No standard cert — portfolio of design documents + mock interviews on Pramp/Exponent matter more",
-            "timeCommitment": "3-6 months of structured practice (Grokking the System Design Interview + real mock rounds)"
+            "name": "System Design (Distributed Systems fundamentals)",
+            "whatIsIt": "Designing scalable, fault-tolerant backend systems — covering load balancing, caching (Redis), databases (SQL vs NoSQL), message queues (Kafka, RabbitMQ), and microservices.",
+            "whoFor": "Software engineers with 2+ years of experience who want to crack senior or staff-level interviews and move beyond feature coding.",
+            "leadsTo": "Senior Software Engineer, Tech Lead, Staff Engineer — unlocks ₹1.2L–2.5L/month roles at product companies and remote-first firms.",
+            "keyExams": "",
+            "timeCommitment": "3–4 months of structured practice alongside work"
           },
           {
-            "name": "Data Engineering (PySpark + Airflow + dbt + Snowflake/BigQuery)",
-            "whatIsIt": "Building and maintaining data pipelines that move, transform, and serve large volumes of data reliably. Combines Python scripting with orchestration tools and modern cloud data warehouses.",
-            "whoFor": "Backend developers or analysts who have touched databases/SQL and want to move into a higher-paying, lower-competition niche than pure software dev.",
-            "leadsTo": "Data Engineer, Analytics Engineer, Platform Engineer — ₹80k-1.5L/month Tier 2; strong remote demand internationally too.",
-            "keyExams": "dbt Fundamentals (free, widely recognized); Google Professional Data Engineer; Databricks Certified Associate Developer",
-            "timeCommitment": "4-5 months to build a solid portfolio project (end-to-end pipeline); 6 months to be interview-ready"
+            "name": "DevOps & CI/CD (Docker, Kubernetes, GitHub Actions / Jenkins)",
+            "whatIsIt": "Containerising applications with Docker, orchestrating them with Kubernetes, and automating build-test-deploy pipelines using CI/CD tools.",
+            "whoFor": "Developers tired of manual deployments and ops folks looking to shift into the higher-paying DevOps or platform engineering space.",
+            "leadsTo": "DevOps Engineer, Site Reliability Engineer (SRE), Platform Engineer — ₹70k–1.5L/month in Tier 2/3, significantly higher for remote.",
+            "keyExams": "Certified Kubernetes Administrator (CKA), AWS DevOps Professional",
+            "timeCommitment": "3–5 months to build hands-on portfolio projects"
           },
           {
-            "name": "DevOps / Platform Engineering (Docker + Kubernetes + CI/CD + Terraform)",
-            "whatIsIt": "Automating the build, test, deploy, and monitoring lifecycle of software — containers with Docker/Kubernetes, infrastructure-as-code with Terraform, and CI/CD pipelines with GitHub Actions or Jenkins.",
-            "whoFor": "Developers who enjoy infrastructure over product features; QA engineers wanting a higher-leverage pivot; sysadmins looking to modernize their skill set.",
-            "leadsTo": "DevOps Engineer, SRE, Platform Engineer — ₹80k-1.8L/month; one of the fastest-growing hiring categories in Indian product startups and GCCs.",
-            "keyExams": "Certified Kubernetes Administrator (CKA) — widely respected; HashiCorp Terraform Associate; AWS DevOps Engineer Professional",
-            "timeCommitment": "4-6 months hands-on with personal projects on a cloud free tier; CKA prep alone takes 6-8 weeks focused"
+            "name": "Data Structures & Algorithms (DSA) for Competitive Interviews",
+            "whatIsIt": "Practising algorithmic problem-solving on LeetCode / HackerRank covering arrays, trees, graphs, DP, and complexity analysis — specifically for cracking product-company interviews.",
+            "whoFor": "Any software professional targeting FAANG-adjacent companies, unicorn startups, or high-paying remote roles — mandatory for salary jumps above ₹1L/month.",
+            "leadsTo": "Breaks into higher-paying product companies — can jump from ₹40k–60k at a service company to ₹1L–2L/month at a product firm.",
+            "keyExams": "",
+            "timeCommitment": "4–6 months of consistent daily practice (1–2 hours)"
           },
           {
-            "name": "Applied AI / ML Integration (LangChain + OpenAI APIs + fine-tuning basics)",
-            "whatIsIt": "Not research-level ML — this is the engineering skill of integrating LLMs and AI APIs into products: RAG pipelines, prompt engineering, vector databases (Pinecone/Weaviate), and deploying AI features to production.",
-            "whoFor": "Full-stack or backend developers who want to stay relevant in the next 3-5 years and work on greenfield AI product features. High demand in startups right now.",
-            "leadsTo": "AI Engineer, ML Platform Engineer, Founding Engineer at AI startups — ₹1L-2.5L/month; extremely high remote demand globally.",
-            "keyExams": "DeepLearning.AI short courses (Andrew Ng — widely respected on resumes); no hard gate cert yet; GitHub portfolio matters most",
-            "timeCommitment": "2-3 months to build one strong end-to-end AI feature (RAG chatbot or similar); 4-5 months to confidently interview"
+            "name": "Python for Automation & Backend (FastAPI / Django + scripting)",
+            "whatIsIt": "Using Python to build REST APIs with FastAPI or Django, automate repetitive tasks, write scripts for data processing, and integrate with cloud services.",
+            "whoFor": "Frontend-heavy developers, QA engineers, and IT support professionals who want to shift to backend or automation roles.",
+            "leadsTo": "Backend Developer, Automation Engineer, Python Developer — ₹55k–1.2L/month; also opens doors to data and ML-adjacent roles.",
+            "keyExams": "PCEP / PCAP (Python Institute certifications, optional but credible for freshers to mid-level)",
+            "timeCommitment": "2–4 months to build 2–3 deployable projects"
           },
           {
-            "name": "Product Sense + SQL Analytics (for developer-to-PM or senior dev path)",
-            "whatIsIt": "The ability to define product requirements, instrument features with analytics, and use SQL + tools like Mixpanel/Amplitude to drive decisions. Bridges the engineering and product worlds.",
-            "whoFor": "Developers with 3+ years who frequently interact with PMs or have opinions on product direction — this is the unlock for a PM pivot or a senior IC who can own features end-to-end.",
-            "leadsTo": "Technical Product Manager, Senior Engineer with PM influence, Product-led roles — ₹80k-2L/month depending on company stage.",
-            "keyExams": "PSPO I (Scrum.org Product Owner) or PMC (ProductHood) — useful signal; SQL proficiency demonstrated via portfolio",
-            "timeCommitment": "3-4 months of targeted learning + one product case study documented publicly"
+            "name": "Security Fundamentals (CompTIA Security+ / Ethical Hacking basics)",
+            "whatIsIt": "Understanding network security, common vulnerabilities (OWASP Top 10), penetration testing basics, and secure coding practices.",
+            "whoFor": "Developers, network admins, and IT generalists who want to pivot into the fast-growing and well-paying cybersecurity space.",
+            "leadsTo": "Security Analyst, Penetration Tester, AppSec Engineer — ₹70k–1.5L/month; high demand at banks, fintechs, and government contractors.",
+            "keyExams": "CompTIA Security+, CEH (Certified Ethical Hacker), eJPT (eLearnSecurity)",
+            "timeCommitment": "4–6 months to certification level"
           }
         ]
       },
       {
         "title": "Roles to target next",
-        "intro": "These are realistic next-rung roles for someone with 1-10 years in Software & IT. Honest salary bands for Tier 2/3 cities and remote Indian market included.",
+        "intro": "These are the most realistic and rewarding next-rung roles for a Software & IT professional at your stage.",
         "options": [
           {
             "name": "Senior Software Engineer",
-            "whatIsIt": "Owns medium-to-large feature development independently, conducts code reviews, mentors junior devs, and contributes to architectural decisions. Day-to-day is still mostly coding but with more design ownership.",
-            "whoFor": "Developers with 3-6 years who can already deliver features with minimal hand-holding and want a clear title/pay upgrade without leaving the IC track.",
-            "leadsTo": "₹80k-1.5L/month at product startups/mid-size companies in Tier 2; ₹1.2L-2.5L at GCCs or remote-first firms. Direct ladder to Staff Engineer or Tech Lead.",
-            "keyExams": "No mandatory cert — strong DSA + system design interview performance is the gate",
-            "timeCommitment": "3-6 months of interview prep (DSA grind + system design practice) if switching companies; internal promotion timeline 6-18 months"
+            "whatIsIt": "Owns full features end-to-end — writes clean, reviewed code, mentors junior devs, contributes to technical decisions, and handles production incidents.",
+            "whoFor": "Engineers with 3+ years of hands-on development who are consistently shipping features and ready to take on design ownership.",
+            "leadsTo": "₹80k–1.8L/month at product companies in Tier 2/3; ₹1.5L–3L/month at remote-first or funded startups.",
+            "keyExams": "",
+            "timeCommitment": "6–12 months of targeted upskilling (DSA + system design + one deep tech stack)"
           },
           {
             "name": "DevOps / Cloud Engineer",
-            "whatIsIt": "Manages cloud infrastructure, automates deployments, monitors system reliability, and owns the CI/CD pipeline. Less feature coding, more infrastructure ownership and on-call responsibility.",
-            "whoFor": "Backend or full-stack developers who enjoy the infrastructure side; current sysadmins who want to modernize. Good fit if you find feature sprint cycles tedious.",
-            "leadsTo": "₹75k-1.4L/month in Tier 2 market; ₹1.2L-2.5L remote. Strong hiring demand from GCCs in Pune, Hyderabad, and remote-first product companies.",
-            "keyExams": "AWS Solutions Architect Associate or CKA — both are real hiring gates at most companies",
-            "timeCommitment": "4-6 months upskilling + cert; 1-3 months active job search thereafter"
+            "whatIsIt": "Manages infrastructure as code, sets up CI/CD pipelines, monitors system health, handles auto-scaling on cloud, and reduces deployment friction for dev teams.",
+            "whoFor": "Developers or sysadmins who prefer infrastructure and automation over product feature work.",
+            "leadsTo": "₹75k–1.5L/month in Tier 2/3 India; high demand in remote roles paying ₹1.5L–3L/month.",
+            "keyExams": "AWS Certified DevOps Engineer, CKA (Certified Kubernetes Administrator)",
+            "timeCommitment": "4–6 months with hands-on cloud lab projects"
           },
           {
-            "name": "Data Engineer",
-            "whatIsIt": "Designs and maintains data pipelines, ensures data quality, and builds the infrastructure that analysts and ML teams rely on. Uses Python, SQL, Spark, Airflow, and cloud data warehouses daily.",
-            "whoFor": "Backend developers with solid SQL skills who want a higher-paying niche with lower competition than pure SWE roles. Also good for analysts who can code.",
-            "leadsTo": "₹80k-1.6L/month in Tier 2/Pune/Hyderabad market; strong international remote opportunities. Grows into Senior DE or Data Platform Lead.",
-            "keyExams": "Google Professional Data Engineer or Databricks Associate — recognized by most hiring managers",
-            "timeCommitment": "5-7 months (skill-up + portfolio project + interview prep)"
+            "name": "Tech Lead / Engineering Lead",
+            "whatIsIt": "Leads a small team of 3–6 engineers — balances coding with code reviews, sprint planning, stakeholder communication, and architectural decisions.",
+            "whoFor": "Senior engineers (5+ years) who are already informally guiding teammates and want the title and salary to match.",
+            "leadsTo": "₹1L–2L/month in mid-sized companies; stepping stone to Engineering Manager roles.",
+            "keyExams": "",
+            "timeCommitment": "12–18 months of building leadership visibility internally or switching to a company that has this track"
           },
           {
-            "name": "Technical Product Manager (TPM / PM)",
-            "whatIsIt": "Owns the product roadmap for a feature area — writes PRDs, defines success metrics, works with designers and engineers, and makes prioritization calls. Requires understanding technical constraints deeply.",
-            "whoFor": "Developers with 4+ years who find themselves constantly thinking about user experience or business logic rather than just implementation. Best if you already drive requirement discussions internally.",
-            "leadsTo": "₹90k-1.8L/month at product startups; ₹1.5L-3L+ at mature product companies or GCCs. One of the highest-ceiling roles coming from a dev background.",
-            "keyExams": "PSPO I or PMC is a supporting signal; portfolio of product thinking (case studies, teardowns) matters more",
-            "timeCommitment": "6-12 months to build the product muscle and credibly interview; internal switch is faster (3-6 months) if your company allows it"
+            "name": "Full-Stack Developer (React + Node.js / Django)",
+            "whatIsIt": "Builds both frontend (React, Next.js) and backend (Node.js, Django, FastAPI) — owns complete features from UI to database and API.",
+            "whoFor": "Frontend or backend specialists who want to double their project scope, freelance potential, and salary band.",
+            "leadsTo": "₹55k–1.2L/month in Tier 2/3; extremely strong freelance and remote demand — one of the easiest profiles to monetise internationally.",
+            "keyExams": "",
+            "timeCommitment": "3–5 months to bridge the skill gap from single-stack to full-stack"
           },
           {
-            "name": "Engineering Manager (EM)",
-            "whatIsIt": "Manages a team of 4-8 engineers — owns hiring, performance reviews, project delivery, and team health. Writes very little code; spends time in 1:1s, planning, and cross-team coordination.",
-            "whoFor": "Senior engineers with 6+ years who genuinely enjoy mentoring and team dynamics more than deep technical work. Not the right move if you love coding — be honest with yourself here.",
-            "leadsTo": "₹1.2L-2.5L/month in Tier 2 market; ₹2L-4L at GCCs or funded startups. Grows into Director of Engineering or VP Engineering.",
-            "keyExams": "No hard cert gate — internal credibility + one management training program (CTO Craft, Reforge Engineering) is helpful",
-            "timeCommitment": "Typically requires 1-2 years building leadership reputation internally; external EM hiring is competitive without prior people management title"
+            "name": "Product Engineer / Developer Advocate (at a SaaS / startup)",
+            "whatIsIt": "Works at the intersection of engineering and product — builds internal tools, writes technical documentation, creates demo apps, or works directly with customers on integration.",
+            "whoFor": "Engineers who enjoy communication, have a knack for explaining technical things clearly, and are bored of pure feature development.",
+            "leadsTo": "₹70k–1.4L/month at funded startups and SaaS companies; excellent path toward product management or developer relations.",
+            "keyExams": "",
+            "timeCommitment": "Lateral switch possible in 3–6 months — requires a portfolio of technical writing or open-source contribution"
           }
         ]
       },
       {
         "title": "Side moves",
-        "intro": "Your Software & IT background transfers well into these adjacent fields. Worth knowing even if you are not planning a switch right now.",
+        "intro": "Your software and IT skills transfer into these adjacent fields — worth knowing even if you are happy where you are.",
         "options": [
           {
-            "name": "Data Analytics / Business Intelligence",
-            "whatIsIt": "Using SQL, Python, and BI tools (Power BI, Tableau, Looker) to answer business questions and build dashboards. Less engineering depth, more business-facing communication.",
-            "whoFor": "Developers with solid SQL skills who want roles closer to business impact and stakeholder communication. Lower stress than production systems in many orgs.",
-            "leadsTo": "Data Analyst, BI Developer, Analytics Engineer — ₹50k-1.2L/month. High demand across BFSI, e-commerce, and healthcare sectors.",
-            "keyExams": "Microsoft PL-300 (Power BI); Google Data Analytics Certificate; dbt Fundamentals",
-            "timeCommitment": "2-4 months to be credibly interview-ready with a portfolio"
+            "name": "Data Engineering / Analytics Engineering",
+            "whatIsIt": "Building data pipelines, transforming raw data using dbt, orchestrating with Apache Airflow, and working with warehouses like BigQuery or Snowflake.",
+            "whoFor": "Backend developers or IT professionals comfortable with SQL and Python who want to enter the high-demand data space without becoming data scientists.",
+            "leadsTo": "Data Engineer, Analytics Engineer — ₹80k–1.8L/month; one of the fastest-growing job categories in India right now.",
+            "keyExams": "dbt Fundamentals (free, widely respected), Google Professional Data Engineer, Databricks Certified Associate",
+            "timeCommitment": "3–5 months to build a credible portfolio with real pipeline projects"
           },
           {
             "name": "Cybersecurity / Information Security",
-            "whatIsIt": "Identifying vulnerabilities, conducting security audits, managing SIEM tools, and ensuring applications and infrastructure are hardened against attacks. Covers AppSec, cloud security, and compliance tracks.",
-            "whoFor": "Developers or DevOps engineers curious about how systems get broken. High demand in banking, GCCs, and government-adjacent companies. Significantly less talent supply than demand.",
-            "leadsTo": "Security Engineer, AppSec Engineer, Cloud Security Analyst — ₹70k-1.6L/month in Tier 2; very strong international remote demand.",
-            "keyExams": "CompTIA Security+; CEH (EC-Council); AWS Security Specialty; OSCP for penetration testing track",
-            "timeCommitment": "4-6 months to clear Security+ and build a home-lab portfolio; OSCP is a 6-12 month journey"
+            "whatIsIt": "Protecting systems and networks — covers ethical hacking, vulnerability assessments, SIEM tools, compliance (ISO 27001, SOC 2), and incident response.",
+            "whoFor": "IT professionals, network admins, and developers who want a specialisation with strong demand, less commoditisation, and better job security.",
+            "leadsTo": "Security Analyst, Penetration Tester, GRC Analyst — ₹65k–1.5L/month in India; significantly higher for remote or BFSI-sector roles.",
+            "keyExams": "CompTIA Security+, CEH, OSCP (for penetration testing — premium but highly respected)",
+            "timeCommitment": "4–6 months to entry-level switch; 9–12 months for specialised roles like pentesting"
           },
           {
-            "name": "Technical Writing / Developer Relations",
-            "whatIsIt": "Creating documentation, tutorials, API guides, and developer-facing content for software products. DevRel extends this to community engagement, talks, and evangelism.",
-            "whoFor": "Developers who enjoy explaining complex things clearly — good writers who find coding alone unfulfilling. Especially viable if you have a public GitHub or blog already.",
-            "leadsTo": "Technical Writer, Developer Advocate, DevRel Engineer — ₹50k-1L/month in India; strong remote opportunities with US/EU SaaS companies paying $4k-8k/month.",
-            "keyExams": "Google Technical Writing Fundamentals (free, recognized); no hard cert gate — portfolio of published docs or blogs is the real gate",
-            "timeCommitment": "2-3 months to build a writing portfolio; remote job search adds 2-4 months"
+            "name": "Technical Product Management",
+            "whatIsIt": "Managing the roadmap and delivery of software products — writing PRDs, prioritising features, coordinating with engineering and design, and tracking product metrics.",
+            "whoFor": "Software engineers who have 3+ years of experience, understand the full development lifecycle, and genuinely enjoy the strategy and user side of building products.",
+            "leadsTo": "Associate Product Manager, Product Manager — ₹80k–1.8L/month at funded startups and mid-size tech companies.",
+            "keyExams": "AIPMM CPM, Pragmatic Institute PMC (optional but useful for career switchers), PG programs from ISB / IIM in product management for credibility",
+            "timeCommitment": "6–9 months of preparation — requires portfolio of product thinking (teardowns, case studies, side projects)"
           }
         ]
       }
     ],
-    "closingMessage": "You're in one of the best fields to be in right now — the challenge is direction, not opportunity. Since you're still figuring out your goal, the smartest move is to pick ONE skill from the list above that genuinely excites you and go deep on it for the next 3 months. Cloud, system design, or AI integration will keep all doors open regardless of which direction you eventually choose. Come back to SkillKite when you've narrowed it down — we'll build a more specific roadmap from there. Share this with your teammates who are in the same boat. \uD83E\uDE81",
+    "closingMessage": "These are the highest-leverage skills and roles for your field. Pick one skill, go deep for 3 months, and build a portfolio — that is what changes the interview game. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. \uD83E\uDE81",
     "flowLabel": "Upskill"
   }
 }

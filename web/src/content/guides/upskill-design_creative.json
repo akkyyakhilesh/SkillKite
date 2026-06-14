@@ -5,141 +5,141 @@
   "seoTitle": "Upskill in Design & Creative — skills, next roles & moves | SkillKite",
   "seoDescription": "Upskill in Design & Creative — skills, roles, freelance and portfolio moves",
   "guide": {
-    "heading": "SkillKite — Next career rung for you",
-    "greeting": "Hey there! You're working in design and creative, and you're still figuring out where you want to take things next — that's actually a smart place to be. Keeping your options open while leveling up is a solid strategy. Here's a high-leverage breakdown of what to add to your toolkit, which roles to aim for, and where your skills can take you sideways if you ever want to pivot.",
+    "heading": "Your next career move — SkillKite",
+    "greeting": "Hi there! You are working in design and creative, and you are still figuring out where you want to go next. That is completely fine — you have built real visual and conceptual muscle, and the market is hungry for it in several directions. Here are the highest-leverage skills and next roles for your field — listed by relevance.",
     "sections": [
       {
         "title": "Skills to add now",
-        "intro": "These skills have the highest salary and seniority leverage for design professionals in India right now — whether you stay in design, move into a related field, or eventually go freelance or abroad.",
+        "intro": "These skills have the highest salary and seniority leverage in your current field.",
         "options": [
           {
-            "name": "UI/UX Design + Figma Advanced (Auto Layout, Variables, Prototyping)",
-            "whatIsIt": "Figma has become the industry-standard design tool. Advanced Figma skills — component libraries, design tokens, advanced prototyping, and Dev Mode handoffs — separate mid-level designers from seniors who can run entire design systems.",
-            "whoFor": "Graphic designers, visual designers, or anyone currently using older tools like Adobe XD, Sketch, or even Photoshop for screen-based work. If you already use Figma basics, leveling up to systems-level work is the move.",
-            "leadsTo": "Senior UI Designer, Product Designer, Design Systems Designer roles. Salary jump from ₹35k-50k to ₹70k-1.2L in Tier 2/3 cities; remote Indian product companies pay ₹1L-2L for strong Figma + systems skills.",
-            "keyExams": "Google UX Design Certificate (Coursera) is widely recognized for freshness on a CV; no formal exam gates hiring — portfolio is king here.",
-            "timeCommitment": "2-3 months to get portfolio-ready with 2-3 strong case studies"
+            "name": "UI/UX Design with Figma + Prototyping",
+            "whatIsIt": "Figma is the industry-standard tool for designing digital interfaces — screens, flows, components, and interactive prototypes. UX adds the research and logic layer: user journeys, wireframes, and usability thinking.",
+            "whoFor": "Graphic designers or visual communicators who want to move into product and tech companies where digital design commands significantly higher pay.",
+            "leadsTo": "UI Designer, UX Designer, Product Designer roles — salary jump from ₹25k-40k to ₹55k-1.2L per month in Tier 2/3 and remote Indian market.",
+            "keyExams": "Google UX Design Certificate (Coursera) — widely recognised entry credential. No mandatory exam but portfolio is the real gate.",
+            "timeCommitment": "3-5 months to build a job-ready portfolio of 3 case studies."
           },
           {
-            "name": "UX Research (User Interviews, Usability Testing, Affinity Mapping)",
-            "whatIsIt": "The ability to run structured user interviews, synthesize findings into actionable insights, and present them to product teams. Most designers in India skip this — which is exactly why it's a gap worth filling.",
-            "whoFor": "UI/UX designers who want to move from execution to strategy, or visual designers who want to transition into product design. Suits people who enjoy conversations and pattern-finding as much as screen work.",
-            "leadsTo": "UX Researcher, Product Designer, Senior UX Designer roles. Companies paying for research skills: ₹80k-1.5L at mid-to-large product startups and MNC India offices.",
-            "keyExams": "Nielsen Norman Group UX Certification is the gold standard (expensive but globally respected); IDEO Human-Centered Design course is a cheaper credible alternative.",
-            "timeCommitment": "2-3 months to do 5-6 real research studies you can show in a portfolio"
+            "name": "Motion Graphics with After Effects + Lottie",
+            "whatIsIt": "After Effects is the standard tool for animated video, kinetic typography, and brand motion. Lottie exports lightweight animations for apps and websites — a skill almost no designer in Tier 2/3 has yet.",
+            "whoFor": "Static graphic designers and social media designers who want to command premium rates from startups, D2C brands, and edtech companies.",
+            "leadsTo": "Motion Designer, Brand Motion Lead, Video Production Designer — ₹40k-90k per month, with strong freelance income on top.",
+            "keyExams": "",
+            "timeCommitment": "2-3 months for job-ready motion reel."
           },
           {
-            "name": "Motion Design (After Effects + Lottie for UI Animations)",
-            "whatIsIt": "Creating micro-interactions, animated UI components, and brand motion content using Adobe After Effects, with export to Lottie format for developer-ready web and app animations. Separate from heavy video editing — this is product-focused motion.",
-            "whoFor": "UI designers wanting to differentiate themselves in product teams, and graphic/brand designers wanting to add a premium service. High demand in app-first companies and D2C brands.",
-            "leadsTo": "Motion Designer, Senior UI Designer with animation skills, Brand Motion Designer. Freelance rates for motion design are significantly higher — ₹15k-40k per short project. In-house roles: ₹60k-1.2L.",
-            "keyExams": "No gating certifications — portfolio of 3-5 motion pieces is what gets you hired or hired for freelance gigs.",
-            "timeCommitment": "3-4 months to build a solid motion portfolio from scratch"
+            "name": "Brand Strategy and Visual Identity Systems",
+            "whatIsIt": "Going beyond logo design to building complete brand systems — tone of voice, colour logic, typography hierarchy, design tokens, and brand guidelines that a full team can follow.",
+            "whoFor": "Designers with 2+ years of client or agency work who keep getting asked to do only execution. This skill moves you to the strategy conversation.",
+            "leadsTo": "Brand Designer, Brand Strategist, Creative Director track — ₹60k-1.4L per month in agencies and startups. Also the highest-value freelance path.",
+            "keyExams": "",
+            "timeCommitment": "3-4 months — best learned through real client rebrand projects or a structured course like Futur Pro Group or SVA online."
           },
           {
-            "name": "Brand Strategy + Visual Identity Systems",
-            "whatIsIt": "Going beyond logo design to building complete brand systems — tone of voice, color philosophy, typography hierarchy, usage guidelines, and brand architecture for multi-product companies. This is what separates a designer from a brand consultant.",
-            "whoFor": "Graphic designers and brand designers with 2+ years of experience who want to move from execution to strategic branding. Also relevant for those eyeing agency lead or creative director tracks.",
-            "leadsTo": "Brand Strategist, Creative Lead, Brand Designer at growth-stage startups. Salary band: ₹70k-1.5L. Freelance brand identity projects: ₹25k-1L per project depending on client size.",
-            "keyExams": "No standard exam; a strong case study showing brand strategy thinking (the why, not just the what) is your certification. Canva Design School and Skillshare have good brand strategy courses for structured learning.",
-            "timeCommitment": "3-4 months to reframe existing work as strategy-led and build 2-3 new case studies"
+            "name": "No-Code / Low-Code Design with Webflow or Framer",
+            "whatIsIt": "Webflow and Framer let designers build fully functional, production-grade websites without writing code. This turns a designer into a one-person digital studio.",
+            "whoFor": "Designers tired of handing off files and waiting for developers. Especially useful for freelancers and small-studio designers.",
+            "leadsTo": "Webflow Designer, No-Code Developer, Digital Product Designer — ₹45k-1L per month. Freelance rates of $30-80/hour on international platforms.",
+            "keyExams": "Webflow University Certification — free and employer-recognised.",
+            "timeCommitment": "2-3 months to launch 2-3 live websites as portfolio proof."
           },
           {
-            "name": "No-Code / Low-Code Tools (Webflow, Framer, Notion-based portfolios)",
-            "whatIsIt": "The ability to build production-ready websites and landing pages in Webflow or Framer without writing code. For designers, this collapses the handoff gap and lets you own end-to-end delivery — a massive value multiplier.",
-            "whoFor": "UI/UX and web designers who are tired of watching their designs get mis-implemented. Also valuable for freelancers who want to offer complete website delivery rather than just mockups.",
-            "leadsTo": "Webflow Developer-Designer hybrid roles (rare and high-paying: ₹80k-1.8L), freelance website builds (₹20k-80k per project), and stronger positioning as a full-stack creative.",
-            "keyExams": "Webflow University certification is free and recognized by agencies hiring Webflow talent.",
-            "timeCommitment": "2-3 months to build 3 live Webflow/Framer sites you can point to"
+            "name": "Design Systems and Component Libraries",
+            "whatIsIt": "Building and documenting reusable design systems in Figma — components, tokens, spacing grids, and documentation that engineering teams can consume at scale.",
+            "whoFor": "UI/UX designers with at least 1 year of product experience who want to move into senior or staff-level roles at tech companies.",
+            "leadsTo": "Senior Product Designer, Design Systems Designer, Design Lead — ₹80k-1.6L per month in product companies and remote roles.",
+            "keyExams": "",
+            "timeCommitment": "3-4 months to build a credible public design system on Figma Community."
           },
           {
-            "name": "Data-Informed Design (Basic Analytics + A/B Testing Concepts)",
-            "whatIsIt": "Understanding how to read Google Analytics, Hotjar heatmaps, and Mixpanel funnels to inform design decisions. Running or participating in A/B tests to validate design changes. Not data science — just enough to speak the same language as product managers.",
-            "whoFor": "Product and UI/UX designers at tech companies or startups who want to move into senior or lead positions. PMs and engineering leads heavily favor designers who can back decisions with data.",
-            "leadsTo": "Senior Product Designer, Lead Designer, and eventually Head of Design roles. This skill is what gets designers into strategy conversations. Salary bands: ₹1L-2L at mid-stage startups.",
-            "keyExams": "Google Analytics 4 Certification (free, widely recognized). CXL Institute's A/B testing courses are excellent for depth.",
-            "timeCommitment": "1-2 months to get comfortable; ongoing habit to build fluency"
+            "name": "AI-Assisted Design Workflows (Midjourney + Adobe Firefly + Stable Diffusion)",
+            "whatIsIt": "Using generative AI tools to accelerate concept generation, moodboarding, image creation, and asset production — and knowing how to integrate them into a professional creative workflow without losing craft quality.",
+            "whoFor": "Any working designer who wants to 2x their output and pitch AI-integrated workflows to clients and employers — this is fast becoming a table-stakes skill.",
+            "leadsTo": "Creative Technologist, AI Design Lead, freelance content production at scale — ₹50k-1.2L per month. Also a strong differentiator in any design interview right now.",
+            "keyExams": "",
+            "timeCommitment": "1-2 months of hands-on experimentation with a documented workflow case study."
           }
         ]
       },
       {
         "title": "Roles to target next",
-        "intro": "These are the realistic next rungs on the ladder for someone already working in design and creative in India — ranging from natural progressions to slightly bigger leaps.",
+        "intro": "These are the most realistic next-rung roles for a working design professional — ranked by opportunity volume and salary jump.",
         "options": [
           {
-            "name": "Senior UI/UX Designer",
-            "whatIsIt": "Owns end-to-end design of product features — from wireframes and user flows to final UI and handoff. Mentors junior designers, participates in product roadmap discussions, and drives design consistency through component libraries.",
-            "whoFor": "UI/UX designers with 2-4 years of experience who have shipped real products and can show measurable impact in their portfolio. Requires strong Figma skills and at least basic UX research experience.",
-            "leadsTo": "₹70k-1.2L/month in Tier 2/3 cities; ₹1.2L-2L for remote-first Indian product companies. Leads to Lead Designer or Design Manager track.",
-            "keyExams": "No hard gate — portfolio and case studies are the exam. Google UX Certificate adds credibility for career switchers but is not required for progressions.",
-            "timeCommitment": "6-12 months of deliberate skill-building and reframing of existing work into strong case studies"
+            "name": "Product Designer (UI/UX)",
+            "whatIsIt": "Owns the end-to-end design of digital product features — from user research and wireframes to final UI and handoff to engineering. Works inside a product team, not a service studio.",
+            "whoFor": "Graphic or visual designers who have learned Figma, done at least 2-3 UX case studies, and want to leave agency timelines for product company culture.",
+            "leadsTo": "Senior Product Designer, Design Lead, Head of Design — ₹55k-1.2L per month in Tier 2/3 and remote Indian roles. Remote international roles pay ₹1.2L-2.5L per month.",
+            "keyExams": "Google UX Design Certificate helps for first job switch. Portfolio is the real gate.",
+            "timeCommitment": "4-6 months of preparation plus 2-3 months of job search."
           },
           {
-            "name": "Product Designer",
-            "whatIsIt": "A role that combines UX research, interaction design, and visual UI into one function. Product Designers work closely with PMs and engineers in agile teams to define, design, and iterate on product features. More strategic than a pure UI role.",
-            "whoFor": "Designers who enjoy problem-solving as much as visual craft, and who want to influence what gets built — not just how it looks. Strong for people adding UX research and data-informed design to their toolkit.",
-            "leadsTo": "₹80k-1.5L at growth-stage startups; ₹1.5L-3L at well-funded Indian unicorns or remote international roles. Leads to Lead Product Designer or Head of Design.",
-            "keyExams": "No standard gate; a portfolio with research → design → outcome stories is mandatory.",
-            "timeCommitment": "6-18 months depending on how much UX research and product thinking you need to build up"
+            "name": "Brand Designer / Visual Identity Designer",
+            "whatIsIt": "Leads brand identity projects for companies — logo systems, brand guidelines, packaging, and campaign visual language. Works at agencies, in-house brand teams, or as a consultant.",
+            "whoFor": "Designers with strong visual craft and 2+ years of logo or print/digital brand work who want to work at a more strategic level and command higher project fees.",
+            "leadsTo": "Senior Brand Designer, Brand Strategist, Creative Director — ₹50k-1.1L per month in-house. Freelance brand projects range from ₹30k-2L per project depending on client size.",
+            "keyExams": "",
+            "timeCommitment": "3-5 months to reposition portfolio and target brand-focused studios and D2C startups."
+          },
+          {
+            "name": "Motion Designer",
+            "whatIsIt": "Creates animated content for brands — explainer videos, social reels, app animations, title sequences, and advertising. Works in agencies, edtech, D2C brands, or as a freelancer.",
+            "whoFor": "Graphic designers with a good eye for timing and storytelling who are willing to invest 2-3 months in After Effects and animation fundamentals.",
+            "leadsTo": "Senior Motion Designer, Creative Lead (Video), freelance motion studio — ₹40k-90k per month in-house. Freelance retainers of ₹50k-1.5L per month are realistic at 2 years of experience.",
+            "keyExams": "",
+            "timeCommitment": "3-4 months to build a motion reel of 4-5 pieces."
           },
           {
             "name": "Creative Lead / Art Director",
-            "whatIsIt": "Manages the visual direction for a brand or campaign — briefing designers, reviewing work against brand guidelines, presenting creative concepts to clients or stakeholders, and ensuring quality across all creative output.",
-            "whoFor": "Brand designers, graphic designers, or visual designers with 4-6 years of experience who have strong aesthetic judgment and are beginning to guide junior team members already. Suits people who enjoy directing and mentoring.",
-            "leadsTo": "₹70k-1.2L in Tier 2/3 agency or in-house roles; ₹1L-2L at larger agencies or D2C brands. Leads to Creative Director track.",
-            "keyExams": "No formal certification gates this role — portfolio and leadership examples are the filter.",
-            "timeCommitment": "Usually a natural promotion after 4-6 years; active timeline 3-6 months if you start taking on informal leadership responsibilities now"
+            "whatIsIt": "Leads a team of designers and oversees the visual direction of campaigns, product interfaces, or brand assets. Splits time between hands-on design and reviewing and directing others' work.",
+            "whoFor": "Designers with 4+ years of experience who already informally mentor juniors and want that acknowledged in their title and pay.",
+            "leadsTo": "Creative Director, Head of Design, VP Design — ₹80k-1.6L per month at growth-stage startups and agencies. Leadership track typically leads to ₹1.5L-3L per month at senior levels.",
+            "keyExams": "",
+            "timeCommitment": "Internal promotion path: 6-12 months of building leadership evidence. External switch: 3-4 months of targeted applications."
           },
           {
-            "name": "Brand Designer at a Startup / Scale-up",
-            "whatIsIt": "Owns all visual brand output for a company — from social and marketing collateral to pitch decks, website visuals, and product marketing assets. Often a team of one at early-stage companies, which means high ownership and high variety.",
-            "whoFor": "Graphic or visual designers who want a single high-ownership role rather than agency-style multi-client work. Strong fit for people who enjoy building brand systems from scratch.",
-            "leadsTo": "₹50k-90k at early-stage startups (Series A-B); ₹80k-1.5L at more established scale-ups. Massive portfolio leverage — owning a brand at a startup that grows is career gold.",
-            "keyExams": "No certifications gate this. Brand strategy coursework and a strong case study portfolio are what matter.",
-            "timeCommitment": "3-6 months of targeted job search with a reframed portfolio"
-          },
-          {
-            "name": "UX Researcher",
-            "whatIsIt": "Conducts structured qualitative and quantitative research to understand user needs, test design hypotheses, and inform product decisions. Creates research reports, journey maps, and usability findings that product and design teams act on.",
-            "whoFor": "Designers who are more energized by the research and strategy phase than the execution phase. Suits people who are naturally curious, analytical, and good at synthesizing information from conversations.",
-            "leadsTo": "₹70k-1.2L at product-first companies in India; ₹1L-2L at MNC India offices. Remote international research roles exist but require strong English communication and portfolio of research work.",
-            "keyExams": "Nielsen Norman Group UX Research Specialty certification is the most respected globally. IDEO courses work for foundational credibility.",
-            "timeCommitment": "6-12 months to build a research portfolio with 4-5 real studies"
+            "name": "Webflow / No-Code Designer",
+            "whatIsIt": "Designs and builds production websites for clients using Webflow or Framer — combining design craft with site delivery, eliminating the need for a separate developer on most projects.",
+            "whoFor": "Designers who are comfortable with layout systems and want to own the full delivery pipeline — especially strong for freelancers and small agency owners.",
+            "leadsTo": "Freelance Webflow Developer-Designer, Digital Creative Director at small agencies — ₹50k-1.2L per month. International freelance on Upwork: $30-80/hour.",
+            "keyExams": "Webflow University Certification — free, takes 1-2 weeks.",
+            "timeCommitment": "2-4 months to build 3 live client sites as portfolio proof."
           }
         ]
       },
       {
         "title": "Side moves",
-        "intro": "Your design and creative skills transfer surprisingly well into these adjacent fields — worth knowing even if you're not planning to switch right now.",
+        "intro": "Fields where your design skills transfer well — useful to know whether you stay in design or decide to pivot.",
         "options": [
           {
-            "name": "Product Management (PM)",
-            "whatIsIt": "Product Managers define what gets built, why, and for whom — owning the roadmap, working with engineering and design, and measuring outcomes. Designers who move into PM bring a rare user-empathy and visual thinking edge that most PMs lack.",
-            "whoFor": "Designers who already find themselves influencing product decisions, writing specs, or pushing back on feature requests based on user needs. A natural move for senior UI/UX designers who want to own the full product rather than just the design layer.",
-            "leadsTo": "Associate PM or PM roles at ₹80k-1.8L in product-first companies. Designer-to-PM transitions are increasingly common and valued. Leads to Senior PM at ₹1.5L-4L.",
-            "keyExams": "Product School certifications, AIPMM CPPM, or simply building a side project and launching it is more powerful than any certificate.",
-            "timeCommitment": "6-18 months; faster if you're already in a product team and can take on PM-adjacent responsibilities internally"
+            "name": "Content Marketing and Social Media Strategy",
+            "whatIsIt": "Using your visual storytelling instinct to lead content strategy — writing briefs, directing creators, and owning the aesthetic and messaging of a brand's digital presence.",
+            "whoFor": "Designers who already write decent copy for their own work and enjoy the brand and audience side of their projects.",
+            "leadsTo": "Social Media Manager, Content Strategist, Brand Content Lead — ₹35k-80k per month in-house. Strong freelance path with Indian and international clients.",
+            "keyExams": "HubSpot Content Marketing Certification — free and credible.",
+            "timeCommitment": "2-3 months to reposition with a content-plus-design portfolio."
           },
           {
-            "name": "Growth Marketing / Performance Creative",
-            "whatIsIt": "Creating ad creatives, landing pages, and conversion-focused visual content that is directly tied to business metrics (CTR, ROAS, conversion rates). Performance Creative roles sit at the intersection of design and performance marketing.",
-            "whoFor": "Graphic or brand designers who enjoy fast-feedback work and want to see the direct business impact of their design. Also good for those interested in D2C brands, e-commerce, or digital agencies.",
-            "leadsTo": "Performance Creative Designer, Growth Designer roles at ₹50k-1L. Freelance performance creative work is high-demand and pays ₹20k-60k per month from 2-3 clients.",
-            "keyExams": "Meta Blueprint Certification and Google Ads certifications add credibility for agency roles. No hard gates for in-house roles.",
-            "timeCommitment": "2-3 months to learn the metrics language and build a small portfolio of ad creative case studies"
+            "name": "EdTech and Learning Experience Design",
+            "whatIsIt": "Designing digital learning content, course interfaces, and instructional materials for EdTech companies — combining visual design with learning logic.",
+            "whoFor": "Designers with patience for structured communication who want stable in-house roles at fast-growing EdTech companies like PhysicsWallah, Unacademy, or BYJU's network studios.",
+            "leadsTo": "Learning Experience Designer, Instructional Designer, EdTech Creative Lead — ₹40k-90k per month. High demand in Tier 2 cities with remote options.",
+            "keyExams": "Articulate Storyline or Adobe Captivate proficiency is often asked for — no formal exam but a demo project is expected.",
+            "timeCommitment": "2-3 months to learn the tools and build 1-2 sample course modules."
           },
           {
-            "name": "EdTech Content / Visual Learning Design",
-            "whatIsIt": "Creating course visuals, explainer illustrations, instructional design layouts, and video-based learning assets for EdTech platforms. India's EdTech sector is large and has a consistent demand for strong visual communicators who understand learning design.",
-            "whoFor": "Graphic designers or motion designers who enjoy educational content and want more purpose-driven work. Also a good move for those who want stable in-house roles without the pressure of a startup environment.",
-            "leadsTo": "Visual/Instructional Designer roles at ₹40k-80k at EdTech companies (BYJU's, Unacademy, upGrad, Vedantu and their many competitors). Freelance EdTech illustration pays well — ₹1,500-5,000 per illustration for larger platforms.",
-            "keyExams": "CPTD or ATD Instructional Design certificate adds value for senior roles; not required for entry into the field.",
-            "timeCommitment": "2-3 months to pivot portfolio toward learning-focused work"
+            "name": "Product Management (Design-to-PM track)",
+            "whatIsIt": "Transitioning from design into product management — where your understanding of user needs and interface logic is a strong advantage over engineers making the same switch.",
+            "whoFor": "Senior designers (4+ years) who are frustrated that product decisions ignore design thinking and want to own the roadmap rather than just execute it.",
+            "leadsTo": "Associate Product Manager, Product Manager — ₹80k-1.6L per month at startups and tech companies. One of the highest-ceiling moves from a design background.",
+            "keyExams": "No mandatory cert, but Product School's certifications or Reforge programs help signal intent. A strong portfolio of product-impact case studies is what actually gets interviews.",
+            "timeCommitment": "6-9 months of deliberate preparation — shadowing PMs, writing PRDs, and reframing past design work as product-impact stories."
           }
         ]
       }
     ],
-    "closingMessage": "You're in one of the most versatile fields out there — design skills compound across products, brands, research, and even management. Since you're still figuring out your direction, the smartest play is to pick one high-leverage skill from the list above (Figma advanced or UX Research are the best starting bets) and build 2-3 portfolio case studies around it in the next 3 months. The options will get much clearer once you've done that work. Come back to SkillKite when you're ready for a specific role roadmap or want to explore freelance and abroad paths. Share this with your designer friends too — everyone's figuring out the same thing. \uD83E\uDE81",
+    "closingMessage": "These are the highest-leverage skills and roles for your field. You do not need to have the final answer on where you are going — pick one skill from the list above, go deep for 3 months, and build a portfolio piece around it. That single move will clarify your direction faster than any amount of planning. Come back to SkillKite when you want a specific roadmap for your next role. Share it with a colleague who needs it. \uD83E\uDE81",
     "flowLabel": "Upskill"
   }
 }
