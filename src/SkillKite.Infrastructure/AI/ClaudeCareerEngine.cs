@@ -735,12 +735,16 @@ public class ClaudeCareerEngine : ICareerEngine
     {
         var system = LanguageDirective(student.PreferredLanguage) + BuildSkillUpgradeSystemPrompt();
         var user = $$"""
-            Working professional's profile (from the 3-question upskill flow):
+            Working professional's profile (from the upskill flow):
             {{session.AssessmentDataJson}}
 
             Known fields:
             - Name: {{student.Name ?? "unknown"}}
             - Preferred language: {{student.PreferredLanguage}}
+
+            The "goal" field may contain comma-separated values if the user picked
+            multiple goals. The "techStack" field (if present) is the user's
+            self-reported tech stack — use it to tailor every recommendation.
 
             Generate the StudentGuide JSON now. Output ONLY the JSON object —
             no prose, no markdown fences. flowLabel MUST be "Upskill".
@@ -896,9 +900,22 @@ public class ClaudeCareerEngine : ICareerEngine
         Tier 2/3 India (1-10 years experience, salaries roughly ₹15k-1L
         per month). A student has told you their CURRENT FIELD (one of:
         software_it, data_analytics, design_creative, content_marketing,
-        banking_finance, healthcare, teaching_edu, ops_support, other) and
-        their GOAL (one of: higher_salary_same, switch_field, management,
-        freelance, abroad, not_sure).
+        banking_finance, healthcare, teaching_edu, ops_support, other),
+        optionally their TECH STACK (free-text, e.g. ".NET, Azure, SQL"
+        — present for software_it and data_analytics fields), and one or
+        more GOALs (comma-separated from: higher_salary_same, switch_field,
+        management, freelance, abroad, not_sure).
+
+        IMPORTANT — if a tech stack is provided, tailor ALL suggestions to
+        it. A .NET developer should see .NET-adjacent skills (Azure, C#
+        advanced, microservices), not Python/Django. A React dev should see
+        frontend/full-stack growth, not Java Spring Boot. The tech stack is
+        the single most important signal for relevance.
+
+        If multiple goals are provided, include the bonus section for EACH
+        applicable goal (e.g. if goals are "higher_salary_same,abroad",
+        include the "Abroad / remote path" bonus section but skip the
+        "higher_salary_same" bonus since that goal has no bonus section).
 
         Generate a comprehensive skill-upgrade guide tailored to their
         field-and-goal pair. The guide is for someone who is ALREADY

@@ -222,10 +222,20 @@ public class AssessmentOrchestrator
                 return;
             }
 
-            // Brand-new student: send the 4-option entry menu so they can pick
-            // 10th / 12th / Career / Skill upgrade. We do NOT drop them straight
-            // into the 13-question career assessment any more — that was a design
-            // bug for 10th- and 12th-pass kids who want different guidance.
+            // Brand-new student. If they've never picked a language, ask that
+            // FIRST so the flow menu itself renders in their chosen language.
+            // Non-Hindi speakers (Karnataka, Tamil Nadu, etc.) used to see a
+            // Hinglish greeting before they could choose English — bounce risk.
+            var hasLanguage = await _db.ChatSessions
+                .AnyAsync(s => s.StudentId == student.Id && s.Status == SessionStatus.Completed, ct);
+            if (!hasLanguage && student.PreferredLanguage == PreferredLanguage.Hinglish)
+            {
+                // Default is Hinglish — if they've never completed a flow,
+                // we don't know if that's their real choice or just the default.
+                await SendLanguageFirstPromptAsync(student, ct);
+                return;
+            }
+
             await SendFlowChoiceMenuAndAwaitAsync(student, ct);
             return;
         }
@@ -536,34 +546,48 @@ public class AssessmentOrchestrator
 
         var name = student.Name;
         var greet = string.IsNullOrWhiteSpace(name) ? "" : $", {name}";
+        var english = student.PreferredLanguage == PreferredLanguage.English;
 
-        var body =
-            $"Hi{greet}! 🪁 Main SkillKite hoon — aapka AI career guide.\n\n" +
-            "Pehle ek baat batao — aapko kya help chahiye? Neeche se choose karo:";
+        var body = english
+            ? $"Hi{greet}! 🪁 I'm SkillKite — your AI career guide.\n\nFirst, tell me — what help do you need? Pick one below:"
+            : $"Hi{greet}! 🪁 Main SkillKite hoon — aapka AI career guide.\n\nPehle ek baat batao — aapko kya help chahiye? Neeche se choose karo:";
 
-        var options = new List<InteractiveOption>
-        {
-            new("flow_10th",
-                "📚 10th ke baad",
-                "Stream selection — Science / Commerce / Arts"),
-
-            new("flow_12th",
-                "🎯 12th ke baad",
-                "Course selection — B.Tech / MBBS / BCA etc."),
-
-            new("flow_career",
-                "💼 Career roadmap",
-                "Degree done / final year ke liye"),
-
-            new("flow_upskill",
-                "🌱 Skill upgrade",
-                "Already working — next ladder rung"),
-        };
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("flow_10th",
+                    "📚 After 10th",
+                    "Stream selection — Science / Commerce / Arts"),
+                new("flow_12th",
+                    "🎯 After 12th",
+                    "Course selection — B.Tech / MBBS / BCA etc."),
+                new("flow_career",
+                    "💼 Career roadmap",
+                    "Degree done / final year"),
+                new("flow_upskill",
+                    "🌱 Skill upgrade",
+                    "Already working — next ladder rung"),
+            }
+            : new List<InteractiveOption>
+            {
+                new("flow_10th",
+                    "📚 10th ke baad",
+                    "Stream selection — Science / Commerce / Arts"),
+                new("flow_12th",
+                    "🎯 12th ke baad",
+                    "Course selection — B.Tech / MBBS / BCA etc."),
+                new("flow_career",
+                    "💼 Career roadmap",
+                    "Degree done / final year ke liye"),
+                new("flow_upskill",
+                    "🌱 Skill upgrade",
+                    "Already working — next ladder rung"),
+            };
 
         await TrySendAsync(() => _messaging.SendListAsync(
             student.Phone, body,
-            buttonLabel: "Choose one",
-            sectionTitle: "What do you need?",
+            buttonLabel: english ? "Choose one" : "Choose karo",
+            sectionTitle: english ? "What do you need?" : "Kya chahiye?",
             options, ct));
 
         _db.ChatMessages.Add(new ChatMessage
@@ -603,20 +627,8 @@ public class AssessmentOrchestrator
             return;
         }
 
-        // If this student has never been asked their language preference, ask it
-        // ONCE — upfront, before the first real flow question — so the rest of
-        // the conversation respects what they pick. Returning students who've
-        // already completed a flow keep their existing preference and skip
-        // straight to the chosen flow's first question.
-        var isFirstTime = !await _db.ChatSessions
-            .AnyAsync(s => s.StudentId == student.Id && s.Status == SessionStatus.Completed, ct);
-
-        if (isFirstTime)
-        {
-            await SendLanguageChoicePromptAsync(student, choice, ct);
-            return;
-        }
-
+        // Language is already known — either picked upfront (new flow) or
+        // carried over from a previous session. Go straight to the chosen flow.
         await StartChosenFlowAsync(student, choice, ct);
     }
 
@@ -635,35 +647,30 @@ public class AssessmentOrchestrator
     };
 
     /// <summary>
-    /// Brand-new student just picked their flow. Before they answer name /
-    /// stream / field, ask which language they want the bot in. The flow they
-    /// picked is stashed in the session's AssessmentDataJson under "pendingFlow"
-    /// so HandleLanguageChoiceAsync can resume the right path after their tap.
-    ///
-    /// We use a SHORT bilingual prompt (one line English + one line Hinglish)
-    /// so even a student who'd be uncomfortable in one mode can read the other.
+    /// Brand-new student just said "Hi" and has never picked a language.
+    /// Ask language FIRST — before the flow menu — so the greeting, menu labels,
+    /// and everything downstream renders in their chosen language. After they
+    /// pick, HandleLanguageChoiceAsync routes them to the flow menu.
     /// </summary>
-    private async Task SendLanguageChoicePromptAsync(Student student, string pendingFlow, CancellationToken ct)
+    private async Task SendLanguageFirstPromptAsync(Student student, CancellationToken ct)
     {
-        var data = new Dictionary<string, string>
-        {
-            ["pendingFlow"] = pendingFlow
-        };
-
         var langSession = new ChatSession
         {
             StudentId = student.Id,
             Status = SessionStatus.AwaitingLanguageChoice,
-            AssessmentDataJson = JsonSerializer.Serialize(data)
+            AssessmentDataJson = JsonSerializer.Serialize(new Dictionary<string, string>())
         };
         _db.ChatSessions.Add(langSession);
         await _db.SaveChangesAsync(ct);
 
+        var name = student.Name;
+        var greet = string.IsNullOrWhiteSpace(name) ? "" : $", {name}";
+
         var body =
+            $"Hi{greet}! 🪁 I'm SkillKite — your AI career guide.\n" +
+            $"Main SkillKite hoon — aapka AI career guide.\n\n" +
             "Which language should we continue in?\n" +
-            "Hum kis language mein baat karein?\n\n" +
-            "🤝 Hinglish — Hindi + English mix (default, most natural for most students)\n" +
-            "🇬🇧 English — formal English throughout";
+            "Hum kis language mein baat karein?";
 
         var options = new List<InteractiveOption>
         {
@@ -713,8 +720,12 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
 
         // Resume into the flow that was queued before we asked for language.
-        string pendingFlow = ReadField(langSession, "pendingFlow") ?? "flow_career";
-        await StartChosenFlowAsync(student, pendingFlow, ct);
+        // If no pendingFlow (language asked before flow menu), show the menu now.
+        string? pendingFlow = ReadField(langSession, "pendingFlow");
+        if (string.IsNullOrEmpty(pendingFlow))
+            await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+        else
+            await StartChosenFlowAsync(student, pendingFlow, ct);
     }
 
     private async Task SendAndPersistStubAsync(
@@ -1814,19 +1825,67 @@ public class AssessmentOrchestrator
             case "field":
             {
                 var field = NormaliseUpskillField(text);
-                session.AssessmentDataJson = WriteField(session, ("field", field), ("step", "goal"));
+                // For tech-heavy fields, ask tech stack before goal — so the guide
+                // can be tailored (e.g. .NET dev vs Python dev get different advice).
+                if (field is "software_it" or "data_analytics")
+                {
+                    session.AssessmentDataJson = WriteField(session, ("field", field), ("step", "techstack"));
+                    await _db.SaveChangesAsync(ct);
+                    await SendUpskillTechStackPromptAsync(student, session, ct);
+                }
+                else
+                {
+                    session.AssessmentDataJson = WriteField(session, ("field", field), ("step", "goal"));
+                    await _db.SaveChangesAsync(ct);
+                    await SendUpskillGoalPromptAsync(student, session, ct);
+                }
+                return;
+            }
+            case "techstack":
+            {
+                var stack = text.Trim();
+                if (stack.Length > 200) stack = stack[..200];
+                session.AssessmentDataJson = WriteField(session, ("techStack", stack), ("step", "goal"));
                 await _db.SaveChangesAsync(ct);
                 await SendUpskillGoalPromptAsync(student, session, ct);
                 return;
             }
             case "goal":
             {
-                var goal = NormaliseUpskillGoal(text);
-                session.AssessmentDataJson = WriteField(session,
-                    ("goal", goal), ("step", "generating"),
-                    ("generatingAt", DateTime.UtcNow.ToString("O")));
+                var pick = NormaliseUpskillGoal(text);
+
+                // "done" means the student finished picking goals.
+                if (pick == "goal_done")
+                {
+                    var existingGoals = ReadField(session, "goals") ?? "";
+                    if (string.IsNullOrEmpty(existingGoals))
+                    {
+                        // They tapped Done without picking anything — treat as "not_sure".
+                        existingGoals = "not_sure";
+                    }
+                    session.AssessmentDataJson = WriteField(session,
+                        ("goal", existingGoals), ("step", "generating"),
+                        ("generatingAt", DateTime.UtcNow.ToString("O")));
+                    await _db.SaveChangesAsync(ct);
+                    await DeliverSkillUpgradeGuideAsync(student, session, ct);
+                    return;
+                }
+
+                // Accumulate goals as comma-separated list.
+                var goals = ReadField(session, "goals") ?? "";
+                var goalList = string.IsNullOrEmpty(goals)
+                    ? new List<string>()
+                    : goals.Split(',').ToList();
+
+                if (!goalList.Contains(pick))
+                    goalList.Add(pick);
+
+                var joined = string.Join(",", goalList);
+                session.AssessmentDataJson = WriteField(session, ("goals", joined), ("step", "goal"));
                 await _db.SaveChangesAsync(ct);
-                await DeliverSkillUpgradeGuideAsync(student, session, ct);
+
+                // Ask "anything else?" with remaining options + Done button.
+                await SendUpskillGoalFollowUpAsync(student, session, goalList, ct);
                 return;
             }
             default:
@@ -1887,14 +1946,104 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
     }
 
+    private async Task SendUpskillTechStackPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var field = ReadField(session, "field");
+        var fieldLabel = field == "data_analytics" ? "Data / Analytics" : "Software / IT";
+
+        var body = english
+            ? $"Great, {fieldLabel}! 💻\n\n*What's your current tech stack?*\nType the languages, frameworks and tools you work with daily.\n\nExample: \".NET, Azure, SQL Server\" or \"React, Node.js, AWS\""
+            : $"Great, {fieldLabel}! 💻\n\n*Aapka current tech stack kya hai?*\nDaily kaam mein jo languages, frameworks aur tools use karte ho wo type karo.\n\nExample: \".NET, Azure, SQL Server\" ya \"React, Node.js, AWS\"";
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, body, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
     private async Task SendUpskillGoalPromptAsync(Student student, ChatSession session, CancellationToken ct)
     {
         var english = student.PreferredLanguage == PreferredLanguage.English;
         var body = english
-            ? "Got it 👍\n\n*What do you want next?* Pick one below:"
-            : "Got it 👍\n\n*Aage kya chahiye?* Neeche se choose karo:";
+            ? "Got it 👍\n\n*What do you want next?* Pick one — you can add more after:"
+            : "Got it 👍\n\n*Aage kya chahiye?* Ek choose karo — baad mein aur add kar sakte ho:";
 
-        var options = english
+        var options = GetUpskillGoalOptions(english, exclude: new List<string>());
+
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, english ? "Pick a goal" : "Goal choose karo",
+            english ? "Your goals" : "Aapke goals",
+            options, ct));
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendUpskillGoalFollowUpAsync(
+        Student student, ChatSession session, List<string> pickedGoals, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+
+        var remaining = GetUpskillGoalOptions(english, exclude: pickedGoals);
+
+        // If they picked "not_sure" or all goals are selected, skip straight to generating.
+        if (pickedGoals.Contains("not_sure") || remaining.Count <= 1)
+        {
+            var goals = ReadField(session, "goals") ?? "not_sure";
+            session.AssessmentDataJson = WriteField(session,
+                ("goal", goals), ("step", "generating"),
+                ("generatingAt", DateTime.UtcNow.ToString("O")));
+            await _db.SaveChangesAsync(ct);
+            await DeliverSkillUpgradeGuideAsync(student, session, ct);
+            return;
+        }
+
+        var pickedLabels = pickedGoals.Select(GoalLabel).ToList();
+        var pickedStr = string.Join(", ", pickedLabels);
+
+        var body = english
+            ? $"Got it — *{pickedStr}* ✅\n\nAnything else? Pick another goal or tap Done:"
+            : $"Got it — *{pickedStr}* ✅\n\nAur kuch? Ek aur goal choose karo ya Done dabao:";
+
+        // Add "Done" as a reply button (max 3 buttons). Use buttons for Done + show
+        // remaining as list only if > 2 remain, otherwise use buttons for all.
+        if (remaining.Count <= 2)
+        {
+            // Few enough to use reply buttons: remaining goals + Done
+            var buttons = remaining.Select(o => new InteractiveOption(o.Id, o.Title)).ToList();
+            buttons.Add(new InteractiveOption("goal_done", english ? "✅ Done" : "✅ Done"));
+            await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, buttons, ct));
+        }
+        else
+        {
+            // Too many for buttons — use list. Add Done as first option.
+            var listOptions = new List<InteractiveOption>
+            {
+                new("goal_done", english ? "✅ Done — generate guide" : "✅ Done — guide banao", "")
+            };
+            listOptions.AddRange(remaining);
+            await TrySendAsync(() => _messaging.SendListAsync(
+                student.Phone, body, english ? "Pick or Done" : "Choose ya Done",
+                english ? "More goals" : "Aur goals",
+                listOptions, ct));
+        }
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private static List<InteractiveOption> GetUpskillGoalOptions(bool english, List<string> exclude)
+    {
+        var all = english
             ? new List<InteractiveOption>
             {
                 new("higher_salary_same", "💰 Higher salary",        "Promotion / better company"),
@@ -1906,24 +2055,46 @@ public class AssessmentOrchestrator
             }
             : new List<InteractiveOption>
             {
-                new("higher_salary_same", "💰 Same field, higher salary", "Promotion / better company"),
-                new("switch_field",       "🔀 Switch to new field",       "Pivot — naya domain"),
-                new("management",         "👔 Management track",          "Lead / EM / people mgr"),
-                new("freelance",          "🚀 Freelance / own thing",     "Consulting / startup"),
-                new("abroad",             "🌍 Remote / abroad",            "Global companies / visa route"),
-                new("not_sure",           "🤷 Not sure — sab options",     "Show me everything")
+                new("higher_salary_same", "💰 Higher salary",        "Promotion / better company"),
+                new("switch_field",       "🔀 Switch to new field",  "Pivot — naya domain"),
+                new("management",         "👔 Management track",     "Lead / EM / people mgr"),
+                new("freelance",          "🚀 Freelance / own thing","Consulting / startup"),
+                new("abroad",             "🌍 Remote / abroad",      "Global companies / visa route"),
+                new("not_sure",           "🤷 Sab options dikhao",   "Show me everything")
             };
 
-        await TrySendAsync(() => _messaging.SendListAsync(
-            student.Phone, body, "Choose one",
-            english ? "Your next goal" : "Aapka next goal",
-            options, ct));
+        return all.Where(o => !exclude.Contains(o.Id)).ToList();
+    }
 
-        _db.ChatMessages.Add(new ChatMessage
+    private static string GoalLabel(string goalId) => goalId switch
+    {
+        "higher_salary_same" => "Higher salary",
+        "switch_field"       => "Switch fields",
+        "management"         => "Management track",
+        "freelance"          => "Freelance",
+        "abroad"             => "Remote/abroad",
+        "not_sure"           => "Show all",
+        _                    => goalId
+    };
+
+    private static string BuildUpskillTop3(StudentGuide guide, bool english)
+    {
+        // Pull one top pick from each of the first 3 sections (Skills / Roles / Side moves).
+        var picks = new List<string>();
+        var emojis = new[] { "1️⃣", "2️⃣", "3️⃣" };
+        foreach (var section in guide.Sections.Take(3))
         {
-            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
-        });
-        await _db.SaveChangesAsync(ct);
+            var first = section.Options.FirstOrDefault();
+            if (first is null) continue;
+            picks.Add($"{emojis[picks.Count]} *{first.Name}* — {first.LeadsTo}");
+        }
+
+        if (picks.Count == 0) return "";
+
+        var header = english
+            ? "Your *top 3 moves* right now:"
+            : "Aapke *top 3 moves* abhi:";
+        return header + "\n" + string.Join("\n", picks);
     }
 
     private async Task DeliverSkillUpgradeGuideAsync(Student student, ChatSession session, CancellationToken ct)
@@ -1944,9 +2115,13 @@ public class AssessmentOrchestrator
             var guide = await _engine.GenerateSkillUpgradeGuideAsync(student, session, ct);
             var pdfUrl = await _pdf.GenerateGuideAsync(student, guide, ct);
 
+            // Top-3 summary: extract the first skill + first role + first side move
+            // to give an immediate takeaway before the PDF (like career flow does).
+            var top3 = BuildUpskillTop3(guide, english);
+
             var summary = english
-                ? $"🎯 *Your skill-upgrade guide is ready!*\n\n{guide.Greeting}\n\nThe PDF has all the skills, next roles and side moves laid out in detail. In the next 3 months, learn one of these skills deeply."
-                : $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\nPDF mein skills, next roles, side moves — sab detailed hai. 3 mahine ke andar ek skill deeply seekho.";
+                ? $"🎯 *Your skill-upgrade guide is ready!*\n\n{guide.Greeting}\n\n{top3}\n\nThe full PDF has all the details — skills, roles, side moves, and timelines."
+                : $"🎯 *Aapki skill-upgrade guide ready hai!*\n\n{guide.Greeting}\n\n{top3}\n\nFull PDF mein sab details hai — skills, roles, side moves, aur timelines.";
             await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, summary, ct));
             await TrySendAsync(() => _messaging.SendDocumentAsync(
                 student.Phone, pdfUrl,
@@ -2000,6 +2175,7 @@ public class AssessmentOrchestrator
     private static string NormaliseUpskillGoal(string text)
     {
         var t = text.Trim().ToLowerInvariant();
+        if (t is "goal_done" or "done" or "✅ done") return "goal_done";
         var ids = new[] { "higher_salary_same","switch_field","management","freelance","abroad","not_sure" };
         if (ids.Contains(t)) return t;
         if (t.Contains("salary") || t.Contains("paisa") || t.Contains("hike") || t.Contains("promotion")) return "higher_salary_same";
