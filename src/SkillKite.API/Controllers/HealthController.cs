@@ -72,6 +72,22 @@ public class HealthController : ControllerBase
         var newStudentsLast7d = await _db.Students.CountAsync(s => s.CreatedAt >= since, ct);
         var roadmapsLast7d = await _db.Roadmaps.CountAsync(r => r.CreatedAt >= since, ct);
 
+        // In-flight sessions — used by the deploy guard (tools/deploy.ps1) to avoid
+        // restarting the service mid-flow (a restart kills an in-flight Claude call
+        // and can strand a session in "generating"). "Active" here means a session
+        // in Active status whose student interacted within the last 5 minutes — the
+        // same window HandleGeneratingStepAsync treats as "still in flight". The
+        // recency filter is essential: there are stale Active sessions from days ago
+        // that never reached a terminal state, and counting those would block every
+        // deploy. Parked Awaiting* states are excluded — they're persisted in the DB
+        // and resume cleanly after a restart.
+        var activeCutoff = DateTime.UtcNow.AddMinutes(-5);
+        var activeSessions = await _db.ChatSessions.CountAsync(
+            s => s.Status == SessionStatus.Active
+              && s.Student != null
+              && s.Student.LastActiveAt != null
+              && s.Student.LastActiveAt >= activeCutoff, ct);
+
         // Feedback ratings per flow. We don't have a Feedback table —
         // rating is stored as a string key in ChatSession.AssessmentDataJson
         // ("feedbackRating" = "Useful"/"Ok"/"NotUseful"/"Skipped"). Pull the
@@ -131,6 +147,8 @@ public class HealthController : ControllerBase
                 roadmapsGenerated = roadmaps,
                 careersAvailable
             },
+            // Consumed by tools/deploy.ps1's pre-deploy guard ($stats.sessions.active).
+            sessions = new { active = activeSessions },
             last7d = new
             {
                 newStudents = newStudentsLast7d,
