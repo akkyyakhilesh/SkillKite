@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { whatsappLink, CAREER_CATEGORIES, slugify, inr } from '../../config/categories';
 import careers from '../../data/careers.json';
 
@@ -15,6 +16,11 @@ const grouped = CAREER_CATEGORIES.map((cat) => ({
 ---
 
 <Base title={title} description={description} path="/after-graduation">
+  <Breadcrumbs items={[
+    { name: 'Home', path: '/' },
+    { name: 'Careers', path: '/after-graduation' },
+  ]} />
+
   <section class="hero hero--sub">
     <div class="hero-inner">
       <span class="eyebrow">💼 After Graduation</span>

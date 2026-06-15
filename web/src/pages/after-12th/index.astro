@@ -21,6 +21,10 @@ const items = TWELFTH_STREAMS.map((s) => ({
     heading="Which stream did you take?"
     intro="Your options after 12th depend on your stream. Pick yours to see every course, entrance exam and career — all on one page."
     items={items}
+    breadcrumbs={[
+      { name: 'Home', path: '/' },
+      { name: 'After 12th', path: '/after-12th' },
+    ]}
     escapePrompt="Not sure which fits you?"
     escapeWaText="Hi SkillKite! Help me choose after 12th"
   />

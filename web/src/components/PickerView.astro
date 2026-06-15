@@ -1,5 +1,7 @@
 ---
 import { whatsappLink } from '../config/categories';
+import Breadcrumbs from './Breadcrumbs.astro';
+import type { Crumb } from '../lib/seo';
 
 interface Item {
   href: string;
@@ -15,10 +17,14 @@ export interface Props {
   items: Item[];
   escapePrompt: string;
   escapeWaText: string;
+  /** Breadcrumb trail (Home › this category). */
+  breadcrumbs: Crumb[];
 }
 
-const { eyebrow, heading, intro, items, escapePrompt, escapeWaText } = Astro.props;
+const { eyebrow, heading, intro, items, escapePrompt, escapeWaText, breadcrumbs } = Astro.props;
 ---
+
+<Breadcrumbs items={breadcrumbs} />
 
 <section class="hero hero--sub">
   <div class="hero-inner">

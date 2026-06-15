@@ -21,6 +21,10 @@ const items = TENTH_INTERESTS.map((s) => ({
     heading="What interests you most?"
     intro="After 10th, your big choice is your stream. Pick what pulls you — or explore everything if you're still deciding. We'll show every realistic path."
     items={items}
+    breadcrumbs={[
+      { name: 'Home', path: '/' },
+      { name: 'After 10th', path: '/after-10th' },
+    ]}
     escapePrompt="Still confused? That's completely normal at this stage."
     escapeWaText="Hi SkillKite! Help me choose after 10th"
   />

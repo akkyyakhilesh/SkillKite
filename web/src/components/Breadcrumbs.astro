@@ -1,0 +1,52 @@
+---
+// Shared breadcrumb: visible nav + BreadcrumbList JSON-LD, used on every page
+// below the homepage (category pickers + guide/career leaf pages).
+import { breadcrumbListSchema, type Crumb } from '../lib/seo';
+
+export interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+const breadcrumbJson = JSON.stringify(breadcrumbListSchema(Astro.site!, items));
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  {items.map((c, i) => (
+    <>
+      {i > 0 && <span class="crumb-sep" aria-hidden="true">›</span>}
+      {i < items.length - 1 ? (
+        <a href={c.path}>{c.name}</a>
+      ) : (
+        <span aria-current="page">{c.name}</span>
+      )}
+    </>
+  ))}
+</nav>
+
+<script type="application/ld+json" is:inline set:html={breadcrumbJson} />
+
+<style>
+  .crumbs {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px 20px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--saffron-light);
+    text-decoration: underline;
+  }
+  .crumbs [aria-current='page'] {
+    color: var(--ink, #e8ecf6);
+  }
+  .crumb-sep {
+    margin: 0 8px;
+    opacity: 0.5;
+  }
+</style>

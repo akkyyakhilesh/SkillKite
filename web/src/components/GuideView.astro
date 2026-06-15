@@ -1,6 +1,7 @@
 ---
 import { whatsappLink } from '../config/categories';
-import { breadcrumbListSchema, faqPageSchema, type Crumb } from '../lib/seo';
+import { faqPageSchema, type Crumb } from '../lib/seo';
+import Breadcrumbs from './Breadcrumbs.astro';
 
 interface Option {
   name: string;
@@ -33,10 +34,9 @@ export interface Props {
 const { eyebrow, heading, intro, pdfWaText, backHref, backLabel, sections, escapePrompt, escapeWaText, breadcrumbs } =
   Astro.props;
 
-// Structured data: the option cards are FAQ-shaped, and every guide sits under
-// a clear Home → category → page trail. Both rendered as JSON-LD below.
+// The option cards are FAQ-shaped → FAQPage JSON-LD. Breadcrumbs (visible nav
+// + BreadcrumbList JSON-LD) are handled by the shared <Breadcrumbs> component.
 const faqJson = JSON.stringify(faqPageSchema(sections));
-const breadcrumbJson = JSON.stringify(breadcrumbListSchema(Astro.site!, breadcrumbs));
 
 // Short preview line for the collapsed card — first sentence of "leads to".
 const preview = (s: string) => {
@@ -45,18 +45,7 @@ const preview = (s: string) => {
 };
 ---
 
-<nav class="crumbs" aria-label="Breadcrumb">
-  {breadcrumbs.map((c, i) => (
-    <>
-      {i > 0 && <span class="crumb-sep" aria-hidden="true">›</span>}
-      {i < breadcrumbs.length - 1 ? (
-        <a href={c.path}>{c.name}</a>
-      ) : (
-        <span aria-current="page">{c.name}</span>
-      )}
-    </>
-  ))}
-</nav>
+<Breadcrumbs items={breadcrumbs} />
 
 <section class="hero hero--sub">
   <div class="hero-inner">
@@ -114,29 +103,3 @@ const preview = (s: string) => {
 </section>
 
 <script type="application/ld+json" is:inline set:html={faqJson} />
-<script type="application/ld+json" is:inline set:html={breadcrumbJson} />
-
-<style>
-  .crumbs {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 18px 20px 0;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .crumbs a {
-    color: var(--muted);
-    text-decoration: none;
-  }
-  .crumbs a:hover {
-    color: var(--saffron-light);
-    text-decoration: underline;
-  }
-  .crumbs [aria-current='page'] {
-    color: var(--ink, #e8ecf6);
-  }
-  .crumb-sep {
-    margin: 0 8px;
-    opacity: 0.5;
-  }
-</style>

@@ -21,6 +21,10 @@ const items = SKILL_FIELDS.map((s) => ({
     heading="What field are you in?"
     intro="Pick your current field to see the skills worth adding now, the next roles to target, and side moves where your experience already counts."
     items={items}
+    breadcrumbs={[
+      { name: 'Home', path: '/' },
+      { name: 'Skill Upgrade', path: '/skill-upgrade' },
+    ]}
     escapePrompt="Want this matched to your exact experience and goal?"
     escapeWaText="Hi SkillKite! I want to upskill"
   />
