@@ -2407,15 +2407,22 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
 
         var name = student.Name ?? "friend";
-        var body = student.PreferredLanguage == PreferredLanguage.English
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
             ? $"Just to confirm, {name} — do you want me to delete ALL your SkillKite data?\n\nThat means: every chat message, every roadmap / guide PDF I made for you, and your profile. This cannot be undone. 🪁"
             : $"Confirm karo {name} — kya tumhara saara SkillKite data delete kar du?\n\nMatlab: saari chats, saare roadmap/guide PDFs, aur tumhari profile. Yeh undo nahi ho sakta. 🪁";
 
-        var options = new List<InteractiveOption>
-        {
-            new("reset_yes", "✅ Haan, delete"),
-            new("reset_no",  "❌ Nahi, keep")
-        };
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("reset_yes", "✅ Yes, delete"),
+                new("reset_no",  "❌ No, keep")
+            }
+            : new List<InteractiveOption>
+            {
+                new("reset_yes", "✅ Haan, delete"),
+                new("reset_no",  "❌ Nahi, keep")
+            };
 
         await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
 

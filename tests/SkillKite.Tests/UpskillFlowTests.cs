@@ -226,6 +226,43 @@ public class UpskillFlowTests
     }
 
     [Fact]
+    public async Task ResetPrompt_RespectsSelectedLanguage()
+    {
+        // English user: body AND button labels should be English.
+        var (orch, msg, _, _) = NewHarness();
+        const string phone = "91900000008";
+
+        await orch.HandleIncomingAsync(phone, "Hi", "Ramya");
+        await orch.HandleIncomingAsync(phone, "lang_english", "Ramya");
+        msg.Log.Clear();
+
+        await orch.HandleIncomingAsync(phone, "reset", "Ramya");
+
+        var prompt = msg.Log.Single(m => m.Kind == "buttons");
+        Assert.Contains("delete ALL your SkillKite data", prompt.Body);
+        Assert.Contains(prompt.Options!, o => o.Id == "reset_yes" && o.Title.Contains("Yes"));
+        Assert.Contains(prompt.Options!, o => o.Id == "reset_no" && o.Title.Contains("No"));
+        Assert.DoesNotContain(prompt.Options!, o => o.Title.Contains("Haan") || o.Title.Contains("Nahi"));
+    }
+
+    [Fact]
+    public async Task ResetPrompt_HinglishUser_GetsHinglishButtons()
+    {
+        var (orch, msg, _, _) = NewHarness();
+        const string phone = "91900000009";
+
+        await orch.HandleIncomingAsync(phone, "Hi", "Ramya");
+        await orch.HandleIncomingAsync(phone, "lang_hinglish", "Ramya");
+        msg.Log.Clear();
+
+        await orch.HandleIncomingAsync(phone, "reset", "Ramya");
+
+        var prompt = msg.Log.Single(m => m.Kind == "buttons");
+        Assert.Contains(prompt.Options!, o => o.Id == "reset_yes" && o.Title.Contains("Haan"));
+        Assert.Contains(prompt.Options!, o => o.Id == "reset_no" && o.Title.Contains("Nahi"));
+    }
+
+    [Fact]
     public async Task NotSureGoal_AutoCompletesWithoutFollowUp()
     {
         var (orch, msg, eng, _) = NewHarness();
