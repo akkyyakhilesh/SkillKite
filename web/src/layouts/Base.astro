@@ -9,9 +9,11 @@ export interface Props {
   path?: string;
   /** Optional OG image override (absolute or root-relative). */
   ogImage?: string;
+  /** Keep utility pages (404, terms, privacy) out of the index. */
+  noindex?: boolean;
 }
 
-const { title, description, path = '/', ogImage = '/og-image.png' } = Astro.props;
+const { title, description, path = '/', ogImage = '/og-image.png', noindex = false } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
 const ogUrl = new URL(ogImage, Astro.site).href;
 ---
@@ -26,6 +28,7 @@ const ogUrl = new URL(ogImage, Astro.site).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />

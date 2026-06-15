@@ -21,6 +21,11 @@ const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
     backHref="/skill-upgrade"
     backLabel="Other fields"
     sections={guide.sections}
+    breadcrumbs={[
+      { name: 'Home', path: '/' },
+      { name: 'Skill Upgrade', path: '/skill-upgrade' },
+      { name: streamLabel, path: `/skill-upgrade/${stream}` },
+    ]}
     escapePrompt="Want this matched to your exact experience and goal?"
     escapeWaText={`Hi SkillKite! I work in ${streamLabel}`}
   />

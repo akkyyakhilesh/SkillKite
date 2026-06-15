@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Utility pages carry a noindex meta tag and are excluded from the sitemap.
+Disallow: /404
+
+Sitemap: https://skillkite.in/sitemap-index.xml

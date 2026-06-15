@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { whatsappLink, CAREER_CATEGORIES, slugify, inr } from '../../config/categories';
+import { breadcrumbListSchema } from '../../lib/seo';
 import careers from '../../data/careers.json';
 
 export function getStaticPaths() {
@@ -11,9 +12,29 @@ const { career } = Astro.props;
 const cat = CAREER_CATEGORIES.find((g) => g.key === career.Category);
 const title = `${career.Title} — career path, salary & roadmap | SkillKite`;
 const description = `${career.Description} Salary ${inr(career.SalaryRangeMin)}–${inr(career.SalaryRangeMax)}/month, ${career.DemandLevel.toLowerCase()} demand, job-ready in ${career.TimeToJobReady}. Free personalized roadmap.`;
+
+const breadcrumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Careers', path: '/after-graduation' },
+  { name: career.Title, path: `/after-graduation/${slugify(career.Title)}` },
+];
+const breadcrumbJson = JSON.stringify(breadcrumbListSchema(Astro.site!, breadcrumbs));
 ---
 
 <Base title={title} description={description} path={`/after-graduation/${slugify(career.Title)}`}>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    {breadcrumbs.map((c, i) => (
+      <>
+        {i > 0 && <span class="crumb-sep" aria-hidden="true">›</span>}
+        {i < breadcrumbs.length - 1 ? (
+          <a href={c.path}>{c.name}</a>
+        ) : (
+          <span aria-current="page">{c.name}</span>
+        )}
+      </>
+    ))}
+  </nav>
+
   <section class="hero hero--sub">
     <div class="hero-inner">
       <span class="eyebrow">{cat?.emoji} {cat?.label ?? 'Career'}</span>
@@ -60,4 +81,20 @@ const description = `${career.Description} Salary ${inr(career.SalaryRangeMin)}�
       </a>
     </div>
   </section>
+
+  <script type="application/ld+json" is:inline set:html={breadcrumbJson} />
+
+  <style>
+    .crumbs {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 20px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .crumbs a { color: var(--muted); text-decoration: none; }
+    .crumbs a:hover { color: var(--saffron-light); text-decoration: underline; }
+    .crumbs [aria-current='page'] { color: var(--ink, #e8ecf6); }
+    .crumb-sep { margin: 0 8px; opacity: 0.5; }
+  </style>
 </Base>

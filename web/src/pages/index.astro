@@ -1,10 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import { CATEGORIES, whatsappLink } from '../config/categories';
+import { organizationSchema, webSiteSchema } from '../lib/seo';
 
 const title = 'SkillKite — Free AI career guidance for Indian students';
 const description =
   'From choosing a stream after 10th to landing your first job after a degree — get a clear, personalized plan you can actually follow. Free, in Hindi + English.';
+
+const orgJson = JSON.stringify(organizationSchema(Astro.site!));
+const siteJson = JSON.stringify(webSiteSchema(Astro.site!));
 ---
 
 <Base title={title} description={description} path="/">
@@ -46,4 +50,7 @@ const description =
       }
     </div>
   </section>
+
+  <script type="application/ld+json" is:inline set:html={orgJson} />
+  <script type="application/ld+json" is:inline set:html={siteJson} />
 </Base>

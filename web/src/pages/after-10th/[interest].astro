@@ -21,6 +21,11 @@ const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
     backHref="/after-10th"
     backLabel="Other interests"
     sections={guide.sections}
+    breadcrumbs={[
+      { name: 'Home', path: '/' },
+      { name: 'After 10th', path: '/after-10th' },
+      { name: streamLabel, path: `/after-10th/${stream}` },
+    ]}
     escapePrompt="Want a plan matched to your marks and goals?"
     escapeWaText={`Hi SkillKite! I just finished 10th, interested in ${streamLabel}`}
   />
