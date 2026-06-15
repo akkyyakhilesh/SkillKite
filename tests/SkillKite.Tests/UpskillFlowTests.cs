@@ -136,8 +136,92 @@ public class UpskillFlowTests
         var flowMenu = msg.Log.Last();
         Assert.Equal("list", flowMenu.Kind);
         Assert.Contains(flowMenu.Options!, o => o.Id == "flow_upskill");
-        // English greeting, not Hinglish.
-        Assert.Contains("I'm SkillKite", flowMenu.Body);
+        Assert.Contains("What would you like help with", flowMenu.Body);
+    }
+
+    [Fact]
+    public async Task FlowMenu_DoesNotRepeatNameOrIntroAfterLanguagePrompt()
+    {
+        // Regression: the flow menu used to re-greet "Hi {name}! I'm SkillKite…"
+        // right after the language prompt already did — a double greeting.
+        var (orch, msg, _, _) = NewHarness();
+
+        await orch.HandleIncomingAsync("91900000010", "Hi", "Ramya");   // usable name
+        var langPrompt = msg.Log.First(m => m.Kind == "buttons");
+        await orch.HandleIncomingAsync("91900000010", "lang_english", "Ramya");
+        var flowMenu = msg.Log.Last();
+
+        // Name appears in the language prompt…
+        Assert.Contains("Ramya", langPrompt.Body);
+        // …but NOT again in the flow menu, and no repeated "I'm SkillKite" intro.
+        Assert.DoesNotContain("Ramya", flowMenu.Body);
+        Assert.DoesNotContain("I'm SkillKite", flowMenu.Body);
+    }
+
+    [Fact]
+    public async Task UnusableWhatsAppName_AsksNameBeforeFlowMenu()
+    {
+        // "S D" is not a usable name (no 2 contiguous letters). The greeting must
+        // NOT show it, and we ask the name BEFORE the 4-path menu — centrally.
+        var (orch, msg, _, _) = NewHarness();
+        const string phone = "91900000011";
+
+        await orch.HandleIncomingAsync(phone, "Hi", "S D");
+        var langPrompt = msg.Log.First(m => m.Kind == "buttons");
+        Assert.DoesNotContain("S D", langPrompt.Body);
+        Assert.Contains("Hi! 🪁", langPrompt.Body);   // generic, no name
+
+        await orch.HandleIncomingAsync(phone, "lang_english", "S D");
+
+        // Name is asked right after language — before any flow list appears.
+        var afterLang = msg.Log.Last();
+        Assert.Equal("text", afterLang.Kind);
+        Assert.Contains("what's your name", afterLang.Body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(msg.Log, m => m.Options?.Any(o => o.Id == "flow_upskill") == true);
+
+        // After typing a name, the 4-path menu appears with a one-time greeting.
+        await orch.HandleIncomingAsync(phone, "Shristi", "S D");
+        var flowMenu = msg.Log.Last();
+        Assert.Equal("list", flowMenu.Kind);
+        Assert.Contains(flowMenu.Options!, o => o.Id == "flow_upskill");
+        Assert.Contains("Shristi", flowMenu.Body);
+    }
+
+    [Fact]
+    public async Task CentralName_ThenUpskill_DoesNotAskNameAgain()
+    {
+        // The whole point: name collected before the path choice means the
+        // upskill flow must NOT ask it a second time.
+        var (orch, msg, _, _) = NewHarness();
+        const string phone = "91900000013";
+
+        await orch.HandleIncomingAsync(phone, "Hi", "S D");
+        await orch.HandleIncomingAsync(phone, "lang_english", "S D");
+        await orch.HandleIncomingAsync(phone, "Shristi", "S D");   // central name
+        msg.Log.Clear();
+        await orch.HandleIncomingAsync(phone, "flow_upskill", "S D");
+
+        Assert.DoesNotContain(msg.Log, m => m.Body.Contains("what's your name", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(msg.Log, m => m.Body.Contains("Shristi"));   // greets by collected name
+    }
+
+    [Fact]
+    public async Task UsableWhatsAppName_SkipsNameQuestionEntirely()
+    {
+        // A good WhatsApp name should be used and the name question skipped —
+        // no central prompt, straight to the menu, straight to the field selector.
+        var (orch, msg, _, _) = NewHarness();
+        const string phone = "91900000012";
+
+        await orch.HandleIncomingAsync(phone, "Hi", "Ramya");
+        await orch.HandleIncomingAsync(phone, "lang_english", "Ramya");
+        // No name prompt between language and the flow menu.
+        Assert.Equal("list", msg.Log.Last().Kind);
+        Assert.Contains(msg.Log.Last().Options!, o => o.Id == "flow_upskill");
+
+        await orch.HandleIncomingAsync(phone, "flow_upskill", "Ramya");
+        Assert.DoesNotContain(msg.Log, m => m.Body.Contains("what's your name", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(msg.Log, m => m.Kind == "list" && m.Options!.Any(o => o.Id == "software_it"));
     }
 
     [Fact]

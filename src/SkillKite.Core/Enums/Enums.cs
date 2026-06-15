@@ -29,6 +29,13 @@ public enum SessionStatus
     /// </summary>
     AwaitingLanguageChoice,
     /// <summary>
+    /// New student picked their language and we don't have a usable name for
+    /// them yet (WhatsApp profile name missing or junk like "S D"). We asked
+    /// "what's your name?" ONCE, centrally, before the 4-path flow menu — so no
+    /// individual flow has to ask it. Next inbound message is their name.
+    /// </summary>
+    AwaitingName,
+    /// <summary>
     /// PDF / guide just delivered. Bot sent 3 feedback buttons
     /// (👍 Useful / 😐 OK / 👎 Not useful). Next inbound message is interpreted
     /// as either a button tap (saved as rating) or free text (saved as "Skipped"

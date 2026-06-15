@@ -174,6 +174,19 @@ public class AssessmentOrchestrator
             return;
         }
 
+        // Fourth-and-a-half check: did we just ask the student their name
+        // (centrally, after language, before the 4-path menu)? Next message is it.
+        var awaitingName = await _db.ChatSessions
+            .Where(s => s.StudentId == student.Id && s.Status == SessionStatus.AwaitingName)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (awaitingName is not null)
+        {
+            await HandleNameEntryAsync(student, awaitingName, text, ct);
+            return;
+        }
+
         // Fifth check: did we just deliver a PDF and ask for feedback?
         // (Session is parked in AwaitingFeedback until they tap a button or
         // type something; either way we capture a rating and move to Completed.)
@@ -236,7 +249,7 @@ public class AssessmentOrchestrator
                 return;
             }
 
-            await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+            await ProceedToFlowMenuAsync(student, ct);
             return;
         }
 
@@ -528,13 +541,18 @@ public class AssessmentOrchestrator
     }
 
     /// <summary>
-    /// Brand-new student just said "Hi" — show the 4-option entry menu so they
-    /// can pick which flow they want (10th / 12th / Career / Skill upgrade)
-    /// instead of being dropped straight into the 13-question career assessment.
+    /// Show the 4-option entry menu so the student can pick which flow they want
+    /// (10th / 12th / Career / Skill upgrade) instead of being dropped straight
+    /// into the 13-question career assessment.
+    ///
+    /// By this point language is chosen and we have a usable name. <paramref name="lead"/>
+    /// lets the caller prepend a one-time greeting (e.g. "Nice to meet you, X! 🙌"
+    /// right after we collected the name); when null we use a neutral transition,
+    /// since the full intro + name greeting already happened in the language prompt.
     ///
     /// Uses a WhatsApp List Message because we have 4 options (Reply Buttons cap at 3).
     /// </summary>
-    private async Task SendFlowChoiceMenuAndAwaitAsync(Student student, CancellationToken ct)
+    private async Task SendFlowChoiceMenuAndAwaitAsync(Student student, CancellationToken ct, string? lead = null)
     {
         var menuSession = new ChatSession
         {
@@ -544,13 +562,12 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(menuSession);
         await _db.SaveChangesAsync(ct);
 
-        var name = student.Name;
-        var greet = string.IsNullOrWhiteSpace(name) ? "" : $", {name}";
         var english = student.PreferredLanguage == PreferredLanguage.English;
+        var opener = string.IsNullOrEmpty(lead) ? "Great 👍" : lead;
 
         var body = english
-            ? $"Hi{greet}! 🪁 I'm SkillKite — your AI career guide.\n\nFirst, tell me — what help do you need? Pick one below:"
-            : $"Hi{greet}! 🪁 Main SkillKite hoon — aapka AI career guide.\n\nPehle ek baat batao — aapko kya help chahiye? Neeche se choose karo:";
+            ? $"{opener} What would you like help with? Pick one below:"
+            : $"{opener} Aapko kis cheez mein help chahiye? Neeche se choose karo:";
 
         var options = english
             ? new List<InteractiveOption>
@@ -597,6 +614,73 @@ public class AssessmentOrchestrator
             Content = body
         });
         await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Gate before the 4-path menu: if we already have a usable name (good
+    /// WhatsApp profile name or one from a prior session), go straight to the
+    /// menu. Otherwise ask for it ONCE here — so name is collected before the
+    /// flow choice and no individual flow has to ask it again.
+    /// </summary>
+    private Task ProceedToFlowMenuAsync(Student student, CancellationToken ct) =>
+        HasUsableName(student)
+            ? SendFlowChoiceMenuAndAwaitAsync(student, ct)
+            : SendNamePromptAndAwaitAsync(student, ct);
+
+    /// <summary>
+    /// Ask the student's name centrally (after language, before the flow menu).
+    /// Parks the session in AwaitingName; HandleNameEntryAsync resumes to the menu.
+    /// </summary>
+    private async Task SendNamePromptAndAwaitAsync(Student student, CancellationToken ct)
+    {
+        var nameSession = new ChatSession
+        {
+            StudentId = student.Id,
+            Status = SessionStatus.AwaitingName
+        };
+        _db.ChatSessions.Add(nameSession);
+        await _db.SaveChangesAsync(ct);
+
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Nice! 🪁 Before we start — *what's your name?*"
+            : "Badhiya! 🪁 Shuru karne se pehle — *aapka naam kya hai?*";
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, body, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = nameSession.Id,
+            Role = MessageRole.Assistant,
+            Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Student typed their name at the central name prompt. Store it on the
+    /// Student row, close the AwaitingName session, then show the 4-path menu
+    /// with a one-time "Nice to meet you" lead.
+    /// </summary>
+    private async Task HandleNameEntryAsync(
+        Student student, ChatSession nameSession, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = nameSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var name = text.Trim();
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 60)
+            name = student.Name ?? "friend";
+        student.Name = name;
+
+        nameSession.Status = SessionStatus.Abandoned;
+        await _db.SaveChangesAsync(ct);
+
+        await SendFlowChoiceMenuAndAwaitAsync(student, ct, lead: $"Nice to meet you, {name}! 🙌");
     }
 
     /// <summary>
@@ -663,8 +747,11 @@ public class AssessmentOrchestrator
         _db.ChatSessions.Add(langSession);
         await _db.SaveChangesAsync(ct);
 
-        var name = student.Name;
-        var greet = string.IsNullOrWhiteSpace(name) ? "" : $", {name}";
+        // Only address them by name if the WhatsApp profile name is actually
+        // usable (real letters, not "S D" / "iPhone User"). If it isn't, we greet
+        // generically here AND ask for their name later in the flow — so the
+        // greeting never uses a name we're about to re-ask.
+        var greet = HasUsableName(student) ? $", {student.Name!.Trim()}" : "";
 
         var body =
             $"Hi{greet}! 🪁 I'm SkillKite — your AI career guide.\n" +
@@ -720,10 +807,11 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
 
         // Resume into the flow that was queued before we asked for language.
-        // If no pendingFlow (language asked before flow menu), show the menu now.
+        // If no pendingFlow (language asked before flow menu), collect the name
+        // (if we don't have a usable one) and then show the menu.
         string? pendingFlow = ReadField(langSession, "pendingFlow");
         if (string.IsNullOrEmpty(pendingFlow))
-            await SendFlowChoiceMenuAndAwaitAsync(student, ct);
+            await ProceedToFlowMenuAsync(student, ct);
         else
             await StartChosenFlowAsync(student, pendingFlow, ct);
     }
