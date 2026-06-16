@@ -84,6 +84,7 @@ public class UpskillFlowTests
             => Task.FromResult(new PostRoadmapTurnResult($"Post-guide reply to: {m}", false));
         public Task<StudentGuide> GenerateTenthGuideAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<StudentGuide> GenerateTwelfthGuideAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<string> GraduationFollowUpAsync(Student s, ChatSession se, CancellationToken ct = default) => Task.FromResult("What languages or frameworks do you know?");
     }
 
     private sealed class FakePdf : IRoadmapGenerator
