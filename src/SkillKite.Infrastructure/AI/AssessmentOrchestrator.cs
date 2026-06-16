@@ -331,12 +331,9 @@ public class AssessmentOrchestrator
 
         if (roadmapRow is null)
         {
-            // Edge case: completed session but no roadmap saved (generation failed).
-            // Fall through to a fresh assessment so the student isn't stuck.
-            var fresh = new ChatSession { StudentId = student.Id };
-            _db.ChatSessions.Add(fresh);
-            await _db.SaveChangesAsync(ct);
-            await ContinueAssessmentAsync(student, fresh, text, ct);
+            // Non-career flows (10th, 12th, upskill) generate guides, not roadmaps.
+            // Route to the post-guide handler instead of starting a fresh assessment.
+            await HandlePostGuideAsync(student, completedSession, text, ct);
             return;
         }
 
@@ -353,10 +350,7 @@ public class AssessmentOrchestrator
 
         if (roadmap is null)
         {
-            var fresh = new ChatSession { StudentId = student.Id };
-            _db.ChatSessions.Add(fresh);
-            await _db.SaveChangesAsync(ct);
-            await ContinueAssessmentAsync(student, fresh, text, ct);
+            await HandlePostGuideAsync(student, completedSession, text, ct);
             return;
         }
 
@@ -393,6 +387,44 @@ public class AssessmentOrchestrator
         if (turn.ShouldRestart)
         {
             await StartRerollFromCompletedAsync(student, completedSession, roadmap!, ct);
+        }
+    }
+
+    private async Task HandlePostGuideAsync(
+        Student student,
+        ChatSession completedSession,
+        string text,
+        CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = completedSession.Id,
+            Role = MessageRole.User,
+            Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var cutoff = completedSession.CompletedAt ?? DateTime.UtcNow;
+        var postHistory = completedSession.Messages
+            .Where(m => m.CreatedAt > cutoff)
+            .OrderBy(m => m.CreatedAt)
+            .ToList();
+
+        var turn = await _engine.PostGuideTurnAsync(student, completedSession, postHistory, text, ct);
+
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = completedSession.Id,
+            Role = MessageRole.Assistant,
+            Content = turn.ReplyText
+        });
+        await _db.SaveChangesAsync(ct);
+
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, turn.ReplyText, ct));
+
+        if (turn.ShouldRestart)
+        {
+            await ProceedToFlowMenuAsync(student, ct);
         }
     }
 

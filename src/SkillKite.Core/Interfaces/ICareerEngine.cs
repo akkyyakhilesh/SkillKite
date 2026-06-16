@@ -82,6 +82,19 @@ public interface ICareerEngine
         CancellationToken ct = default);
 
     /// <summary>
+    /// Handles a post-guide conversational turn for non-career flows (10th,
+    /// 12th, upskill). The student completed a guide flow and received a PDF;
+    /// this answers follow-up questions using the student's context and
+    /// assessment data. Same return shape as <see cref="PostRoadmapTurnAsync"/>.
+    /// </summary>
+    Task<PostRoadmapTurnResult> PostGuideTurnAsync(
+        Student student,
+        ChatSession completedSession,
+        IReadOnlyList<ChatMessage> postHistory,
+        string latestUserMessage,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// Generates the skill-upgrade guide for a working professional. The
     /// student told us their current field and what they want next (higher
     /// salary same field, switch field, management, freelance, abroad,

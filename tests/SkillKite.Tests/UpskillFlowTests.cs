@@ -80,6 +80,8 @@ public class UpskillFlowTests
         public Task<CareerSuggestionsResult> SuggestCareerPathsAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<GeneratedRoadmap> GenerateRoadmapAsync(Student s, ChatSession se, string? c = null, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<PostRoadmapTurnResult> PostRoadmapTurnAsync(Student s, GeneratedRoadmap r, IReadOnlyList<ChatMessage> h, string m, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<PostRoadmapTurnResult> PostGuideTurnAsync(Student s, ChatSession se, IReadOnlyList<ChatMessage> h, string m, CancellationToken ct = default)
+            => Task.FromResult(new PostRoadmapTurnResult($"Post-guide reply to: {m}", false));
         public Task<StudentGuide> GenerateTenthGuideAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<StudentGuide> GenerateTwelfthGuideAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
     }

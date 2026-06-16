@@ -172,6 +172,33 @@ public class ClaudeCareerEngine : ICareerEngine
         return ParsePostRoadmapTurn(raw);
     }
 
+    public async Task<PostRoadmapTurnResult> PostGuideTurnAsync(
+        Student student,
+        ChatSession completedSession,
+        IReadOnlyList<ChatMessage> postHistory,
+        string latestUserMessage,
+        CancellationToken ct = default)
+    {
+        var system = BuildPostGuideSystemPrompt(student, completedSession);
+
+        var messages = postHistory
+            .Where(m => m.Role != MessageRole.System)
+            .Select(m => new ClaudeMessage(m.Role == MessageRole.User ? "user" : "assistant", m.Content))
+            .ToList();
+
+        if (!string.IsNullOrWhiteSpace(latestUserMessage) &&
+            (messages.Count == 0 || messages[^1].Role != "user"))
+        {
+            messages.Add(new ClaudeMessage("user", latestUserMessage));
+        }
+
+        if (messages.Count == 0)
+            messages.Add(new ClaudeMessage("user", "<<post-guide turn>>"));
+
+        var raw = await CallClaudeAsync(system, messages, ct);
+        return ParsePostRoadmapTurn(raw);
+    }
+
     // ----- prompts -----
 
     private static string BuildAssessmentSystemPrompt(Student student, ChatSession session)
@@ -191,10 +218,16 @@ public class ClaudeCareerEngine : ICareerEngine
             ? "REPLY LANGUAGE: Pure professional English throughout. Do not mix Hindi words in. The student picked English upfront because they prefer a fully English experience."
             : "REPLY LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English, like how college students in Lucknow, Patna, or Indore actually text. Use Hindi words for warmth ('haan', 'bhai', 'kya'), English for tech and structural terms. Do NOT use Devanagari script — student prefers Latin-script Hinglish.";
 
+        var nameContext = !string.IsNullOrWhiteSpace(student.Name)
+            ? $"\n        KNOWN STUDENT: This student's name is \"{student.Name}\" (stored in our database). " +
+              "Use this name naturally. NEVER ask their name — you already know it. " +
+              "NEVER guess or hallucinate a different name."
+            : "";
+
         return $$"""
         You are SkillKite, a warm, encouraging AI career coach for students in Tier 2/3 India.
 
-        {{languageDirective}}
+        {{languageDirective}}{{nameContext}}
 
         Your job RIGHT NOW: conduct a friendly career assessment, one question at a time.
 
@@ -211,6 +244,10 @@ public class ClaudeCareerEngine : ICareerEngine
           a govt answer is jarring.
         - When you have answers to ALL keys above, mark the assessment complete.
         - Never give career advice yet — just gather info warmly.
+        - EXIT INTENT: If the student says "leave it", "I don't want to talk", "bye",
+          "not interested", or similar exit signals, DO NOT keep pushing questions. Reply
+          with a warm, short sign-off ("No worries! Jab bhi baat karni ho, main yahin
+          hoon. 😊") and set "complete": false. Respect their boundary.
 
         NOTE: We removed the old "what language for the PDF?" question — student picked
         language upfront, before this assessment started. Do NOT ask language again here.
@@ -520,6 +557,69 @@ public class ClaudeCareerEngine : ICareerEngine
 
         Set shouldRestart=true ONLY when the student has just confirmed they want a brand
         new assessment. Default is false.
+        """;
+    }
+
+    private static string BuildPostGuideSystemPrompt(Student student, ChatSession completedSession)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var languageDirective = english
+            ? "REPLY LANGUAGE: Pure professional English throughout."
+            : "REPLY LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English. Do NOT use Devanagari.";
+
+        var flowType = "career guidance";
+        var assessmentData = completedSession.AssessmentDataJson ?? "{}";
+        try
+        {
+            using var doc = JsonDocument.Parse(assessmentData);
+            if (doc.RootElement.TryGetProperty("flowType", out var ft))
+            {
+                flowType = ft.GetString() switch
+                {
+                    "10th" => "After 10th stream selection",
+                    "12th" => "After 12th career options",
+                    "upskill" => "Skill upgrade / upskilling",
+                    _ => "career guidance"
+                };
+            }
+        }
+        catch (JsonException) { }
+
+        return $$"""
+        You are SkillKite, continuing to chat with {{student.Name ?? "the student"}}
+        AFTER their guide PDF has already been delivered. You are a warm, helpful
+        AI career coach.
+
+        {{languageDirective}}
+
+        The student's context:
+        - Name: {{student.Name ?? "unknown"}}
+        - City: {{student.City ?? "unknown"}}
+        - Education: {{student.EducationLevel ?? "unknown"}}
+        - Flow they completed: {{flowType}}
+        - Their assessment data: {{assessmentData}}
+
+        Conversation rules:
+        - Keep the same warm voice, in the language above.
+        - Replies are SHORT — 1-3 sentences max.
+        - You KNOW this student — address them by name. NEVER ask their name.
+        - Answer follow-up questions about their guide helpfully.
+        - If they give feedback about the guide (e.g. "sirf skills hai, roadmap
+          nahi hai"), acknowledge it warmly, explain what the guide covers, and
+          offer to help with next steps.
+        - If they want to explore a different flow (different career path, upskill
+          in another area), set shouldRestart=true.
+        - If they say bye/thanks/leave it → warm sign-off, remind them you're here
+          anytime.
+
+        OUTPUT FORMAT — reply with a single JSON object, nothing else:
+        {
+          "reply": "<message to send to the student>",
+          "shouldRestart": <true|false>
+        }
+
+        Default shouldRestart to false. Only true if they explicitly want to start
+        a completely new flow.
         """;
     }
 
