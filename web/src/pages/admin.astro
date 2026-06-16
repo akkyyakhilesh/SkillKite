@@ -1,0 +1,435 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Admin — SkillKite" description="Internal dashboard" path="/admin" noindex={true}>
+  <div id="gate" class="admin-gate">
+    <div class="gate-box">
+      <h1>Admin</h1>
+      <input type="password" id="pwd" placeholder="Password" autocomplete="off" />
+      <button id="go">Enter</button>
+    </div>
+  </div>
+
+  <div id="dash" class="admin-dash" style="display:none">
+    <div class="dash-header">
+      <h1>SkillKite Dashboard</h1>
+      <div class="dash-meta">
+        <span id="utc"></span>
+        <button id="refresh" class="refresh-btn">Refresh</button>
+      </div>
+    </div>
+
+    <!-- Totals row -->
+    <div class="dash-section">
+      <h2>Overview</h2>
+      <div class="stat-row" id="totals"></div>
+    </div>
+
+    <!-- Last 7 days -->
+    <div class="dash-section">
+      <h2>Last 7 Days</h2>
+      <div class="stat-row" id="last7d"></div>
+    </div>
+
+    <!-- Flow distribution -->
+    <div class="dash-section">
+      <h2>Flow Distribution</h2>
+      <div id="flow-bars" class="flow-bars"></div>
+      <div class="flow-table-wrap">
+        <table id="flow-table" class="dash-table">
+          <thead><tr><th>Flow</th><th>Started</th><th>Completed</th><th>Abandoned</th><th>Completion %</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Returning students -->
+    <div class="dash-section">
+      <h2>Returning Students</h2>
+      <div class="stat-row" id="returning"></div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="dash-section">
+      <h2>Feedback by Flow</h2>
+      <div id="feedback-cards" class="feedback-cards"></div>
+    </div>
+
+    <!-- Deploy guard -->
+    <div class="dash-section">
+      <h2>Deploy Guard</h2>
+      <div class="stat-row" id="deploy"></div>
+    </div>
+  </div>
+</Base>
+
+<style is:global>
+  /* Gate */
+  .admin-gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+  .gate-box {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .gate-box h1 {
+    font-size: 28px;
+    font-weight: 900;
+  }
+  .gate-box input {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #fff;
+    font-size: 15px;
+    width: 260px;
+    outline: none;
+    text-align: center;
+  }
+  .gate-box input:focus {
+    border-color: var(--saffron);
+  }
+  .gate-box button {
+    background: var(--saffron);
+    color: #0F1834;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 10px 32px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  /* Dashboard */
+  .admin-dash {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 38px 60px;
+  }
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dash-header h1 {
+    font-size: 28px;
+    font-weight: 900;
+  }
+  .dash-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--muted-dim);
+    font-size: 13px;
+  }
+  .refresh-btn {
+    background: rgba(255,255,255,0.08);
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .refresh-btn:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+  }
+
+  .dash-section {
+    margin-bottom: 36px;
+  }
+  .dash-section h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--saffron-light);
+    margin-bottom: 14px;
+  }
+
+  /* Stat cards */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .s-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .s-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .s-val {
+    font-size: 28px;
+    font-weight: 900;
+  }
+  .s-val.green { color: #4ade80; }
+  .s-val.warn { color: #facc15; }
+  .s-val.red { color: #f87171; }
+
+  /* Flow bars */
+  .flow-bars {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    height: 120px;
+    margin-bottom: 18px;
+    padding: 0 4px;
+  }
+  .flow-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .flow-bar {
+    width: 100%;
+    max-width: 80px;
+    border-radius: 8px 8px 4px 4px;
+    min-height: 4px;
+    transition: height 0.3s;
+  }
+  .flow-bar-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-dim);
+    text-transform: capitalize;
+  }
+  .flow-bar-count {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  /* Table */
+  .flow-table-wrap {
+    overflow-x: auto;
+  }
+  .dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .dash-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 700;
+    color: var(--muted-dim);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .dash-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--muted);
+  }
+  .dash-table td:first-child {
+    font-weight: 800;
+    color: #fff;
+    text-transform: capitalize;
+  }
+  .dash-table .pct {
+    font-weight: 800;
+  }
+  .pct-high { color: #4ade80; }
+  .pct-mid { color: #facc15; }
+  .pct-low { color: #f87171; }
+
+  /* Feedback cards */
+  .feedback-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .fb-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .fb-flow {
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: capitalize;
+    margin-bottom: 12px;
+  }
+  .fb-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fb-row .fb-count {
+    font-weight: 800;
+    color: #fff;
+  }
+  .fb-bar-bg {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .fb-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .admin-dash { padding: 20px 18px 40px; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .flow-bars { height: 90px; }
+    .feedback-cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  const API = 'https://bot.skillkite.in/api/stats';
+  const PASS_HASH = 'a36aef5a11c4073fbe60314fc9df530a9d5f986533594d1f5190742ff9e0e408';
+
+  const flowColors = {
+    career: '#ef7a2a',
+    upskill: '#9d52e0',
+    '10th': '#1f9d57',
+    '12th': '#2f7fd6',
+    unknown: '#6b7280'
+  };
+
+  async function sha256(msg) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function card(label, value, cls) {
+    return `<div class="s-card"><span class="s-label">${label}</span><span class="s-val ${cls || ''}">${value}</span></div>`;
+  }
+
+  async function loadStats() {
+    const res = await fetch(API);
+    const d = await res.json();
+
+    document.getElementById('utc').textContent = new Date(d.utc).toLocaleString();
+
+    // Totals
+    document.getElementById('totals').innerHTML =
+      card('Students', d.totals.students) +
+      card('Sessions', d.totals.sessions) +
+      card('Completed', d.totals.completedAssessments) +
+      card('Roadmaps', d.totals.roadmapsGenerated) +
+      card('Careers DB', d.totals.careersAvailable);
+
+    // Last 7d
+    document.getElementById('last7d').innerHTML =
+      card('New Students', d.last7d.newStudents) +
+      card('Roadmaps', d.last7d.roadmaps);
+
+    // Flow distribution bars + table
+    const flows = Object.keys(d.flows.distribution);
+    const maxVal = Math.max(...Object.values(d.flows.distribution), 1);
+    const barsEl = document.getElementById('flow-bars');
+    const tbody = document.querySelector('#flow-table tbody');
+
+    barsEl.innerHTML = flows.map(f => {
+      const v = d.flows.distribution[f];
+      const h = Math.max((v / maxVal) * 100, 4);
+      const color = flowColors[f] || flowColors.unknown;
+      return `<div class="flow-bar-col">
+        <span class="flow-bar-count">${v}</span>
+        <div class="flow-bar" style="height:${h}%;background:${color}"></div>
+        <span class="flow-bar-label">${f}</span>
+      </div>`;
+    }).join('');
+
+    tbody.innerHTML = flows.map(f => {
+      const started = d.flows.distribution[f] || 0;
+      const completed = (d.flows.completed && d.flows.completed[f]) || 0;
+      const abandoned = (d.flows.abandoned && d.flows.abandoned[f]) || 0;
+      const pct = started > 0 ? Math.round(100 * completed / started) : 0;
+      const pctCls = pct >= 70 ? 'pct-high' : pct >= 40 ? 'pct-mid' : 'pct-low';
+      return `<tr>
+        <td>${f}</td><td>${started}</td><td>${completed}</td><td>${abandoned}</td>
+        <td class="pct ${pctCls}">${pct}%</td>
+      </tr>`;
+    }).join('');
+
+    // Returning
+    document.getElementById('returning').innerHTML =
+      card('Returning', d.returning.total) +
+      card('Rate', d.returning.pct + '%');
+
+    // Feedback
+    const fbEl = document.getElementById('feedback-cards');
+    const fbColors = { Useful: '#4ade80', Ok: '#facc15', NotUseful: '#f87171', Skipped: '#6b7280' };
+    fbEl.innerHTML = Object.entries(d.feedback).map(([flow, ratings]) => {
+      const total = Object.values(ratings).reduce((a, b) => a + b, 0) || 1;
+      const rows = Object.entries(ratings).map(([k, v]) => {
+        const pct = Math.round(100 * v / total);
+        return `<div class="fb-row"><span>${k}</span><span class="fb-count">${v}</span></div>
+          <div class="fb-bar-bg"><div class="fb-bar-fill" style="width:${pct}%;background:${fbColors[k] || '#888'}"></div></div>`;
+      }).join('');
+      return `<div class="fb-card"><div class="fb-flow">${flow}</div>${rows}</div>`;
+    }).join('');
+
+    // Deploy guard
+    document.getElementById('deploy').innerHTML =
+      card('Active Sessions', d.sessions.active, d.sessions.active === 0 ? 'green' : 'red');
+  }
+
+  // Gate
+  const gate = document.getElementById('gate');
+  const dash = document.getElementById('dash');
+  const pwd = document.getElementById('pwd');
+  const go = document.getElementById('go');
+
+  if (sessionStorage.getItem('sk_admin') === '1') {
+    gate.style.display = 'none';
+    dash.style.display = 'block';
+    loadStats();
+  }
+
+  async function tryLogin() {
+    const hash = await sha256(pwd.value);
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem('sk_admin', '1');
+      gate.style.display = 'none';
+      dash.style.display = 'block';
+      loadStats();
+    } else {
+      pwd.style.borderColor = '#f87171';
+      pwd.value = '';
+      pwd.placeholder = 'Wrong password';
+    }
+  }
+
+  go.addEventListener('click', tryLogin);
+  pwd.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  document.getElementById('refresh').addEventListener('click', loadStats);
+</script>

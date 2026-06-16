@@ -15,7 +15,9 @@ export default defineConfig({
         !page.endsWith('/terms/') &&
         !page.endsWith('/terms') &&
         !page.endsWith('/privacy/') &&
-        !page.endsWith('/privacy'),
+        !page.endsWith('/privacy') &&
+        !page.endsWith('/admin/') &&
+        !page.endsWith('/admin'),
     }),
   ],
 });
