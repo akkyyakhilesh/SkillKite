@@ -137,6 +137,47 @@ public class HealthController : ControllerBase
             if (bucket.ContainsKey(rating)) bucket[rating]++;
         }
 
+        // --- Flow distribution: how many sessions started each flow ---
+        // flowType is stored in AssessmentDataJson. We already pulled allCompletedData
+        // above (completed only), but for distribution we want ALL sessions that got
+        // past flow selection (have a flowType), regardless of final status.
+        var allSessionData = await _db.ChatSessions
+            .Select(s => new { s.AssessmentDataJson, s.Status, s.StudentId })
+            .ToListAsync(ct);
+
+        var flowDistribution = new Dictionary<string, int>();
+        var flowCompleted = new Dictionary<string, int>();
+        var flowAbandoned = new Dictionary<string, int>();
+
+        foreach (var s in allSessionData)
+        {
+            if (string.IsNullOrWhiteSpace(s.AssessmentDataJson) || s.AssessmentDataJson == "{}") continue;
+            string? flow = null;
+            try
+            {
+                using var doc = JsonDocument.Parse(s.AssessmentDataJson);
+                if (doc.RootElement.TryGetProperty("flowType", out var f) && f.ValueKind == JsonValueKind.String)
+                    flow = f.GetString();
+            }
+            catch { continue; }
+
+            if (string.IsNullOrEmpty(flow)) continue;
+
+            flowDistribution[flow] = flowDistribution.GetValueOrDefault(flow) + 1;
+
+            if (s.Status == SessionStatus.Completed)
+                flowCompleted[flow] = flowCompleted.GetValueOrDefault(flow) + 1;
+            else if (s.Status == SessionStatus.Abandoned)
+                flowAbandoned[flow] = flowAbandoned.GetValueOrDefault(flow) + 1;
+        }
+
+        // --- Returning-student rate: students with more than 1 session ---
+        var sessionsByStudent = allSessionData
+            .GroupBy(s => s.StudentId)
+            .Select(g => g.Count())
+            .ToList();
+        var returningStudents = sessionsByStudent.Count(c => c > 1);
+
         return Ok(new
         {
             totals = new
@@ -147,14 +188,26 @@ public class HealthController : ControllerBase
                 roadmapsGenerated = roadmaps,
                 careersAvailable
             },
-            // Consumed by tools/deploy.ps1's pre-deploy guard ($stats.sessions.active).
             sessions = new { active = activeSessions },
             last7d = new
             {
                 newStudents = newStudentsLast7d,
                 roadmaps = roadmapsLast7d
             },
-            feedback,  // { "career": {Useful, Ok, NotUseful, Skipped}, "10th": ..., ... }
+            flows = new
+            {
+                distribution = flowDistribution,
+                completed = flowCompleted,
+                abandoned = flowAbandoned
+            },
+            returning = new
+            {
+                total = returningStudents,
+                pct = students > 0
+                    ? Math.Round(100.0 * returningStudents / students, 1)
+                    : 0
+            },
+            feedback,
             utc = DateTime.UtcNow
         });
     }
