@@ -58,6 +58,16 @@ public interface ICareerEngine
         CancellationToken ct = default);
 
     /// <summary>
+    /// Graduation flow: given structured data (status, field, direction, experience,
+    /// govtInterest), Claude asks ONE targeted follow-up question. Returns the
+    /// question text to send to the student.
+    /// </summary>
+    Task<string> GraduationFollowUpAsync(
+        Student student,
+        ChatSession session,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// Generates the 10th-flow comprehensive guide. The student has answered
     /// 2-3 light questions (name, interest area, study/earn/both). Claude
     /// returns a full guide covering ALL options after 10th — streams,

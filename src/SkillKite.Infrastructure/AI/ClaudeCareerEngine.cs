@@ -579,6 +579,7 @@ public class ClaudeCareerEngine : ICareerEngine
                     "10th" => "After 10th stream selection",
                     "12th" => "After 12th career options",
                     "upskill" => "Skill upgrade / upskilling",
+                    "graduation" => "Graduation career roadmap",
                     _ => "career guidance"
                 };
             }
@@ -789,6 +790,47 @@ public class ClaudeCareerEngine : ICareerEngine
         lang == PreferredLanguage.English
             ? "OUTPUT LANGUAGE: Pure professional English throughout. Do not mix Hindi words in. The student picked English upfront because they prefer a fully English experience.\n\n"
             : "OUTPUT LANGUAGE: Hinglish — natural mix of Hindi (Latin script) and English. Use Hindi words for warmth ('haan', 'bhai', 'kya', 'bahut achha'), English for tech and structural terms. Do NOT use Devanagari script — student prefers Latin-script Hinglish.\n\n";
+
+    public async Task<string> GraduationFollowUpAsync(
+        Student student, ChatSession session, CancellationToken ct = default)
+    {
+        var lang = student.PreferredLanguage;
+        var languageDirective = lang == PreferredLanguage.English
+            ? "Reply in pure professional English."
+            : "Reply in Hinglish — natural mix of Hindi (Latin script) and English. Do NOT use Devanagari.";
+
+        var system = $$"""
+            You are SkillKite, a warm AI career coach for students in Tier 2/3 India.
+            {{languageDirective}}
+
+            The student just completed a structured intake for the Graduation flow.
+            Their answers so far: {{session.AssessmentDataJson}}
+            Student name: {{student.Name ?? "unknown"}}
+
+            Your ONLY job: ask ONE targeted follow-up question that helps you recommend
+            the best 3 career paths. The structured buttons already told you their
+            education field, career direction interest, experience level, and govt
+            interest. Now ask the ONE thing buttons couldn't capture — the specific
+            depth/niche within their chosen direction.
+
+            Examples of good follow-up questions:
+            - Field=Engineering + Direction=Software → "Which languages or frameworks do you know? (e.g., Python, React, Java)"
+            - Field=Commerce + Direction=Finance → "Are you preparing for CA/CS, or looking at banking/corporate finance roles?"
+            - Field=Arts + Direction=Not sure → "What do you enjoy more — writing, teaching, working with people, or creative work?"
+            - Direction=Government → "Which exams are you targeting — SSC CGL, Banking (IBPS/SBI), UPSC, or State PSC?"
+            - Field=Medical + Direction=Healthcare → "Are you looking at clinical practice, hospital management, or pharma/research?"
+            - Field=Diploma + Direction=Software → "What tech skills do you have so far? (e.g., C, Java, web basics)"
+
+            Rules:
+            - Ask exactly ONE question. Keep it under 2 sentences.
+            - Be warm, address the student by name.
+            - Do NOT greet or introduce yourself — the conversation is already going.
+            - Output ONLY the question text — no JSON, no formatting, just the message to send.
+            """;
+
+        var raw = await CallClaudeAsync(system, new() { new("user", "<<generate follow-up question>>") }, ct);
+        return raw.Trim();
+    }
 
     public async Task<StudentGuide> GenerateTenthGuideAsync(
         Student student, ChatSession session, CancellationToken ct = default)

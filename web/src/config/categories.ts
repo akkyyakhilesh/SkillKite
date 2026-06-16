@@ -5,8 +5,8 @@
 export interface Category {
   /** URL slug + route, e.g. "after-12th" → /after-12th */
   slug: string;
-  /** Bot flow this maps to (10th | 12th | career | upskill). */
-  botFlow: '10th' | '12th' | 'career' | 'upskill';
+  /** Bot flow this maps to (10th | 12th | graduation | upskill). */
+  botFlow: '10th' | '12th' | 'graduation' | 'upskill';
   emoji: string;
   title: string;
   /** Hindi title for the bilingual treatment. */
@@ -42,10 +42,10 @@ export const CATEGORIES: Category[] = [
   },
   {
     slug: 'after-graduation',
-    botFlow: 'career',
+    botFlow: 'graduation',
     emoji: '💼',
-    title: 'After Graduation',
-    titleHi: 'ग्रेजुएशन के बाद',
+    title: 'Graduation',
+    titleHi: 'ग्रेजुएशन',
     blurb: 'A personalized, week-by-week career roadmap with free learning resources to get job-ready.',
     card: 'k3',
     cta: 'Build roadmap →',

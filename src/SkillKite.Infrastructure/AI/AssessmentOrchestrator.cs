@@ -253,8 +253,7 @@ public class AssessmentOrchestrator
             return;
         }
 
-        // Route by flow type. Brand-new flows (10th / 12th) have their own thin
-        // state machine in this class — they don't use the 13-question engine.
+        // Route by flow type. Each flow has its own thin state machine.
         var flowType = ReadFlowType(session);
         if (flowType == "10th")
         {
@@ -271,49 +270,14 @@ public class AssessmentOrchestrator
             await HandleSkillUpgradeTurnAsync(student, session, text, ct);
             return;
         }
-
-        _db.ChatMessages.Add(new ChatMessage
+        if (flowType is "graduation" or "career")
         {
-            SessionId = session.Id,
-            Role = MessageRole.User,
-            Content = text
-        });
-        await _db.SaveChangesAsync(ct);
-
-        var history = session.Messages.OrderBy(m => m.CreatedAt).ToList();
-
-        var turn = await _engine.NextTurnAsync(student, session, history, text, ct);
-
-        // Merge extracted fields into session + student.
-        if (turn.ExtractedFields is { Count: > 0 })
-        {
-            MergeExtracted(session, student, turn.ExtractedFields);
-            session.CurrentQuestionIndex = Math.Min(
-                session.CurrentQuestionIndex + 1,
-                AssessmentQuestions.All.Count);
+            await HandleGraduationTurnAsync(student, session, text, ct);
+            return;
         }
 
-        _db.ChatMessages.Add(new ChatMessage
-        {
-            SessionId = session.Id,
-            Role = MessageRole.Assistant,
-            Content = turn.ReplyText
-        });
-
-        await TrySendAsync(() => SendTurnAsync(phone, turn, ct));
-
-        if (turn.IsComplete)
-        {
-            // Assessment is done. Instead of immediately generating the roadmap,
-            // we ask Claude for 3 best-fit career suggestions and let the
-            // student pick one. This catches AI mismatches before we commit to
-            // a 20-week plan the student won't follow.
-            await SuggestCareerPathsAndAwaitChoiceAsync(student, session, ct);
-        }
-        else
-        {
-            await _db.SaveChangesAsync(ct);
-        }
+        // Unknown flow type — re-show the menu so the student isn't stranded.
+        await ProceedToFlowMenuAsync(student, ct);
     }
 
     private async Task HandlePostRoadmapAsync(
@@ -547,29 +511,10 @@ public class AssessmentOrchestrator
             // If we can't find the prior roadmap, fall through to a brand-new assessment.
         }
 
-        // Default + explicit "Naya assessment": fresh session, but pre-seed
-        // identity fields we already know from the Student row (name, city,
-        // education). The engine reads AssessmentDataJson to decide what to
-        // ask — without this seed it'd ask "aapka naam kya hai?" to a student
-        // we've literally just greeted by name. Other answers (skills, salary
-        // goal, work type, etc.) are intentionally NOT carried — that's the
-        // whole point of choosing "naya assessment", the student's profile
-        // may have changed.
-        var seed = new Dictionary<string, string> { ["flowType"] = "career" };
-        if (!string.IsNullOrWhiteSpace(student.Name))           seed["name"]      = student.Name!;
-        if (!string.IsNullOrWhiteSpace(student.City))           seed["city"]      = student.City!;
-        if (!string.IsNullOrWhiteSpace(student.EducationLevel)) seed["education"] = student.EducationLevel!;
-
-        var fresh = new ChatSession
-        {
-            StudentId = student.Id,
-            AssessmentDataJson = JsonSerializer.Serialize(seed),
-            CurrentQuestionIndex = seed.Count - 1 // exclude flowType; rough hint for Claude
-        };
-        _db.ChatSessions.Add(fresh);
-        await _db.SaveChangesAsync(ct);
-
-        await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+        // Default + explicit "Naya assessment": show the flow menu so the
+        // student can pick whichever flow they want (they may want a different
+        // flow this time). We already have their name from the Student row.
+        await SendFlowChoiceMenuAndAwaitAsync(student, ct);
     }
 
     /// <summary>
@@ -610,9 +555,9 @@ public class AssessmentOrchestrator
                 new("flow_12th",
                     "🎯 After 12th",
                     "Course selection — B.Tech / MBBS / BCA etc."),
-                new("flow_career",
-                    "💼 Career roadmap",
-                    "Degree done / final year"),
+                new("flow_graduation",
+                    "💼 Graduation",
+                    "In college / graduated — career roadmap"),
                 new("flow_upskill",
                     "🌱 Skill upgrade",
                     "Already working — next ladder rung"),
@@ -625,9 +570,9 @@ public class AssessmentOrchestrator
                 new("flow_12th",
                     "🎯 12th ke baad",
                     "Course selection — B.Tech / MBBS / BCA etc."),
-                new("flow_career",
-                    "💼 Career roadmap",
-                    "Degree done / final year ke liye"),
+                new("flow_graduation",
+                    "💼 Graduation",
+                    "College mein / graduate — career roadmap"),
                 new("flow_upskill",
                     "🌱 Skill upgrade",
                     "Already working — next ladder rung"),
@@ -737,7 +682,7 @@ public class AssessmentOrchestrator
         var choice = NormaliseFlowChoice(text);
 
         // Validate the choice. Unknown → re-show menu so student isn't stranded.
-        if (choice is not ("flow_career" or "flow_10th" or "flow_12th" or "flow_upskill"))
+        if (choice is not ("flow_graduation" or "flow_career" or "flow_10th" or "flow_12th" or "flow_upskill"))
         {
             await SendFlowChoiceMenuAndAwaitAsync(student, ct);
             return;
@@ -755,11 +700,12 @@ public class AssessmentOrchestrator
     /// </summary>
     private Task StartChosenFlowAsync(Student student, string flowChoice, CancellationToken ct) => flowChoice switch
     {
-        "flow_career"  => StartCareerFlowAsync(student, ct),
-        "flow_upskill" => StartSkillUpgradeFlowAsync(student, ct),
-        "flow_10th"    => StartTenthFlowAsync(student, ct),
-        "flow_12th"    => StartTwelfthFlowAsync(student, ct),
-        _              => SendFlowChoiceMenuAndAwaitAsync(student, ct)
+        "flow_graduation" => StartGraduationFlowAsync(student, ct),
+        "flow_career"     => StartGraduationFlowAsync(student, ct),
+        "flow_upskill"    => StartSkillUpgradeFlowAsync(student, ct),
+        "flow_10th"       => StartTenthFlowAsync(student, ct),
+        "flow_12th"       => StartTwelfthFlowAsync(student, ct),
+        _                 => SendFlowChoiceMenuAndAwaitAsync(student, ct)
     };
 
     /// <summary>
@@ -861,25 +807,435 @@ public class AssessmentOrchestrator
         await _db.SaveChangesAsync(ct);
     }
 
-    /// <summary>
-    /// Start the existing 13-question career assessment for a student who picked
-    /// "💼 Career roadmap" on the entry menu. The new session is tagged with
-    /// flowType=career in AssessmentDataJson so later code (and queries) can tell
-    /// which flow it belongs to without inferring from question shape.
-    /// </summary>
-    private async Task StartCareerFlowAsync(Student student, CancellationToken ct)
+    // ============================================================================
+    // Graduation flow — button-driven state machine (replaces old 13-question
+    // AI-driven career assessment).
+    //
+    // Steps stored in AssessmentDataJson under "step":
+    //   "status"      → education status (in college / graduated / postgrad)
+    //   "field"       → field of study (engineering / commerce / science / etc.)
+    //   "direction"   → career direction interest (software / creative / govt / etc.)
+    //   "govtInterest"→ conditional: only if direction ≠ government
+    //   "experience"  → work experience level
+    //   "aiFollowUp"  → Claude asks ONE targeted follow-up, student types answer
+    //   → SuggestCareerPathsAndAwaitChoiceAsync (3 suggestions, student picks one)
+    //   → HandleCareerChoiceAsync stores the pick, then asks dailyHours
+    //   "dailyHours"  → how many hours per day
+    //   → GenerateAndDeliverRoadmapAsync
+    // ============================================================================
+
+    private async Task StartGraduationFlowAsync(Student student, CancellationToken ct)
     {
-        var data = new Dictionary<string, string> { ["flowType"] = "career" };
-        var fresh = new ChatSession
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var data = new Dictionary<string, string>
+        {
+            ["flowType"] = "graduation",
+            ["step"] = "status"
+        };
+        var session = new ChatSession
         {
             StudentId = student.Id,
             AssessmentDataJson = JsonSerializer.Serialize(data),
             Status = SessionStatus.Active
         };
-        _db.ChatSessions.Add(fresh);
+        _db.ChatSessions.Add(session);
         await _db.SaveChangesAsync(ct);
 
-        await ContinueAssessmentAsync(student, fresh, latestUserMessage: null, ct);
+        var name = student.Name ?? "friend";
+        var greet = english
+            ? $"Great choice {name}! 💼 Let me ask a few quick things to build your personalized career roadmap."
+            : $"Sahi choice {name}! 💼 Career roadmap banane ke liye kuch quick questions hain.";
+        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, greet, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = greet
+        });
+        await _db.SaveChangesAsync(ct);
+
+        await SendGraduationStatusPromptAsync(student, session, ct);
+    }
+
+    private async Task HandleGraduationTurnAsync(
+        Student student, ChatSession session, string text, CancellationToken ct)
+    {
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.User, Content = text
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var step = ReadField(session, "step") ?? "status";
+
+        switch (step)
+        {
+            case "status":
+            {
+                var status = NormaliseGraduationStatus(text);
+                session.AssessmentDataJson = WriteField(session, ("educationStatus", status), ("step", "field"));
+                await _db.SaveChangesAsync(ct);
+                await SendGraduationFieldPromptAsync(student, session, ct);
+                return;
+            }
+            case "field":
+            {
+                var field = NormaliseGraduationField(text);
+                session.AssessmentDataJson = WriteField(session, ("educationField", field), ("step", "direction"));
+                student.EducationLevel = $"{ReadField(session, "educationStatus")} - {field}";
+                await _db.SaveChangesAsync(ct);
+                await SendGraduationDirectionPromptAsync(student, session, ct);
+                return;
+            }
+            case "direction":
+            {
+                var direction = NormaliseGraduationDirection(text);
+                if (direction == "government")
+                {
+                    session.AssessmentDataJson = WriteField(session,
+                        ("careerDirection", direction), ("govtInterest", "yes"), ("step", "experience"));
+                    await _db.SaveChangesAsync(ct);
+                    await SendGraduationExperiencePromptAsync(student, session, ct);
+                }
+                else
+                {
+                    session.AssessmentDataJson = WriteField(session,
+                        ("careerDirection", direction), ("step", "govtInterest"));
+                    await _db.SaveChangesAsync(ct);
+                    await SendGraduationGovtPromptAsync(student, session, ct);
+                }
+                return;
+            }
+            case "govtInterest":
+            {
+                var govt = NormaliseGovtInterest(text);
+                session.AssessmentDataJson = WriteField(session, ("govtInterest", govt), ("step", "experience"));
+                await _db.SaveChangesAsync(ct);
+                await SendGraduationExperiencePromptAsync(student, session, ct);
+                return;
+            }
+            case "experience":
+            {
+                var exp = NormaliseGraduationExperience(text);
+                session.AssessmentDataJson = WriteField(session, ("experience", exp), ("step", "aiFollowUp"));
+                await _db.SaveChangesAsync(ct);
+                await SendGraduationAiFollowUpAsync(student, session, ct);
+                return;
+            }
+            case "aiFollowUp":
+            {
+                session.AssessmentDataJson = WriteField(session, ("aiFollowUpAnswer", text.Trim()), ("step", "suggesting"));
+                await _db.SaveChangesAsync(ct);
+                await SuggestCareerPathsAndAwaitChoiceAsync(student, session, ct);
+                return;
+            }
+            case "dailyHours":
+            {
+                var hours = NormaliseDailyHours(text);
+                session.AssessmentDataJson = WriteField(session,
+                    ("dailyHours", hours), ("step", "generating"),
+                    ("generatingAt", DateTime.UtcNow.ToString("O")));
+                await _db.SaveChangesAsync(ct);
+                var chosenCareer = ReadField(session, "selectedCareer");
+                await GenerateAndDeliverRoadmapAsync(student, session, chosenCareer, ct);
+                return;
+            }
+            default:
+                await HandleGeneratingStepAsync(student, session,
+                    () =>
+                    {
+                        var career = ReadField(session, "selectedCareer");
+                        return GenerateAndDeliverRoadmapAsync(student, session, career, ct);
+                    }, ct);
+                return;
+        }
+    }
+
+    private async Task SendGraduationStatusPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Where are you in your education journey?"
+            : "Aap apni padhai mein kahan ho?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("in_college", "🏫 In College"),
+                new("graduated",  "✅ Graduated"),
+                new("postgrad",   "📖 Postgrad")
+            }
+            : new List<InteractiveOption>
+            {
+                new("in_college", "🏫 College mein"),
+                new("graduated",  "✅ Graduate ho gaye"),
+                new("postgrad",   "📖 Postgrad")
+            };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendGraduationFieldPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "What is your field of study?"
+            : "Aapka field kya hai?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("engineering",  "💻 Engineering/CS/IT",   "B.Tech, BCA, MCA"),
+                new("commerce",     "📊 Commerce/CA/Business","B.Com, BBA, CA, CS"),
+                new("science",      "🔬 Science",             "BSc, MSc"),
+                new("arts",         "📝 Arts/Humanities",     "BA, MA, Law"),
+                new("medical",      "🏥 Medical/Paramedical", "MBBS, BDS, Nursing"),
+                new("diploma",      "🔧 Diploma/ITI",         "Polytechnic, ITI"),
+                new("other",        "📦 Other",               "Something else")
+            }
+            : new List<InteractiveOption>
+            {
+                new("engineering",  "💻 Engineering/CS/IT",   "B.Tech, BCA, MCA"),
+                new("commerce",     "📊 Commerce/CA/Business","B.Com, BBA, CA, CS"),
+                new("science",      "🔬 Science",             "BSc, MSc"),
+                new("arts",         "📝 Arts/Humanities",     "BA, MA, Law"),
+                new("medical",      "🏥 Medical/Paramedical", "MBBS, BDS, Nursing"),
+                new("diploma",      "🔧 Diploma/ITI",         "Polytechnic, ITI"),
+                new("other",        "📦 Other",               "Kuch aur")
+            };
+
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, english ? "Choose one" : "Choose karo",
+            english ? "Your field" : "Aapka field",
+            options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendGraduationDirectionPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Which career direction interests you?"
+            : "Kaunsa career direction interest karta hai?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("software",    "💻 Software/IT/Tech",     "Dev, QA, Cloud, Data"),
+                new("content",     "✍️ Content/Writing/Media","Writer, journalist, social"),
+                new("creative",    "🎨 Design/Creative",      "UI/UX, graphic, video"),
+                new("business",    "📊 Business/Marketing",   "Sales, marketing, MBA"),
+                new("finance",     "📈 Finance/Banking",      "CA, banking, analyst"),
+                new("government",  "🏛️ Government Jobs",     "SSC, Banking, UPSC"),
+                new("healthcare",  "🏥 Healthcare",           "Clinical, pharma, hospital"),
+                new("teaching",    "📚 Teaching/Education",   "School, coaching, ed-tech"),
+                new("not_sure",    "🤷 Not sure yet",         "Help me decide")
+            }
+            : new List<InteractiveOption>
+            {
+                new("software",    "💻 Software/IT/Tech",     "Dev, QA, Cloud, Data"),
+                new("content",     "✍️ Content/Writing/Media","Writer, journalist, social"),
+                new("creative",    "🎨 Design/Creative",      "UI/UX, graphic, video"),
+                new("business",    "📊 Business/Marketing",   "Sales, marketing, MBA"),
+                new("finance",     "📈 Finance/Banking",      "CA, banking, analyst"),
+                new("government",  "🏛️ Government Jobs",     "SSC, Banking, UPSC"),
+                new("healthcare",  "🏥 Healthcare",           "Clinical, pharma, hospital"),
+                new("teaching",    "📚 Teaching/Education",   "School, coaching, ed-tech"),
+                new("not_sure",    "🤷 Pata nahi",            "Decide karne mein help karo")
+            };
+
+        await TrySendAsync(() => _messaging.SendListAsync(
+            student.Phone, body, english ? "Choose one" : "Choose karo",
+            english ? "Direction" : "Direction",
+            options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendGraduationGovtPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Are you interested in government jobs (SSC, Banking, UPSC)?"
+            : "Kya aapko government jobs mein interest hai (SSC, Banking, UPSC)?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("yes",  "✅ Yes"),
+                new("no",   "❌ No"),
+                new("open", "🤔 Maybe")
+            }
+            : new List<InteractiveOption>
+            {
+                new("yes",  "✅ Haan"),
+                new("no",   "❌ Nahi"),
+                new("open", "🤔 Maybe")
+            };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendGraduationExperiencePromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Do you have any work experience?"
+            : "Kya aapko koi work experience hai?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("fresher", "🆕 Fresher"),
+                new("0-2yr",   "📅 0-2 years"),
+                new("2plus",   "💼 2+ years")
+            }
+            : new List<InteractiveOption>
+            {
+                new("fresher", "🆕 Fresher"),
+                new("0-2yr",   "📅 0-2 saal"),
+                new("2plus",   "💼 2+ saal")
+            };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task SendGraduationAiFollowUpAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        try
+        {
+            var question = await _engine.GraduationFollowUpAsync(student, session, ct);
+            await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, question, ct));
+            _db.ChatMessages.Add(new ChatMessage
+            {
+                SessionId = session.Id, Role = MessageRole.Assistant, Content = question
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Graduation AI follow-up failed for student {Id}; skipping to suggestions", student.Id);
+            session.AssessmentDataJson = WriteField(session, ("aiFollowUpAnswer", "skipped"), ("step", "suggesting"));
+            await _db.SaveChangesAsync(ct);
+            await SuggestCareerPathsAndAwaitChoiceAsync(student, session, ct);
+        }
+    }
+
+    private async Task SendGraduationDailyHoursPromptAsync(Student student, ChatSession session, CancellationToken ct)
+    {
+        var english = student.PreferredLanguage == PreferredLanguage.English;
+        var body = english
+            ? "Almost done! How many hours per day can you dedicate to learning?"
+            : "Bas last question! Roz kitne ghante padhai ke liye de sakte ho?";
+
+        var options = english
+            ? new List<InteractiveOption>
+            {
+                new("1h",   "⏰ 1-2 hours"),
+                new("2-3h", "⏰ 3-4 hours"),
+                new("4-5h", "🔥 5+ hours")
+            }
+            : new List<InteractiveOption>
+            {
+                new("1h",   "⏰ 1-2 ghante"),
+                new("2-3h", "⏰ 3-4 ghante"),
+                new("4-5h", "🔥 5+ ghante")
+            };
+
+        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
+        _db.ChatMessages.Add(new ChatMessage
+        {
+            SessionId = session.Id, Role = MessageRole.Assistant, Content = body
+        });
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private static string NormaliseGraduationStatus(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "in_college" or "graduated" or "postgrad") return t;
+        if (t.Contains("college") || t.Contains("studying") || t.Contains("student")) return "in_college";
+        if (t.Contains("postgrad") || t.Contains("mba") || t.Contains("mca") || t.Contains("mtech") || t.Contains("m.tech") || t.Contains("ma ") || t.Contains("msc")) return "postgrad";
+        if (t.Contains("graduat") || t.Contains("complete") || t.Contains("pass")) return "graduated";
+        return "in_college";
+    }
+
+    private static string NormaliseGraduationField(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        var ids = new[] { "engineering", "commerce", "science", "arts", "medical", "diploma", "other" };
+        if (ids.Contains(t)) return t;
+        if (t.Contains("engineer") || t.Contains("btech") || t.Contains("b.tech") || t.Contains("bca") || t.Contains("mca") || t.Contains("cs") || t.Contains("it")) return "engineering";
+        if (t.Contains("commerce") || t.Contains("bcom") || t.Contains("b.com") || t.Contains("ca") || t.Contains("bba")) return "commerce";
+        if (t.Contains("science") || t.Contains("bsc") || t.Contains("b.sc") || t.Contains("msc")) return "science";
+        if (t.Contains("arts") || t.Contains("humanit") || t.Contains("ba ") || t.Contains("law")) return "arts";
+        if (t.Contains("medical") || t.Contains("mbbs") || t.Contains("nurs") || t.Contains("pharma") || t.Contains("bds")) return "medical";
+        if (t.Contains("diploma") || t.Contains("iti") || t.Contains("poly")) return "diploma";
+        return "other";
+    }
+
+    private static string NormaliseGraduationDirection(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        var ids = new[] { "software", "content", "creative", "business", "finance", "government", "healthcare", "teaching", "not_sure" };
+        if (ids.Contains(t)) return t;
+        if (t.Contains("software") || t.Contains("it") || t.Contains("tech") || t.Contains("dev") || t.Contains("coding")) return "software";
+        if (t.Contains("content") || t.Contains("writ") || t.Contains("media") || t.Contains("journal")) return "content";
+        if (t.Contains("design") || t.Contains("creative") || t.Contains("ui") || t.Contains("ux")) return "creative";
+        if (t.Contains("business") || t.Contains("market") || t.Contains("sales") || t.Contains("mba")) return "business";
+        if (t.Contains("finance") || t.Contains("bank") || t.Contains("account") || t.Contains("ca")) return "finance";
+        if (t.Contains("govern") || t.Contains("ssc") || t.Contains("upsc") || t.Contains("govt") || t.Contains("sarkari")) return "government";
+        if (t.Contains("health") || t.Contains("hospital") || t.Contains("clinical")) return "healthcare";
+        if (t.Contains("teach") || t.Contains("school") || t.Contains("coach") || t.Contains("edu")) return "teaching";
+        return "not_sure";
+    }
+
+    private static string NormaliseGovtInterest(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "yes" or "no" or "open") return t;
+        if (t.Contains("haan") || t.Contains("yes") || t.Contains("interest")) return "yes";
+        if (t.Contains("nahi") || t.Contains("no")) return "no";
+        return "open";
+    }
+
+    private static string NormaliseGraduationExperience(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "fresher" or "0-2yr" or "2plus") return t;
+        if (t.Contains("fresh") || t.Contains("no") || t.Contains("nahi") || t.Contains("kuch nahi")) return "fresher";
+        if (t.Contains("2+") || t.Contains("2 plus") || t.Contains("2 saal se") || t.Contains("senior")) return "2plus";
+        if (t.Contains("intern") || t.Contains("1") || t.Contains("year") || t.Contains("saal")) return "0-2yr";
+        return "fresher";
+    }
+
+    private static string NormaliseDailyHours(string text)
+    {
+        var t = text.Trim().ToLowerInvariant();
+        if (t is "1h" or "2-3h" or "4-5h") return t;
+        if (t.Contains("5") || t.Contains("full") || t.Contains("zyada")) return "4-5h";
+        if (t.Contains("3") || t.Contains("4")) return "2-3h";
+        return "1h";
     }
 
     private static string NormaliseFlowChoice(string text)
@@ -891,7 +1247,7 @@ public class AssessmentOrchestrator
         if (t.Contains("10th") || t.Contains("10 th") || t.Contains("class 10") || t.Contains("dasvi"))     return "flow_10th";
         if (t.Contains("12th") || t.Contains("12 th") || t.Contains("class 12") || t.Contains("barahvi"))   return "flow_12th";
         if (t.Contains("skill") || t.Contains("upgrade") || t.Contains("upskill") || t.Contains("ladder"))  return "flow_upskill";
-        if (t.Contains("career") || t.Contains("roadmap") || t.Contains("degree"))                          return "flow_career";
+        if (t.Contains("graduat") || t.Contains("career") || t.Contains("roadmap") || t.Contains("degree") || t.Contains("college")) return "flow_graduation";
 
         return "unknown";
     }
@@ -1098,6 +1454,18 @@ public class AssessmentOrchestrator
                          s.Title.StartsWith(text.Trim(), StringComparison.OrdinalIgnoreCase));
 
         var chosenTitle = chosen?.Title ?? text.Trim();
+
+        // Graduation flow: ask dailyHours before generating the roadmap.
+        var flow = ReadFlowType(session);
+        if (flow is "graduation" or "career")
+        {
+            session.AssessmentDataJson = WriteField(session, ("selectedCareer", chosenTitle), ("step", "dailyHours"));
+            session.Status = SessionStatus.Active;
+            await _db.SaveChangesAsync(ct);
+            await SendGraduationDailyHoursPromptAsync(student, session, ct);
+            return;
+        }
+
         await GenerateAndDeliverRoadmapAsync(student, session, chosenTitle, ct);
     }
 
