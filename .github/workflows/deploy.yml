@@ -1,0 +1,142 @@
+name: Deploy to VM1
+
+# Manual-only deploy. Click "Run workflow" in the Actions tab to deploy the
+# selected ref to the Oracle Cloud VM (skillkite-api systemd unit).
+#
+# This is the CI port of tools/deploy.sh. It encodes the same hard-won rules:
+#   * NEVER deploy while a user is mid-flow — a restart kills their in-flight
+#     Claude call and strands the session in "generating". The active-session
+#     guard polls /api/stats and only proceeds once it reads 0 (or you force it).
+#   * The tarball MUST exclude wwwroot/roadmaps — extracting it would replace
+#     the server's live PDF directory with stale build output.
+#   * Verify /api/healthz AFTER restart — the unit can be "active" while the app
+#     is still failing to bind or reach the DB.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   DEPLOY_TARGET   ssh target, e.g.  ubuntu@144.24.153.160
+#   DEPLOY_SSH_KEY  full contents of the private key (~/.ssh/skillkite-oci.key)
+# The VM IP lives in a secret (not this file) so the public repo never carries it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Skip the active-session guard (emergencies only)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-vm1
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: publish → guard → deploy → verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+
+    env:
+      APP_DIR: /opt/skillkite
+      SERVICE: skillkite-api
+      HEALTH_URL: http://localhost:5007/api/healthz
+      STATS_URL: http://localhost:5007/api/stats
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore SkillKite.sln
+
+      # Safety net: never deploy a build whose tests are red, even manually.
+      - name: Test
+        run: dotnet test SkillKite.sln --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Publish (Release, linux-x64)
+        run: |
+          dotnet publish src/SkillKite.API -c Release -r linux-x64 \
+            --self-contained false -o publish-linux -v q
+
+      - name: Create tarball (excluding wwwroot/roadmaps)
+        run: |
+          tar czf "$RUNNER_TEMP/skillkite-deploy.tar.gz" \
+            --exclude='wwwroot/roadmaps' -C publish-linux .
+          echo "  $(du -h "$RUNNER_TEMP/skillkite-deploy.tar.gz" | cut -f1) tarball"
+
+      - name: Configure SSH key
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Active-session guard (poll up to ~5 min)
+        run: |
+          TARGET='${{ secrets.DEPLOY_TARGET }}'
+          SSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
+          force='${{ inputs.force }}'
+
+          for i in $(seq 1 10); do
+            JSON=$($SSH "$TARGET" "curl -s --max-time 10 $STATS_URL" 2>/dev/null || echo '')
+            ACTIVE=$(printf '%s' "$JSON" | jq -r '.sessions.active // "unknown"' 2>/dev/null || echo unknown)
+
+            if [ "$ACTIVE" = "0" ]; then
+              echo "✓ 0 active sessions — safe to deploy"
+              exit 0
+            fi
+            if [ "$force" = "true" ]; then
+              echo "⚠ active=$ACTIVE but force=true — proceeding anyway"
+              exit 0
+            fi
+            echo "active=$ACTIVE — a restart now would kill an in-flight request. Waiting 30s (attempt $i/10)…"
+            sleep 30
+          done
+
+          echo "✖ Still busy (or stats unreachable) after ~5 min. Re-run later, or run with force=true for an emergency."
+          exit 1
+
+      - name: Upload, swap, restart
+        run: |
+          TARGET='${{ secrets.DEPLOY_TARGET }}'
+          KEY=~/.ssh/deploy_key
+          OPTS="-i $KEY -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
+
+          scp $OPTS "$RUNNER_TEMP/skillkite-deploy.tar.gz" "$TARGET:/tmp/skillkite-deploy.tar.gz"
+          ssh $OPTS "$TARGET" "
+            set -e
+            sudo systemctl stop $SERVICE
+            sudo tar xzf /tmp/skillkite-deploy.tar.gz -C $APP_DIR/
+            sudo systemctl start $SERVICE
+          "
+
+      - name: Verify healthz (up to 30s)
+        run: |
+          TARGET='${{ secrets.DEPLOY_TARGET }}'
+          SSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
+
+          for i in $(seq 1 10); do
+            HEALTH=$($SSH "$TARGET" "curl -s --max-time 5 $HEALTH_URL" 2>/dev/null || true)
+            if echo "$HEALTH" | grep -q '"status":"ok"'; then
+              echo "✓ $HEALTH"
+              echo "— roadmaps dir survived the deploy:"
+              $SSH "$TARGET" "ls -ld $APP_DIR/wwwroot/roadmaps"
+              echo "✅ Deployed and healthy."
+              exit 0
+            fi
+            sleep 3
+          done
+
+          echo "✖ healthz did not return ok within 30s. Investigate on the VM:"
+          echo "    sudo journalctl -u $SERVICE -n 50 --no-pager"
+          exit 1
