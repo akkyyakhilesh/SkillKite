@@ -245,12 +245,18 @@
   font-family: 'Noto Sans', system-ui, sans-serif;
 }
 
-.docInfo { flex: 1; }
+.docInfo {
+  flex: 1;
+  min-width: 0;
+}
 .docName {
   color: #e8ecf5;
   font-size: 13px;
   font-weight: 500;
   font-family: 'Noto Sans', system-ui, sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .docSize {
   color: #8a98c0;
@@ -260,18 +266,22 @@
 }
 
 .docDownload {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   background: #25D366;
   color: #fff;
   border: none;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 12px;
   cursor: pointer;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   text-decoration: none;
-  font-family: 'Noto Sans', system-ui, sans-serif;
+  transition: background 0.15s;
 }
 .docDownload:hover { background: #1fb954; }
+.docDownload svg { width: 18px; height: 18px; }
 
 /* Thinking dots */
 .thinking {
