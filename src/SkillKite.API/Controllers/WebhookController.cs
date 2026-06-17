@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SkillKite.Core.Interfaces;
@@ -9,6 +10,7 @@ namespace SkillKite.API.Controllers;
 
 [ApiController]
 [Route("api/webhook/whatsapp")]
+[EnableCors("webhook")]
 public class WebhookController : ControllerBase
 {
     // In-memory dedup of WhatsApp inbound message ids. Meta retries the same

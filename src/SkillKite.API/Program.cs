@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SkillKite.API.Middleware;
 using SkillKite.Core.Interfaces;
@@ -42,8 +43,28 @@ builder.Services.AddScoped<AssessmentOrchestrator>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
-    p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy("web", p => p
+        .WithOrigins("https://skillkite.in", "https://www.skillkite.in", "http://localhost:4321")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+    o.AddPolicy("webhook", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("web-chat", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Request.Headers["X-Session-Key"].FirstOrDefault() ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
 
 var app = builder.Build();
 
@@ -55,6 +76,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles(); // serves /roadmaps/*.pdf from wwwroot/roadmaps
 app.UseCors();
+app.UseRateLimiter();
 app.UseRouting();
 app.UseMiddleware<WhatsAppSignatureValidator>();
 app.MapControllers();

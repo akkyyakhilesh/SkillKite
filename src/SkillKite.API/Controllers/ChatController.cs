@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillKite.Core.Models;
@@ -13,6 +14,7 @@ namespace SkillKite.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/chat")]
+[EnableCors("web")]
 public class ChatController : ControllerBase
 {
     private readonly AppDbContext _db;

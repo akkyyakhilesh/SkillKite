@@ -119,3 +119,15 @@ public record StudentGuide(
     IReadOnlyList<GuideSection> Sections,   // ordered by relevance to the student
     string ClosingMessage,                  // CTA + disclaimer
     string FlowLabel);                      // "10th" | "12th" — used in filename + footer
+
+// --- Web chat widget DTOs ---
+
+public record DocumentInfo(string Url, string Filename);
+
+public record WebChatBlock(
+    string Type,                             // "text" | "buttons" | "list" | "document"
+    string Body,
+    List<InteractiveOption>? Options,
+    string? ButtonLabel,
+    string? SectionTitle,
+    DocumentInfo? Document);
