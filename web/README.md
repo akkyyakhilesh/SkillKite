@@ -1,43 +1,48 @@
-# Astro Starter Kit: Minimal
+# SkillKite Website
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Astro static site for [skillkite.in](https://skillkite.in) — the browsable companion to the WhatsApp bot.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Pages
 
-## 🚀 Project Structure
+| Route | What |
+|---|---|
+| `/` | Homepage — hero, 4 category cards, "Why SkillKite" feature grid |
+| `/about` | About page — problem statement, how it works, founder story, contact |
+| `/after-10th` | Stream picker (Science, Commerce, Arts, Not sure) |
+| `/after-10th/[interest]` | Stream detail with FAQ-style guide |
+| `/after-12th` | Stream picker (PCM, PCB, Commerce, Arts) |
+| `/after-12th/[stream]` | Stream detail with courses and entrance exams |
+| `/after-graduation` | 27 career paths grouped by category |
+| `/after-graduation/[career]` | Career detail — salary, demand, timeline, roadmap CTA |
+| `/skill-upgrade` | 8-field picker (Software, Data, Design, Marketing, etc.) |
+| `/skill-upgrade/[field]` | Field detail with skill-up guide |
+| `/privacy`, `/terms` | Legal pages |
+| `/admin` | Password-protected stats dashboard |
 
-Inside of your Astro project, you'll see the following folders and files:
+## Design system
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+- **Palette:** Dark navy (`#0F1834`), saffron accent (`#FF8A3D`), WhatsApp green (`#25D366`)
+- **Typography:** Noto Sans (Latin) + Noto Sans Devanagari (Hindi), weight 900 headings
+- **Layout:** max-width 760px content, 38px padding desktop, 22px mobile, breakpoint 640px
+- **Cards:** `rgba(255,255,255,0.05)` bg, `rgba(255,255,255,0.1)` border, saffron hover glow
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## SEO
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- JSON-LD schemas: Organization, WebSite, BreadcrumbList, FAQPage (via `src/lib/seo.ts`)
+- OG and Twitter cards on every page (via Base layout)
+- Canonical URLs and sitemap generation
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Commands
 
-## 🧞 Commands
+All commands run from `web/`:
 
-All commands are run from the root of the project, from a terminal:
+| Command | Action |
+|---|---|
+| `npm install` | Install dependencies |
+| `npm run dev` | Dev server at `localhost:4321` |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview production build locally |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Deploy
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Deployed to Firebase Hosting via GitHub Actions — auto-deploys on push to `main`.

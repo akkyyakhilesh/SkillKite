@@ -8,7 +8,7 @@
 *A free AI career coach on WhatsApp for Tier 2/3 India.*
 
 [![CI](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/akkyyakhilesh/SkillKite/actions/workflows/ci.yml)
-[![Live site](https://img.shields.io/badge/site-skillkite.in-FF7A00?style=flat-square)](https://skillkite.pages.dev)
+[![Live site](https://img.shields.io/badge/site-skillkite.in-FF7A00?style=flat-square)](https://skillkite.in)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Claude](https://img.shields.io/badge/Claude-Sonnet-D4A373?style=flat-square)](https://www.anthropic.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -24,12 +24,12 @@ You message a WhatsApp number. The bot asks where you are in your journey and ro
 
 | Flow | For | Output |
 |---|---|---|
-| **📚 10th ke baad** | Just finished class 10 | 3-4 page PDF covering every stream (PCM/PCB/Commerce/Arts), plus polytechnic + paramedical diploma options |
-| **🎯 12th ke baad** | Just finished class 12 | Stream-specific PDF (B.Tech / MBBS / CA / BA LLB / etc.) with entrance exams + realistic salary bands |
-| **💼 Career roadmap** | Degree done / final year | ~10-question assessment in Hinglish → 3 best-fit career suggestions → personalized **12–24 week roadmap PDF** with free YouTube + NPTEL resources |
-| **🌱 Skill upgrade** | Already working | *(in build)* |
+| **📚 After 10th** | Just finished class 10 | Stream selection guide — Science (PCM/PCB), Commerce, Arts, polytechnic & paramedical options |
+| **🎯 After 12th** | Just finished class 12 | Stream-specific guide (B.Tech / MBBS / CA / BA LLB / etc.) with entrance exams + realistic salary bands |
+| **💼 After Graduation** | Degree done / final year | 27 career paths across Tech, Creative, Government, Gig, Trades & Emerging fields with salary bands, timelines, and personalized roadmaps |
+| **🌱 Skill Upgrade** | Already working | Field-specific guides for Software/IT, Data, Design, Marketing, Finance, Healthcare, Teaching & Ops |
 
-Everything is in Hinglish, tappable buttons over typing, and delivered as a **bilingual PDF** in the same WhatsApp chat. End-to-end in ~5 minutes.
+Everything is in Hinglish, tappable buttons over typing, and delivered on WhatsApp. The website at [skillkite.in](https://skillkite.in) lets students browse all options directly.
 
 Built for students in places like Bhagalpur, Purnea, Muzaffarpur, Darbhanga — where career counselors charge ₹5,000+ and metro mentors don't reach.
 
@@ -42,7 +42,7 @@ Long-form thesis available on request — DM me on [LinkedIn](https://www.linked
 ## Try it
 
 - 📱 **WhatsApp the bot:** **+91 62012 26351** — no signup, no whitelist, no early-access gate
-- 🪁 **Landing page:** [skillkite.in](https://skillkite.in) → tap the green "Chat on WhatsApp" button
+- 🪁 **Website:** [skillkite.in](https://skillkite.in) — browse all career paths, stream guides, and skill-upgrade options
 - 🌐 **API:** [bot.skillkite.in/api/healthz](https://bot.skillkite.in/api/healthz)
 
 ## Architecture
@@ -54,13 +54,13 @@ Long-form thesis available on request — DM me on [LinkedIn](https://www.linked
 └─────────────────┘     │                       │     └─────────────┘
                         │  ┌─────────────────┐ │
 ┌─────────────────┐     │  │ Orchestrator   │ │     ┌─────────────┐
-│  Angular PWA    │ →   │  │ Career Engine  │ │ →   │ PostgreSQL  │
-│  (Phase 2)      │     │  │ PDF Generator  │ │     │ (jsonb)     │
+│  Astro SSG      │     │  │ Career Engine  │ │ →   │ PostgreSQL  │
+│  (skillkite.in) │     │  │ PDF Generator  │ │     │ (jsonb)     │
 └─────────────────┘     │  └─────────────────┘ │     └─────────────┘
                         └──────────────────────┘
 ```
 
-Clean architecture, 5 projects:
+**Backend** — clean architecture, 5 projects:
 
 | Project | Purpose |
 |---|---|
@@ -70,7 +70,14 @@ Clean architecture, 5 projects:
 | `SkillKite.API` | ASP.NET Core controllers (Webhook, Chat, Roadmap, Progress, Careers, Health) + signature-validation middleware |
 | `SkillKite.Tests` | xUnit — payload parsing, HMAC verification |
 
-The API is **frontend-agnostic**: WhatsApp today, Angular PWA tomorrow (Phase 2), Capacitor Android app (Phase 3) — same orchestrator, no rewrite.
+**Frontend** — Astro static site (`web/`):
+
+| Area | What |
+|---|---|
+| Pages | Homepage, About, After 10th (4 streams), After 12th (4 streams), Graduation (27 careers), Skill Upgrade (8 fields), Privacy, Terms, 404 |
+| SEO | JSON-LD (Organization, BreadcrumbList, FAQPage, WebSite), OG/Twitter cards, canonical URLs, sitemap |
+| Design | Dark navy + saffron palette, mobile-first, Noto Sans + Noto Sans Devanagari |
+| Deploy | Firebase Hosting via GitHub Actions (auto-deploy on push to main) |
 
 ## Tech stack
 
@@ -81,11 +88,12 @@ The API is **frontend-agnostic**: WhatsApp today, Angular PWA tomorrow (Phase 2)
 | Database | **PostgreSQL** + Npgsql | `jsonb` for flexible assessment data; cheap to host |
 | Messaging | **WhatsApp Cloud API** | Zero-friction reach for Tier 2/3 users |
 | PDF | **QuestPDF** + Noto Sans Devanagari | Clean bilingual rendering |
+| Website | **Astro** (SSG) | Static HTML, zero JS by default, fast on 3G |
 | Tunnel (dev) | **Cloudflare Tunnel** | Permanent `bot.skillkite.in` URL, no laptop port forwarding |
-| Landing | Vanilla HTML/CSS/JS on **Cloudflare Pages** | Sub-500 ms load on 3G; no framework bloat |
+| Hosting | **Firebase Hosting** | Auto-deploy via GitHub Actions on push to main |
 | Analytics | **Cloudflare Web Analytics** | Privacy-first, zero JS overhead |
 
-## Endpoints (Phase 1)
+## Endpoints
 
 ```http
 GET    /api/healthz                  Liveness + DB probe
@@ -125,11 +133,15 @@ dotnet user-secrets set "WhatsApp:VerifyToken" "your_random_string"
 # 2. Postgres
 docker run -d --name skillkite-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
 
-# 3. Run (auto-applies migrations, seeds 27 career paths)
+# 3. Run the API (auto-applies migrations, seeds 27 career paths)
 dotnet run --project src/SkillKite.API
 
-# 4. Verify
-curl http://localhost:5007/api/healthz
+# 4. Run the website
+cd web && npm install && npm run dev
+
+# 5. Verify
+curl http://localhost:5007/api/healthz    # API
+# http://localhost:4321                    # Website
 ```
 
 ## Repository layout
@@ -143,7 +155,15 @@ SkillKite/
 │   └── SkillKite.Infrastructure/   Claude engine, WhatsApp service, PDF generator, orchestrator
 ├── tests/
 │   └── SkillKite.Tests/            xUnit tests
-├── site/                           Vanilla HTML landing page (Cloudflare Pages)
+├── web/                            Astro static site (skillkite.in)
+│   ├── src/pages/                  All page routes (index, about, category pickers, career/stream details)
+│   ├── src/layouts/                Base layout with nav, footer, OG tags
+│   ├── src/components/             Breadcrumbs, GuideView
+│   ├── src/config/                 Categories, streams, career groupings, WhatsApp config
+│   ├── src/lib/                    JSON-LD schema builders
+│   ├── src/styles/                 Global CSS (dark navy + saffron design system)
+│   └── public/                     Static assets (favicon, OG image, founder photo)
+├── site/                           Legacy vanilla HTML landing (superseded by web/)
 ├── content/                        Marketing drafts (LinkedIn posts, etc.)
 ├── tools/                          Local-only binaries (cloudflared.exe — gitignored)
 ├── README.md                       This file
@@ -156,8 +176,9 @@ SkillKite/
 | Phase | Status | What |
 |---|---|---|
 | **1. WhatsApp MVP (career roadmap)** | ✅ Shipped | Bot, Claude engine, 27 careers, bilingual PDFs |
-| **1.5. 10th + 12th student flows** | ✅ Shipped | 4-way entry split, thin-discovery PDFs covering streams, polytechnic, paramedical, course selection |
-| **2. Skill upgrade flow** | 🟡 Next | 4th entry option for working professionals — next ladder rung |
+| **1.5. 10th + 12th student flows** | ✅ Shipped | 4-way entry split, stream/course selection guides |
+| **1.6. Astro website** | ✅ Shipped | Full browsable site with all categories, career details, about page, SEO |
+| **2. Skill upgrade flow** | ✅ Shipped | 8-field skill-upgrade guides for working professionals |
 | **3. Angular PWA** | ⏳ Planned | Installable web app, progress dashboard, offline cache |
 | **4. Android via Capacitor** | ⏳ Future | Native push notifications, Play Store listing |
 | **5. Monetization** | ⏳ Future | Premium tier (mock interviews, resume builder), college B2B |
