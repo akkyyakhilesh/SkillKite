@@ -68,8 +68,6 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-app.UseDeveloperExceptionPage();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -77,23 +75,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles(); // serves /roadmaps/*.pdf from wwwroot/roadmaps
+app.UseRouting();
 app.UseCors();
 app.UseRateLimiter();
-app.UseRouting();
 app.UseMiddleware<WhatsAppSignatureValidator>();
 app.MapControllers();
 
 app.MapGet("/", () => Results.Ok(new { app = "SkillKite API", status = "ok" }));
 
-app.MapGet("/diag", (IServiceProvider sp) =>
-{
-    var issues = new List<string>();
-    try { sp.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>(); } catch (Exception ex) { issues.Add($"AppDbContext: {ex.Message}"); }
-    try { sp.CreateScope().ServiceProvider.GetRequiredService<ICareerEngine>(); } catch (Exception ex) { issues.Add($"ICareerEngine: {ex.Message}"); }
-    try { sp.CreateScope().ServiceProvider.GetRequiredService<IRoadmapGenerator>(); } catch (Exception ex) { issues.Add($"IRoadmapGenerator: {ex.Message}"); }
-    try { sp.CreateScope().ServiceProvider.GetRequiredService<ILogger<AssessmentOrchestrator>>(); } catch (Exception ex) { issues.Add($"ILogger: {ex.Message}"); }
-    return Results.Ok(new { ok = issues.Count == 0, issues });
-});
 
 // Apply migrations and seed curated career paths at startup.
 using (var scope = app.Services.CreateScope())
