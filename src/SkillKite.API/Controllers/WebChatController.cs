@@ -40,80 +40,101 @@ public class WebChatController : ControllerBase
     [HttpPost("start")]
     public async Task<IActionResult> Start([FromBody] StartRequest req, CancellationToken ct)
     {
-        var key = req.SessionKey;
-        if (string.IsNullOrWhiteSpace(key) || key.Length > 15 || !key.StartsWith('W'))
-            key = "W" + Guid.NewGuid().ToString("N")[..14];
-
-        var student = await _db.Students.FirstOrDefaultAsync(s => s.Phone == key, ct);
-        if (student is null)
+        try
         {
-            student = new Student { Phone = key };
-            _db.Students.Add(student);
-            await _db.SaveChangesAsync(ct);
+            var key = req.SessionKey;
+            if (string.IsNullOrWhiteSpace(key) || key.Length > 15 || !key.StartsWith('W'))
+                key = "W" + Guid.NewGuid().ToString("N")[..14];
+
+            var student = await _db.Students.FirstOrDefaultAsync(s => s.Phone == key, ct);
+            if (student is null)
+            {
+                student = new Student { Phone = key };
+                _db.Students.Add(student);
+                await _db.SaveChangesAsync(ct);
+            }
+
+            var session = await _db.ChatSessions
+                .Where(s => s.StudentId == student.Id && s.Status != Core.Enums.SessionStatus.Completed && s.Status != Core.Enums.SessionStatus.Abandoned)
+                .OrderByDescending(s => s.CreatedAt)
+                .FirstOrDefaultAsync(ct);
+
+            if (session is null)
+            {
+                session = new ChatSession { StudentId = student.Id };
+                _db.ChatSessions.Add(session);
+                await _db.SaveChangesAsync(ct);
+            }
+
+            return Ok(new { sessionKey = key, sessionId = session.Id });
         }
-
-        var session = await _db.ChatSessions
-            .Where(s => s.StudentId == student.Id && s.Status != Core.Enums.SessionStatus.Completed && s.Status != Core.Enums.SessionStatus.Abandoned)
-            .OrderByDescending(s => s.CreatedAt)
-            .FirstOrDefaultAsync(ct);
-
-        if (session is null)
+        catch (Exception ex)
         {
-            session = new ChatSession { StudentId = student.Id };
-            _db.ChatSessions.Add(session);
-            await _db.SaveChangesAsync(ct);
+            return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace, inner = ex.InnerException?.Message });
         }
-
-        return Ok(new { sessionKey = key, sessionId = session.Id });
     }
 
     [HttpPost("message")]
     public async Task<IActionResult> Message([FromBody] MessageRequest req, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(req.SessionKey) || string.IsNullOrWhiteSpace(req.Text))
-            return BadRequest("sessionKey and text required");
+        try
+        {
+            if (string.IsNullOrWhiteSpace(req.SessionKey) || string.IsNullOrWhiteSpace(req.Text))
+                return BadRequest("sessionKey and text required");
 
-        if (!req.SessionKey.StartsWith('W'))
-            return BadRequest("invalid sessionKey");
+            if (!req.SessionKey.StartsWith('W'))
+                return BadRequest("invalid sessionKey");
 
-        var webMsg = new WebMessagingService();
-        var orch = new AssessmentOrchestrator(_db, _engine, _pdf, webMsg, _orchLogger);
+            var webMsg = new WebMessagingService();
+            var orch = new AssessmentOrchestrator(_db, _engine, _pdf, webMsg, _orchLogger);
 
-        await orch.HandleIncomingAsync(req.SessionKey, req.Text, req.Name, ct);
+            await orch.HandleIncomingAsync(req.SessionKey, req.Text, req.Name, ct);
 
-        return Ok(new { ok = true, blocks = webMsg.Buffer });
+            return Ok(new { ok = true, blocks = webMsg.Buffer });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace, inner = ex.InnerException?.Message });
+        }
     }
 
     [HttpGet("history/{sessionKey}")]
     public async Task<IActionResult> History(string sessionKey, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(sessionKey) || !sessionKey.StartsWith('W'))
-            return BadRequest("invalid sessionKey");
-
-        var student = await _db.Students
-            .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Phone == sessionKey, ct);
-
-        if (student is null)
-            return Ok(new { sessionId = (Guid?)null, messages = Array.Empty<object>() });
-
-        var session = await _db.ChatSessions
-            .AsNoTracking()
-            .Include(s => s.Messages)
-            .Where(s => s.StudentId == student.Id)
-            .OrderByDescending(s => s.CreatedAt)
-            .FirstOrDefaultAsync(ct);
-
-        if (session is null)
-            return Ok(new { sessionId = (Guid?)null, messages = Array.Empty<object>() });
-
-        return Ok(new
+        try
         {
-            sessionId = session.Id,
-            status = session.Status.ToString(),
-            messages = session.Messages
-                .OrderBy(m => m.CreatedAt)
-                .Select(m => new { role = m.Role.ToString(), content = m.Content, createdAt = m.CreatedAt })
-        });
+            if (string.IsNullOrWhiteSpace(sessionKey) || !sessionKey.StartsWith('W'))
+                return BadRequest("invalid sessionKey");
+
+            var student = await _db.Students
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Phone == sessionKey, ct);
+
+            if (student is null)
+                return Ok(new { sessionId = (Guid?)null, messages = Array.Empty<object>() });
+
+            var session = await _db.ChatSessions
+                .AsNoTracking()
+                .Include(s => s.Messages)
+                .Where(s => s.StudentId == student.Id)
+                .OrderByDescending(s => s.CreatedAt)
+                .FirstOrDefaultAsync(ct);
+
+            if (session is null)
+                return Ok(new { sessionId = (Guid?)null, messages = Array.Empty<object>() });
+
+            return Ok(new
+            {
+                sessionId = session.Id,
+                status = session.Status.ToString(),
+                messages = session.Messages
+                    .OrderBy(m => m.CreatedAt)
+                    .Select(m => new { role = m.Role.ToString(), content = m.Content, createdAt = m.CreatedAt })
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace, inner = ex.InnerException?.Message });
+        }
     }
 }
