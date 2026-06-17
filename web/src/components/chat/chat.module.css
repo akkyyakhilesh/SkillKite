@@ -226,8 +226,9 @@
   padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
 }
 
 .docIcon {
