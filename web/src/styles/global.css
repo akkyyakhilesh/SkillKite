@@ -229,8 +229,107 @@ main { flex: 1; }
 .why-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
 .why-card p { font-size: 13px; color: var(--muted-dim); line-height: 1.5; }
 
+/* ---------- About page ---------- */
+.about-section {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 38px 50px;
+  text-align: center;
+}
+.about-section h2 {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+.about-section > p {
+  font-size: 15.5px;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 18px;
+  text-align: left;
+}
+.about-section--center > p {
+  text-align: center;
+}
+.about-divider {
+  max-width: 760px;
+  margin: 0 auto 50px;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Steps */
+.about-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+.about-step {
+  padding: 24px 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.about-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 138, 61, 0.18);
+  color: var(--saffron-light);
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+.about-step-icon { font-size: 30px; margin-bottom: 10px; }
+.about-step h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.about-step p { font-size: 13px; color: var(--muted-dim); line-height: 1.5; }
+
+/* Founder */
+.about-founder {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  text-align: left;
+}
+.about-founder-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  flex-shrink: 0;
+  box-shadow: 0 0 30px rgba(255, 138, 61, 0.25);
+  border: 2px solid rgba(255, 138, 61, 0.3);
+}
+.about-founder-body h3 { font-size: 20px; font-weight: 900; margin-bottom: 2px; }
+.about-founder-role {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--saffron-light);
+  margin-bottom: 14px;
+}
+.about-founder-body p {
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+
+/* Reach out */
+.about-reach {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
 /* ---------- Sub-page hero (category / stream pages) ---------- */
-.hero--sub { padding: 48px 38px 30px; }
+.hero--sub { padding: 48px 38px 30px; text-align: center; }
 .hero--sub h1 {
   font-size: 38px;
   margin: 14px 0 10px;
@@ -455,4 +554,10 @@ main { flex: 1; }
   .stat-grid { grid-template-columns: 1fr; }
   .why-section { padding: 14px 22px 50px; }
   .why-grid { grid-template-columns: 1fr; }
+  .about-section { padding: 0 22px 44px; }
+  .about-steps { grid-template-columns: 1fr; }
+  .about-founder { flex-direction: column; align-items: center; text-align: center; }
+  .about-reach { flex-direction: column; }
+  .about-reach .btn-wa,
+  .about-reach .btn-br { text-align: center; justify-content: center; }
 }

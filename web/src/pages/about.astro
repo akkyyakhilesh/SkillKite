@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+import { whatsappLink } from '../config/categories';
+
+const title = 'About — SkillKite';
+const description =
+  'Career guidance shouldn\'t depend on your city. Meet the team behind SkillKite — free AI career coaching for Indian students, on WhatsApp.';
+---
+
+<Base title={title} description={description} path="/about">
+  <!-- Hero -->
+  <section class="hero--sub">
+    <div class="hero-inner">
+      <span class="eyebrow">About SkillKite</span>
+      <h1>Career guidance shouldn't depend on your city.</h1>
+      <p class="sub">
+        We're building the career coach that every student in India deserves — free, personal, and available right where you are.
+      </p>
+    </div>
+  </section>
+
+  <!-- The problem -->
+  <section class="about-section">
+    <h2>The problem we're solving</h2>
+    <p>
+      If you grow up in a metro, you have career counsellors, coaching centres, and seniors who've been there. If you grow up in a Tier 2 or Tier 3 city, you get "do engineering" or "become a doctor."
+    </p>
+    <p>
+      Millions of students make career choices based on what their relatives suggest, not what actually fits their interests and strengths. Not because they lack talent — because nobody showed them the options.
+    </p>
+    <p>
+      SkillKite is here to change that. One honest conversation at a time, on the app they already use every day.
+    </p>
+  </section>
+
+  <hr class="about-divider" />
+
+  <!-- How it works -->
+  <section class="about-section">
+    <h2>How it works</h2>
+    <div class="about-steps">
+      <div class="about-step">
+        <div class="about-step-num">1</div>
+        <div class="about-step-icon">💬</div>
+        <h3>Say Hi on WhatsApp</h3>
+        <p>No app to download, no form to fill. Just open WhatsApp and send a message.</p>
+      </div>
+      <div class="about-step">
+        <div class="about-step-num">2</div>
+        <div class="about-step-icon">🎯</div>
+        <h3>Answer a few questions</h3>
+        <p>Tell us your education, interests, and what you're confused about. Takes under 5 minutes.</p>
+      </div>
+      <div class="about-step">
+        <div class="about-step-num">3</div>
+        <div class="about-step-icon">🗺️</div>
+        <h3>Get your roadmap</h3>
+        <p>Receive a personalized career plan with week-by-week steps and free learning resources.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="about-divider" />
+
+  <!-- Founder -->
+  <section class="about-section">
+    <h2>Who's behind this</h2>
+    <div class="about-founder">
+      <img class="about-founder-avatar" src="/Akhilesh_profile.PNG" alt="Akhilesh — Founder, SkillKite" />
+      <div class="about-founder-body">
+        <h3>Hi, I'm Akhilesh</h3>
+        <div class="about-founder-role">Founder, SkillKite</div>
+        <p>
+          I grew up in a small city where career guidance meant asking relatives — and the answer was always "engineering." After graduating, I realized how many students like me were making blind choices, not because they lacked talent, but because nobody showed them what was possible.
+        </p>
+        <p>
+          SkillKite is the guide I wish I had. It's free because the students who need it most can't afford to pay for career advice. And it's on WhatsApp because that's where India already is.
+        </p>
+        <p>
+          If this helps even one student make a more informed choice, it's worth it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="about-divider" />
+
+  <!-- Reach out -->
+  <section class="about-section about-section--center">
+    <h2>Reach out</h2>
+    <p>
+      Have feedback, ideas, or want to collaborate? We'd love to hear from you.
+    </p>
+    <div class="about-reach">
+      <a class="btn-wa" href="https://wa.me/919492040362?text=Hi%20Akhilesh!">💬 Say hi on WhatsApp</a>
+      <a class="btn-br" href="mailto:skillkite.in@gmail.com">✉️ skillkite.in@gmail.com</a>
+      <a class="btn-br" href="https://www.linkedin.com/in/akkyyakhilesh/" target="_blank" rel="noopener">🔗 LinkedIn</a>
+    </div>
+  </section>
+</Base>
