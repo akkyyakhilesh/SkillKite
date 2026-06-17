@@ -1,6 +1,6 @@
 import { useReducer, useRef, useEffect, useState } from 'react';
 import type { InteractiveOption } from '../../lib/chat-api';
-import { startSession, sendMessage, getHistory } from '../../lib/chat-api';
+import { sendMessage, getHistory } from '../../lib/chat-api';
 import { chatReducer, initialChatState, getSessionKey } from '../../lib/chat-store';
 import type { DisplayMessage } from '../../lib/chat-store';
 import MessageBubble from './MessageBubble';
@@ -44,7 +44,6 @@ export default function ChatPanel({ onClose }: Props) {
       } catch { /* no history, start fresh */ }
 
       try {
-        await startSession(key);
         dispatch({ type: 'set_thinking', value: true });
         const res = await sendMessage(key, 'Hi');
         dispatch({ type: 'add_bot_response', blocks: res.blocks });
