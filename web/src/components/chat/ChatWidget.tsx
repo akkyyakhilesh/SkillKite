@@ -9,7 +9,7 @@ export default function ChatWidget() {
     <>
       {open && <ChatPanel onClose={() => setOpen(false)} />}
       <button
-        className={styles.fab}
+        className={`${styles.fab} ${open ? styles.fabHideMobile : ''}`}
         onClick={() => setOpen(!open)}
         aria-label={open ? 'Close chat' : 'Open chat'}
       >

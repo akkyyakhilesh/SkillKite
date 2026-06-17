@@ -384,4 +384,5 @@
   }
   .header { border-radius: 0; }
   .fab { bottom: 16px; right: 16px; }
+  .fabHideMobile { display: none; }
 }
