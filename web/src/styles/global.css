@@ -189,6 +189,46 @@ main { flex: 1; }
 .card.k3 { background: var(--grad-grad); }
 .card.k4 { background: var(--grad-skill); }
 
+/* ---------- Why SkillKite (feature grid) ---------- */
+.why-section {
+  padding: 14px 38px 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.why-head { text-align: center; margin-bottom: 30px; }
+.why-label {
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--saffron-light);
+  margin-bottom: 10px;
+}
+.why-head h2 { font-size: 26px; font-weight: 900; }
+.why-head p { color: var(--muted-dim); margin-top: 6px; font-size: 15px; }
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.why-card {
+  padding: 22px 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+.why-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 138, 61, 0.45);
+}
+.why-icon { font-size: 28px; margin-bottom: 10px; }
+.why-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.why-card p { font-size: 13px; color: var(--muted-dim); line-height: 1.5; }
+
 /* ---------- Sub-page hero (category / stream pages) ---------- */
 .hero--sub { padding: 48px 38px 30px; }
 .hero--sub h1 {
@@ -413,4 +453,6 @@ main { flex: 1; }
   .careers { padding: 6px 22px 44px; }
   .career-grid { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: 1fr; }
+  .why-section { padding: 14px 22px 50px; }
+  .why-grid { grid-template-columns: 1fr; }
 }
