@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { whatsappLink } from '../config/categories';
 
 const title = 'About — SkillKite';
@@ -8,6 +9,11 @@ const description =
 ---
 
 <Base title={title} description={description} path="/about">
+  <Breadcrumbs items={[
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+  ]} />
+
   <!-- Hero -->
   <section class="hero--sub">
     <div class="hero-inner">
