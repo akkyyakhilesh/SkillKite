@@ -2,10 +2,12 @@
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { whatsappLink } from '../config/categories';
+import { organizationSchema } from '../lib/seo';
 
 const title = 'About — SkillKite';
 const description =
   'Career guidance shouldn\'t depend on your city. Meet the team behind SkillKite — free AI career coaching for Indian students, on WhatsApp.';
+const orgJson = JSON.stringify(organizationSchema(Astro.site!));
 ---
 
 <Base title={title} description={description} path="/about">
@@ -103,4 +105,6 @@ const description =
       <a class="btn-br" href="https://www.linkedin.com/in/akkyyakhilesh/" target="_blank" rel="noopener">🔗 LinkedIn</a>
     </div>
   </section>
+
+  <script type="application/ld+json" is:inline set:html={orgJson} />
 </Base>

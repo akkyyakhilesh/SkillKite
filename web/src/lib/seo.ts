@@ -71,6 +71,22 @@ export function organizationSchema(site: URL) {
     logo: abs(site, '/og-image.png'),
     description:
       'Free AI-powered career guidance for Indian students and working professionals, in Hindi and English.',
+    sameAs: [
+      'https://www.linkedin.com/in/akkyyakhilesh/',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      url: 'https://wa.me/919492040362',
+      availableLanguage: ['English', 'Hindi'],
+    },
+    founder: {
+      '@type': 'Person',
+      name: 'Akhilesh Kumar',
+      jobTitle: 'Founder',
+      url: 'https://www.linkedin.com/in/akkyyakhilesh/',
+    },
+    email: 'skillkite.in@gmail.com',
   };
 }
 
