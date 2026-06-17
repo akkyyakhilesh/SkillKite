@@ -18,6 +18,7 @@ export default function ChatPanel({ onClose }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionKeyRef = useRef('');
+  const thinkingRef = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -56,9 +57,10 @@ export default function ChatPanel({ onClose }: Props) {
   }, []);
 
   async function send(text: string, displayText?: string) {
-    if (!text.trim() || state.isThinking) return;
+    if (!text.trim() || thinkingRef.current) return;
     const key = sessionKeyRef.current;
 
+    thinkingRef.current = true;
     dispatch({ type: 'add_user_message', text: (displayText ?? text).trim() });
     dispatch({ type: 'set_thinking', value: true });
     setInputText('');
@@ -73,6 +75,7 @@ export default function ChatPanel({ onClose }: Props) {
         dispatch({ type: 'set_error', error: 'Something went wrong. Please try again.' });
       }
     }
+    thinkingRef.current = false;
     inputRef.current?.focus();
   }
 
