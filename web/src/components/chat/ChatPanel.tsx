@@ -11,6 +11,13 @@ interface Props {
   onClose: () => void;
 }
 
+function humanizeOptionId(text: string): string {
+  if (/^[a-z0-9_]+$/.test(text) && text.includes('_')) {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return text;
+}
+
 export default function ChatPanel({ onClose }: Props) {
   const [state, dispatch] = useReducer(chatReducer, initialChatState);
   const [inputText, setInputText] = useState('');
@@ -32,12 +39,16 @@ export default function ChatPanel({ onClose }: Props) {
       try {
         const history = await getHistory(key);
         if (history.messages && history.messages.length > 0) {
-          const msgs: DisplayMessage[] = history.messages.map((m, i) => ({
-            id: `hist-${i}`,
-            role: m.role.toLowerCase() as 'user' | 'assistant',
-            blocks: [{ type: 'text' as const, body: m.content, options: null, buttonLabel: null, sectionTitle: null, document: null }],
-            timestamp: new Date(m.createdAt).getTime(),
-          }));
+          const msgs: DisplayMessage[] = history.messages.map((m, i) => {
+            const role = m.role.toLowerCase() as 'user' | 'assistant';
+            const body = role === 'user' ? humanizeOptionId(m.content) : m.content;
+            return {
+              id: `hist-${i}`,
+              role,
+              blocks: [{ type: 'text' as const, body, options: null, buttonLabel: null, sectionTitle: null, document: null }],
+              timestamp: new Date(m.createdAt).getTime(),
+            };
+          });
           dispatch({ type: 'load_history', messages: msgs });
           setInitialized(true);
           return;
