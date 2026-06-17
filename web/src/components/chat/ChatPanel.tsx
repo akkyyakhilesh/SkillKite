@@ -56,11 +56,11 @@ export default function ChatPanel({ onClose }: Props) {
     init();
   }, []);
 
-  async function send(text: string) {
+  async function send(text: string, displayText?: string) {
     if (!text.trim() || state.isThinking) return;
     const key = sessionKeyRef.current;
 
-    dispatch({ type: 'add_user_message', text: text.trim() });
+    dispatch({ type: 'add_user_message', text: (displayText ?? text).trim() });
     dispatch({ type: 'set_thinking', value: true });
     setInputText('');
 
@@ -79,7 +79,7 @@ export default function ChatPanel({ onClose }: Props) {
 
   function handleOptionSelect(option: InteractiveOption, messageId: string) {
     dispatch({ type: 'disable_options', messageId });
-    send(option.id);
+    send(option.id, option.title);
   }
 
   function handleSubmit(e: React.FormEvent) {

@@ -41,7 +41,7 @@ export interface HistoryResponse {
 }
 
 const API_BASE = 'https://bot.skillkite.in';
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 180_000;
 
 function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
