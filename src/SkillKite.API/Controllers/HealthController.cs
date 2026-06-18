@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillKite.Core.Enums;
@@ -11,6 +12,7 @@ namespace SkillKite.API.Controllers;
 /// No auth — only returns counts, no PII. Safe to expose on a public URL.
 /// </summary>
 [ApiController]
+[EnableCors("web")]
 public class HealthController : ControllerBase
 {
     private readonly AppDbContext _db;
