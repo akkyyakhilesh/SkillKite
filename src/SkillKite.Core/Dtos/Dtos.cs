@@ -1,11 +1,5 @@
 namespace SkillKite.Core.Dtos;
 
-public record AssessmentTurnResult(
-    string ReplyText,
-    bool IsComplete,
-    Dictionary<string, string>? ExtractedFields,
-    InteractiveBlock? Interactive = null);
-
 /// <summary>
 /// One of three career paths the engine suggests after assessment completion.
 /// The student picks one of these — only then do we generate the full roadmap.

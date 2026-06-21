@@ -6,22 +6,6 @@ namespace SkillKite.Core.Interfaces;
 public interface ICareerEngine
 {
     /// <summary>
-    /// Runs the next conversational assessment turn. Returns the reply to send
-    /// back to the student, whether the assessment is complete, and any
-    /// structured fields extracted from the student's latest reply.
-    ///
-    /// The student's <see cref="Student.PreferredLanguage"/> drives whether
-    /// Claude replies in Hinglish (default) or English — picked upfront before
-    /// the first assessment question, since 2026-06-09.
-    /// </summary>
-    Task<AssessmentTurnResult> NextTurnAsync(
-        Student student,
-        ChatSession session,
-        IReadOnlyList<ChatMessage> history,
-        string? latestUserMessage,
-        CancellationToken ct = default);
-
-    /// <summary>
     /// Once assessment is complete, suggest the student's 3 best-fit career paths
     /// (with a one-line rationale per path). The student picks one before we
     /// commit to generating a full 20-week roadmap.

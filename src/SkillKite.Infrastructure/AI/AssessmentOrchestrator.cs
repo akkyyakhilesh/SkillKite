@@ -1304,7 +1304,7 @@ public class AssessmentOrchestrator
         {
             StudentId = student.Id,
             AssessmentDataJson = JsonSerializer.Serialize(carriedData),
-            CurrentQuestionIndex = AssessmentQuestions.All.Count, // already "answered" via carry-forward
+            CurrentQuestionIndex = 99, // sentinel: "all answered" — skip assessment
             Status = SessionStatus.Active
         };
         _db.ChatSessions.Add(fresh);
@@ -1327,42 +1327,6 @@ public class AssessmentOrchestrator
 
         // Skip the assessment entirely — go straight to fresh suggestions.
         await SuggestCareerPathsAndAwaitChoiceAsync(student, fresh, ct);
-    }
-
-    /// <summary>
-    /// Drive one assessment turn for an existing (possibly new) session — used
-    /// when post-roadmap chat decides to restart, and as a fallback if a
-    /// completed session has no recoverable roadmap.
-    /// </summary>
-    private async Task ContinueAssessmentAsync(
-        Student student,
-        ChatSession session,
-        string? latestUserMessage,
-        CancellationToken ct)
-    {
-        if (!string.IsNullOrWhiteSpace(latestUserMessage))
-        {
-            _db.ChatMessages.Add(new ChatMessage
-            {
-                SessionId = session.Id,
-                Role = MessageRole.User,
-                Content = latestUserMessage
-            });
-            await _db.SaveChangesAsync(ct);
-        }
-
-        var history = session.Messages.OrderBy(m => m.CreatedAt).ToList();
-        var turn = await _engine.NextTurnAsync(student, session, history, latestUserMessage, ct);
-
-        _db.ChatMessages.Add(new ChatMessage
-        {
-            SessionId = session.Id,
-            Role = MessageRole.Assistant,
-            Content = turn.ReplyText
-        });
-        await _db.SaveChangesAsync(ct);
-
-        await TrySendAsync(() => _messaging.SendTextAsync(student.Phone, turn.ReplyText, ct));
     }
 
     /// <summary>
@@ -2745,45 +2709,6 @@ public class AssessmentOrchestrator
               ?? new Dictionary<string, string>();
         foreach (var (k, v) in updates) data[k] = v;
         return JsonSerializer.Serialize(data);
-    }
-
-    /// <summary>
-    /// Render one assessment turn to WhatsApp. If Claude attached an
-    /// InteractiveBlock (because we're asking a closed-enum question like
-    /// device or salary), we send tappable buttons / a list instead of a
-    /// plain text reply. The student can always still type freely.
-    /// </summary>
-    private async Task SendTurnAsync(string phone, AssessmentTurnResult turn, CancellationToken ct)
-    {
-        var block = turn.Interactive;
-        if (block is null || block.Options.Count == 0)
-        {
-            await _messaging.SendTextAsync(phone, turn.ReplyText, ct);
-            return;
-        }
-
-        // Body is the prompt shown above the options. Claude usually sets it to
-        // the same line as reply; fall back to reply if it's empty.
-        var body = string.IsNullOrWhiteSpace(block.Body) ? turn.ReplyText : block.Body;
-
-        if (block.Type.Equals("list", StringComparison.OrdinalIgnoreCase))
-        {
-            await _messaging.SendListAsync(
-                phone,
-                body,
-                block.ButtonLabel  ?? "Select",
-                block.SectionTitle ?? "Options",
-                block.Options,
-                ct);
-        }
-        else
-        {
-            // Defensive: WhatsApp Reply Buttons cap at 3. If Claude over-suggested
-            // (or someone added too many to AssessmentQuestions later), trim
-            // gracefully so we still get something to the student.
-            var btnOpts = block.Options.Count > 3 ? block.Options.Take(3).ToList() : block.Options;
-            await _messaging.SendButtonsAsync(phone, body, btnOpts, ct);
-        }
     }
 
     private async Task TrySendAsync(Func<Task> send)

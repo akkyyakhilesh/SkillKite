@@ -76,7 +76,6 @@ public class UpskillFlowTests
         }
 
         // Unused in upskill flow — throw so an accidental call is loud.
-        public Task<AssessmentTurnResult> NextTurnAsync(Student s, ChatSession se, IReadOnlyList<ChatMessage> h, string? m, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<CareerSuggestionsResult> SuggestCareerPathsAsync(Student s, ChatSession se, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<GeneratedRoadmap> GenerateRoadmapAsync(Student s, ChatSession se, string? c = null, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<PostRoadmapTurnResult> PostRoadmapTurnAsync(Student s, GeneratedRoadmap r, IReadOnlyList<ChatMessage> h, string m, CancellationToken ct = default) => throw new NotImplementedException();
