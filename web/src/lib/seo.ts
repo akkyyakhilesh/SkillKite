@@ -90,6 +90,36 @@ export function organizationSchema(site: URL) {
   };
 }
 
+/** Single blog post → schema.org BlogPosting. Helps Google treat the page as an
+ *  article (author, publish date, publisher) rather than a generic page. */
+export function blogPostingSchema(
+  site: URL,
+  post: { title: string; description: string; date: string; path: string }
+) {
+  const url = abs(site, post.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    url,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    image: abs(site, '/og-image.png'),
+    author: {
+      '@type': 'Person',
+      name: 'Akhilesh Kumar',
+      url: 'https://www.linkedin.com/in/akkyyakhilesh/',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'SkillKite',
+      logo: { '@type': 'ImageObject', url: abs(site, '/og-image.png') },
+    },
+  };
+}
+
 /** Site entity for the homepage. */
 export function webSiteSchema(site: URL) {
   return {

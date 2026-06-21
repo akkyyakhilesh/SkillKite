@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, render } from 'astro:content';
 import { whatsappLink } from '../../config/categories';
+import { blogPostingSchema } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -26,6 +27,13 @@ const catLink = categoryLinks[post.data.category] ?? categoryLinks.general;
 const formattedDate = new Date(post.data.date).toLocaleDateString('en-IN', {
   year: 'numeric', month: 'long', day: 'numeric',
 });
+
+const postingJson = JSON.stringify(blogPostingSchema(Astro.site!, {
+  title: post.data.title,
+  description: post.data.description,
+  date: post.data.date,
+  path: `/blog/${post.id}/`,
+}));
 ---
 
 <Base title={`${title} — SkillKite Blog`} description={description} path={`/blog/${post.id}/`}>
@@ -65,6 +73,8 @@ const formattedDate = new Date(post.data.date).toLocaleDateString('en-IN', {
       </div>
     </footer>
   </article>
+
+  <script type="application/ld+json" is:inline set:html={postingJson} />
 </Base>
 
 <style>
