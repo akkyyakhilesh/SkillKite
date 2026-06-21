@@ -157,6 +157,30 @@ main { flex: 1; }
 .btn-wa:hover, .btn-br:hover { transform: translateY(-2px); }
 .btn-br:hover { background: rgba(255, 255, 255, 0.14); }
 
+/* ---------- Stats strip (homepage hero) ---------- */
+.stats-strip {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.stats-strip-item { text-align: center; }
+.stats-strip-num {
+  display: block;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--saffron);
+}
+.stats-strip-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-dim);
+  margin-top: 2px;
+}
+
 /* ---------- Category cards ---------- */
 .cards-wrap { padding: 14px 38px 60px; }
 .cards-head { text-align: center; margin-bottom: 30px; }
@@ -287,6 +311,34 @@ main { flex: 1; }
 .about-step-icon { font-size: 30px; margin-bottom: 10px; }
 .about-step h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
 .about-step p { font-size: 13px; color: var(--muted-dim); line-height: 1.5; }
+
+/* Impact grid (about page) */
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 8px;
+}
+.impact-card {
+  padding: 22px 18px;
+  border-radius: 14px;
+  background: rgba(255, 138, 61, 0.08);
+  border: 1px solid rgba(255, 138, 61, 0.18);
+  text-align: center;
+}
+.impact-num {
+  display: block;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--saffron);
+}
+.impact-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-dim);
+  margin-top: 4px;
+}
 
 /* Founder */
 .about-founder {
