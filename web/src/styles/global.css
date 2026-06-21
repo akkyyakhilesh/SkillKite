@@ -319,6 +319,42 @@ main { flex: 1; }
   margin-bottom: 12px;
 }
 
+/* Follow SkillKite — compact inline pills */
+.social-pills {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.social-pill:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.social-pill--wa {
+  border-color: rgba(37, 211, 102, 0.35);
+  color: var(--wa-green);
+}
+.social-pill--wa:hover {
+  background: rgba(37, 211, 102, 0.12);
+  color: var(--wa-green);
+}
+
 /* Reach out */
 .about-reach {
   display: flex;
