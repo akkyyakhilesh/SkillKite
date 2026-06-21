@@ -1,0 +1,196 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection, render } from 'astro:content';
+import { whatsappLink } from '../../config/categories';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const title = post.data.seoTitle ?? post.data.title;
+const description = post.data.seoDescription ?? post.data.description;
+
+const categoryLinks: Record<string, { label: string; path: string }> = {
+  'after-10th': { label: 'After 10th options', path: '/after-10th/' },
+  'after-12th': { label: 'After 12th options', path: '/after-12th/' },
+  'careers': { label: 'Career paths', path: '/after-graduation/' },
+  'skill-upgrade': { label: 'Skill Upgrade options', path: '/skill-upgrade/' },
+  'general': { label: 'All guidance', path: '/#browse' },
+};
+const catLink = categoryLinks[post.data.category] ?? categoryLinks.general;
+const formattedDate = new Date(post.data.date).toLocaleDateString('en-IN', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<Base title={`${title} — SkillKite Blog`} description={description} path={`/blog/${post.id}/`}>
+  <Breadcrumbs items={[
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog/' },
+    { name: post.data.title, path: `/blog/${post.id}/` },
+  ]} />
+
+  <article class="post">
+    <header class="post-header">
+      <span class="post-date">{formattedDate}</span>
+      <h1>{post.data.title}</h1>
+      <p class="post-desc">{post.data.description}</p>
+    </header>
+
+    {post.data.linkedVideo && (
+      <div class="post-video">
+        <iframe
+          src={post.data.linkedVideo.replace('watch?v=', 'embed/')}
+          title={post.data.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    )}
+
+    <div class="post-body">
+      <Content />
+    </div>
+
+    <footer class="post-footer">
+      <p>Still figuring things out? We can help.</p>
+      <div class="post-ctas">
+        <a class="btn-wa" href={whatsappLink()}>💬 Get a personalized plan</a>
+        <a class="btn-br" href={catLink.path}>Browse {catLink.label} →</a>
+      </div>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  .post {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 38px 60px;
+  }
+  .post-header {
+    padding: 32px 0 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 32px;
+  }
+  .post-date {
+    font-size: 13px;
+    color: var(--muted-dim);
+    display: block;
+    margin-bottom: 10px;
+  }
+  .post-header h1 {
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin: 0 0 12px;
+    background: linear-gradient(90deg, #fff 30%, var(--saffron-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .post-desc {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .post-video {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    margin-bottom: 32px;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .post-video iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  .post-body {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .post-body :global(h2) {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    margin: 36px 0 14px;
+  }
+  .post-body :global(h3) {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--saffron-light);
+    margin: 28px 0 10px;
+  }
+  .post-body :global(p) {
+    margin: 0 0 16px;
+  }
+  .post-body :global(strong) {
+    color: #fff;
+    font-weight: 800;
+  }
+  .post-body :global(ul), .post-body :global(ol) {
+    padding-left: 22px;
+    margin: 0 0 16px;
+  }
+  .post-body :global(li) {
+    margin-bottom: 8px;
+  }
+  .post-body :global(a) {
+    color: var(--saffron-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .post-body :global(a:hover) {
+    color: var(--saffron);
+  }
+  .post-body :global(blockquote) {
+    border-left: 3px solid var(--saffron);
+    padding: 12px 20px;
+    margin: 20px 0;
+    background: rgba(255, 138, 61, 0.06);
+    border-radius: 0 10px 10px 0;
+    font-style: italic;
+  }
+
+  .post-footer {
+    margin-top: 48px;
+    padding: 28px;
+    border-radius: 14px;
+    background: rgba(255, 138, 61, 0.08);
+    border: 1px solid rgba(255, 138, 61, 0.2);
+    text-align: center;
+  }
+  .post-footer p {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 18px;
+    color: #fff;
+  }
+  .post-ctas {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 640px) {
+    .post { padding: 0 22px 44px; }
+    .post-header h1 { font-size: 26px; }
+    .post-ctas { flex-direction: column; }
+    .post-ctas .btn-wa,
+    .post-ctas .btn-br { text-align: center; justify-content: center; }
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+const title = 'Blog — SkillKite';
+const description =
+  'Career guidance articles for Indian students — stream selection, course comparisons, and honest career advice in Hindi + English.';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+const categoryLabels: Record<string, string> = {
+  'after-10th': 'After 10th',
+  'after-12th': 'After 12th',
+  'careers': 'Careers',
+  'skill-upgrade': 'Skill Upgrade',
+  'general': 'General',
+};
+---
+
+<Base title={title} description={description} path="/blog/">
+  <Breadcrumbs items={[
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog/' },
+  ]} />
+
+  <section class="hero--sub">
+    <div class="hero-inner">
+      <span class="eyebrow">Blog</span>
+      <h1>Career guidance, written down.</h1>
+      <p class="sub">
+        Honest articles on stream selection, course comparisons, and career planning — for students who want to think it through before deciding.
+      </p>
+    </div>
+  </section>
+
+  <section class="blog-list">
+    {posts.map((post) => (
+      <a class="blog-card" href={`/blog/${post.id}/`}>
+        <span class="blog-card-cat">{categoryLabels[post.data.category] ?? post.data.category}</span>
+        <h2 class="blog-card-title">{post.data.title}</h2>
+        <p class="blog-card-desc">{post.data.description}</p>
+        <span class="blog-card-date">{new Date(post.data.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  .blog-list {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 38px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .blog-card {
+    display: block;
+    padding: 24px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .blog-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 138, 61, 0.45);
+  }
+  .blog-card-cat {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--saffron-light);
+    background: rgba(255, 138, 61, 0.14);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .blog-card-title {
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0 0 8px;
+    color: #fff;
+  }
+  .blog-card-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0 0 12px;
+  }
+  .blog-card-date {
+    font-size: 12px;
+    color: var(--muted-dim);
+  }
+
+  @media (max-width: 640px) {
+    .blog-list { padding: 0 22px 44px; }
+  }
+</style>

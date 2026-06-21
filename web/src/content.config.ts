@@ -37,4 +37,17 @@ const guides = defineCollection({
   }),
 });
 
-export const collections = { guides };
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+    description: z.string(),
+    category: z.enum(['after-10th', 'after-12th', 'careers', 'skill-upgrade', 'general']),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    linkedVideo: z.string().url().optional(),
+  }),
+});
+
+export const collections = { guides, blog };
