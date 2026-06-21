@@ -47,6 +47,10 @@ const blog = defineCollection({
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
     linkedVideo: z.string().url().optional(),
+    // Catalog page paths this post should surface on as "Related reading"
+    // (e.g. ['/after-12th/pcb/']). The post is the single source of truth —
+    // listing a path here makes the post auto-appear on that catalog page.
+    relatedPages: z.array(z.string()).optional(),
   }),
 });
 

@@ -5,6 +5,7 @@ description: "10th ke baad Science, Commerce, ya Arts — kaunsa stream lein? Po
 category: "after-10th"
 seoTitle: "10th ke baad kya kare — Stream selection guide (2026)"
 seoDescription: "10th ke baad Science, Commerce, ya Arts? Polytechnic ya ITI? Complete guide with honest pros and cons for Indian students."
+relatedPages: ["/after-10th/"]
 ---
 
 ## 10th ke baad sabse pehla sawaal

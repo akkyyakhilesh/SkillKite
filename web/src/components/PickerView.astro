@@ -1,7 +1,9 @@
 ---
 import { whatsappLink } from '../config/categories';
 import Breadcrumbs from './Breadcrumbs.astro';
+import RelatedReading from './RelatedReading.astro';
 import type { Crumb } from '../lib/seo';
+import type { RelatedPost } from '../lib/blog';
 
 interface Item {
   href: string;
@@ -19,9 +21,11 @@ export interface Props {
   escapeWaText: string;
   /** Breadcrumb trail (Home › this category). */
   breadcrumbs: Crumb[];
+  /** Related blog posts surfaced below the picker (optional). */
+  relatedReading?: RelatedPost[];
 }
 
-const { eyebrow, heading, intro, items, escapePrompt, escapeWaText, breadcrumbs } = Astro.props;
+const { eyebrow, heading, intro, items, escapePrompt, escapeWaText, breadcrumbs, relatedReading = [] } = Astro.props;
 ---
 
 <Breadcrumbs items={breadcrumbs} />
@@ -52,6 +56,8 @@ const { eyebrow, heading, intro, items, escapePrompt, escapeWaText, breadcrumbs 
       ))
     }
   </div>
+
+  <RelatedReading posts={relatedReading} />
 
   <div class="escape">
     <p>{escapePrompt}</p>

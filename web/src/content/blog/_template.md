@@ -9,6 +9,9 @@ seoTitle: "Optional — overrides the <title> tag. Defaults to title above."
 seoDescription: "Optional — overrides the meta description. Defaults to description above."
 # linkedVideo: "https://www.youtube.com/watch?v=XXXXXXXXXXX"
 # ^ optional — uncomment to embed a YouTube video at the top of the post
+# relatedPages: ["/after-12th/pcb/"]
+# ^ optional — catalog page paths where this post should appear as "Related
+#   reading". Listing a path here makes the post auto-surface on that page.
 ---
 
 ## First section heading

@@ -5,6 +5,7 @@ description: "10th ke baad polytechnic diploma lein ya 12th karein? Dono ke real
 category: "after-10th"
 seoTitle: "Polytechnic vs 12th — kaunsa better hai? (2026 honest guide)"
 seoDescription: "10th ke baad polytechnic ya 12th? Time, kharcha, jobs, aur lateral entry to B.Tech — dono raaston ki honest comparison Indian students ke liye."
+relatedPages: ["/after-10th/", "/after-10th/science/"]
 ---
 
 ## 10th ke baad ka asli crossroad

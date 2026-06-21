@@ -1,7 +1,9 @@
 ---
 import { whatsappLink } from '../config/categories';
 import { faqPageSchema, type Crumb } from '../lib/seo';
+import type { RelatedPost } from '../lib/blog';
 import Breadcrumbs from './Breadcrumbs.astro';
+import RelatedReading from './RelatedReading.astro';
 
 interface Option {
   name: string;
@@ -29,9 +31,11 @@ export interface Props {
   escapeWaText: string;
   /** Breadcrumb trail (Home → category → this page) for the visible UI + JSON-LD. */
   breadcrumbs: Crumb[];
+  /** Related blog posts surfaced below the guide (optional). */
+  relatedReading?: RelatedPost[];
 }
 
-const { eyebrow, heading, intro, pdfWaText, backHref, backLabel, sections, escapePrompt, escapeWaText, breadcrumbs } =
+const { eyebrow, heading, intro, pdfWaText, backHref, backLabel, sections, escapePrompt, escapeWaText, breadcrumbs, relatedReading = [] } =
   Astro.props;
 
 // The option cards are FAQ-shaped → FAQPage JSON-LD. Breadcrumbs (visible nav
@@ -95,6 +99,8 @@ const preview = (s: string) => {
       </div>
     ))
   }
+
+  <RelatedReading posts={relatedReading} />
 
   <div class="escape">
     <p>{escapePrompt}</p>

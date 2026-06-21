@@ -5,6 +5,7 @@ description: "CSE le lo to job pakki? Mechanical mein scope nahi? Engineering br
 category: "after-12th"
 seoTitle: "Engineering branches comparison — CSE, ECE, Mechanical, Civil (2026)"
 seoDescription: "Engineering branch kaunsi chunein? CSE, ECE, Mechanical, Civil ki honest truth — scope, salary, jobs, aur kis tarah ke student ke liye kaunsi sahi."
+relatedPages: ["/after-12th/pcm/"]
 ---
 
 ## "CSE le lo, baaki sab bekaar hai" — sach kya hai?

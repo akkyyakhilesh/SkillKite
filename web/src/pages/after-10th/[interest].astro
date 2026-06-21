@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import GuideView from '../../components/GuideView.astro';
+import { getRelatedPosts } from '../../lib/blog';
 
 export async function getStaticPaths() {
   const guides = await getCollection('guides', (g) => g.data.category === 'after-10th');
@@ -10,6 +11,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
+const relatedReading = await getRelatedPosts(`/after-10th/${stream}/`);
 ---
 
 <Base title={seoTitle} description={seoDescription} path={`/after-10th/${stream}/`}>
@@ -28,5 +30,6 @@ const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
     ]}
     escapePrompt="Want a plan matched to your marks and goals?"
     escapeWaText={`Hi SkillKite! I just finished 10th, interested in ${streamLabel}`}
+    relatedReading={relatedReading}
   />
 </Base>

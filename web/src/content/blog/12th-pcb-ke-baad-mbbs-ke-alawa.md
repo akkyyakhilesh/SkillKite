@@ -5,6 +5,7 @@ description: "NEET nahi nikla ya MBBS ka kharcha mushkil hai? PCB ke baad 8 real
 category: "after-12th"
 seoTitle: "12th PCB ke baad MBBS ke alawa 8 careers (2026 guide)"
 seoDescription: "NEET ke alawa PCB students ke liye 8 real careers — BPT, BPharm, nursing, biotech, paramedical aur zyada. Honest scope, salary, aur exams."
+relatedPages: ["/after-12th/pcb/"]
 ---
 
 ## "Doctor banna tha, par NEET nahi nikla" — ab kya?

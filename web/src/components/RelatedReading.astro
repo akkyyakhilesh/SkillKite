@@ -1,0 +1,81 @@
+---
+import type { RelatedPost } from '../lib/blog';
+
+export interface Props {
+  posts: RelatedPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="related">
+    <h2 class="related-title">📖 Related reading</h2>
+    <div class="related-list">
+      {posts.map((p) => (
+        <a class="related-card" href={p.path}>
+          <span class="related-card-title">{p.title}</span>
+          <span class="related-card-desc">{p.description}</span>
+          <span class="related-card-go">Read the article →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related {
+    max-width: 760px;
+    margin: 48px auto 0;
+    padding: 0 38px;
+  }
+  .related-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--saffron-light);
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .related-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .related-card {
+    display: block;
+    padding: 18px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .related-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 138, 61, 0.45);
+  }
+  .related-card-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .related-card-desc {
+    display: block;
+    font-size: 13.5px;
+    color: var(--muted-dim);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .related-card-go {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--saffron-light);
+  }
+
+  @media (max-width: 640px) {
+    .related { padding: 0 22px; }
+  }
+</style>

@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PickerView from '../../components/PickerView.astro';
 import { TENTH_INTERESTS } from '../../config/categories';
+import { getRelatedPosts } from '../../lib/blog';
 
 const title = 'After 10th — stream selection guide | SkillKite';
 const description =
@@ -13,6 +14,8 @@ const items = TENTH_INTERESTS.map((s) => ({
   title: s.label,
   blurb: s.blurb,
 }));
+
+const relatedReading = await getRelatedPosts('/after-10th/');
 ---
 
 <Base title={title} description={description} path="/after-10th/">
@@ -27,5 +30,6 @@ const items = TENTH_INTERESTS.map((s) => ({
     ]}
     escapePrompt="Still confused? That's completely normal at this stage."
     escapeWaText="Hi SkillKite! Help me choose after 10th"
+    relatedReading={relatedReading}
   />
 </Base>

@@ -5,6 +5,7 @@ description: "Commerce ke teen bade professional courses — CA, CS, CMA. Kaunsa
 category: "after-12th"
 seoTitle: "CA vs CS vs CMA — honest comparison (2026 guide)"
 seoDescription: "CA, CS, ya CMA — kaunsa course chunein? Honest comparison of difficulty, duration, pass rate, aur career scope Commerce students ke liye."
+relatedPages: ["/after-12th/commerce/", "/after-12th/bba/"]
 ---
 
 ## Commerce ke teen bade naam
