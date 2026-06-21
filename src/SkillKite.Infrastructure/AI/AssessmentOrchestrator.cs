@@ -1524,13 +1524,13 @@ public class AssessmentOrchestrator
     // ============================================================================
     // 10th flow — thin discovery state machine.
     //
-    // Three steps stored in AssessmentDataJson under "step":
+    // Two steps stored in AssessmentDataJson under "step":
     //   "name"      → bot asked the student's name, awaiting free-text reply
     //   "interest"  → bot showed the 5-row interest list, awaiting tap/typed reply
-    //   "goal"      → bot showed the 3-button goal prompt, awaiting tap/typed reply
     //
-    // After "goal" we call Claude → render PDF → send PDF → mark session Completed.
-    // No 13-question assessment, no career-suggestion loop — that's by design.
+    // After "interest" we call Claude → render PDF → send PDF → mark session Completed.
+    // The guide always includes BOTH study and earning sections (goal question removed
+    // June 2026 — it didn't meaningfully filter content).
     // ============================================================================
 
     private async Task StartTenthFlowAsync(Student student, CancellationToken ct)
@@ -1611,13 +1611,17 @@ public class AssessmentOrchestrator
             case "interest":
             {
                 var interest = NormaliseTenthInterest(text);
-                session.AssessmentDataJson = WriteField(session, ("interest", interest), ("step", "goal"));
+                session.AssessmentDataJson = WriteField(session,
+                    ("interest", interest), ("goal", "both"), ("step", "generating"),
+                    ("generatingAt", DateTime.UtcNow.ToString("O")));
                 await _db.SaveChangesAsync(ct);
-                await SendTenthGoalPromptAsync(student, session, interest, ct);
+                await DeliverTenthGuideAsync(student, session, ct);
                 return;
             }
             case "goal":
             {
+                // Backward compat: any session that was already on step="goal" before
+                // this change can still finish normally.
                 var goal = NormaliseGoal(text);
                 session.AssessmentDataJson = WriteField(session,
                     ("goal", goal), ("step", "generating"),
@@ -1664,37 +1668,6 @@ public class AssessmentOrchestrator
             english ? "Your interest" : "Aapka interest",
             options, ct));
 
-        _db.ChatMessages.Add(new ChatMessage
-        {
-            SessionId = session.Id,
-            Role = MessageRole.Assistant,
-            Content = body
-        });
-        await _db.SaveChangesAsync(ct);
-    }
-
-    private async Task SendTenthGoalPromptAsync(Student student, ChatSession session, string interest, CancellationToken ct)
-    {
-        var english = student.PreferredLanguage == PreferredLanguage.English;
-        var body = english
-            ? "Got it 👍\n\nDo you want to *continue studying* or *start earning soon*?"
-            : "Got it 👍\n\nAap *aage padhna* chahte ho ya *abhi earning start* karni hai?";
-
-        var options = english
-            ? new List<InteractiveOption>
-            {
-                new("study", "📖 Study further"),
-                new("earn",  "💰 Start earning"),
-                new("both",  "🤔 Tell me both")
-            }
-            : new List<InteractiveOption>
-            {
-                new("study", "📖 Padhna hai"),
-                new("earn",  "💰 Earning start"),
-                new("both",  "🤔 Dono jaanna hai")
-            };
-
-        await TrySendAsync(() => _messaging.SendButtonsAsync(student.Phone, body, options, ct));
         _db.ChatMessages.Add(new ChatMessage
         {
             SessionId = session.Id,
