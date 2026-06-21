@@ -40,7 +40,7 @@ const siteJson = JSON.stringify(webSiteSchema(Astro.site!));
     <div class="grid">
       {
         CATEGORIES.map((c) => (
-          <a class={`card ${c.card}`} href={`/${c.slug}`}>
+          <a class={`card ${c.card}`} href={`/${c.slug}/`}>
             <div class="emoji">{c.emoji}</div>
             <h3>{c.title}</h3>
             <p>{c.blurb}</p>

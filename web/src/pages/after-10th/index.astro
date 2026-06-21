@@ -8,14 +8,14 @@ const description =
   'After 10th, which stream? Explore Science, Commerce, Arts — plus polytechnic, ITI and paramedical — with every option and where it leads. Free, honest, no pressure.';
 
 const items = TENTH_INTERESTS.map((s) => ({
-  href: `/after-10th/${s.slug}`,
+  href: `/after-10th/${s.slug}/`,
   emoji: s.emoji,
   title: s.label,
   blurb: s.blurb,
 }));
 ---
 
-<Base title={title} description={description} path="/after-10th">
+<Base title={title} description={description} path="/after-10th/">
   <PickerView
     eyebrow="📚 After 10th"
     heading="What interests you most?"
@@ -23,7 +23,7 @@ const items = TENTH_INTERESTS.map((s) => ({
     items={items}
     breadcrumbs={[
       { name: 'Home', path: '/' },
-      { name: 'After 10th', path: '/after-10th' },
+      { name: 'After 10th', path: '/after-10th/' },
     ]}
     escapePrompt="Still confused? That's completely normal at this stage."
     escapeWaText="Hi SkillKite! Help me choose after 10th"

@@ -8,14 +8,14 @@ const description =
   'Already working? Pick your field to see the skills to add now, the next roles to target with salary bands, and side moves where your experience transfers. Free.';
 
 const items = SKILL_FIELDS.map((s) => ({
-  href: `/skill-upgrade/${s.slug}`,
+  href: `/skill-upgrade/${s.slug}/`,
   emoji: s.emoji,
   title: s.label,
   blurb: s.blurb,
 }));
 ---
 
-<Base title={title} description={description} path="/skill-upgrade">
+<Base title={title} description={description} path="/skill-upgrade/">
   <PickerView
     eyebrow="🌱 Skill Upgrade"
     heading="What field are you in?"
@@ -23,7 +23,7 @@ const items = SKILL_FIELDS.map((s) => ({
     items={items}
     breadcrumbs={[
       { name: 'Home', path: '/' },
-      { name: 'Skill Upgrade', path: '/skill-upgrade' },
+      { name: 'Skill Upgrade', path: '/skill-upgrade/' },
     ]}
     escapePrompt="Want this matched to your exact experience and goal?"
     escapeWaText="Hi SkillKite! I want to upskill"

@@ -12,19 +12,19 @@ const { entry } = Astro.props;
 const { streamLabel, seoTitle, seoDescription, stream, guide } = entry;
 ---
 
-<Base title={seoTitle} description={seoDescription} path={`/after-12th/${stream}`}>
+<Base title={seoTitle} description={seoDescription} path={`/after-12th/${stream}/`}>
   <GuideView
     eyebrow={`🎯 After 12th · ${streamLabel}`}
     heading={`${streamLabel} — your options`}
     intro={`Every realistic course, entrance exam and career path after 12th ${streamLabel}. Tap any option to see details. Honest timelines, no hype.`}
     pdfWaText={`Hi SkillKite! I'm 12th ${streamLabel} — send me the guide`}
-    backHref="/after-12th"
+    backHref="/after-12th/"
     backLabel="Other streams"
     sections={guide.sections}
     breadcrumbs={[
       { name: 'Home', path: '/' },
-      { name: 'After 12th', path: '/after-12th' },
-      { name: streamLabel, path: `/after-12th/${stream}` },
+      { name: 'After 12th', path: '/after-12th/' },
+      { name: streamLabel, path: `/after-12th/${stream}/` },
     ]}
     escapePrompt="Want this personalized to you, with free learning resources?"
     escapeWaText={`Hi SkillKite! I'm 12th ${streamLabel}`}

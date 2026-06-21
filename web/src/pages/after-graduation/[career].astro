@@ -15,12 +15,12 @@ const description = `${career.Description} Salary ${inr(career.SalaryRangeMin)}�
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Graduation', path: '/after-graduation' },
-  { name: career.Title, path: `/after-graduation/${slugify(career.Title)}` },
+  { name: 'Graduation', path: '/after-graduation/' },
+  { name: career.Title, path: `/after-graduation/${slugify(career.Title)}/` },
 ];
 ---
 
-<Base title={title} description={description} path={`/after-graduation/${slugify(career.Title)}`}>
+<Base title={title} description={description} path={`/after-graduation/${slugify(career.Title)}/`}>
   <Breadcrumbs items={breadcrumbs} />
 
   <section class="hero hero--sub">
@@ -32,7 +32,7 @@ const breadcrumbs = [
         <a class="btn-wa" href={whatsappLink(`Hi SkillKite! I want a roadmap for ${career.Title}`)}>
           💬 Get my free roadmap
         </a>
-        <a class="btn-br" href="/after-graduation">← All careers</a>
+        <a class="btn-br" href="/after-graduation/">← All careers</a>
       </div>
     </div>
   </section>

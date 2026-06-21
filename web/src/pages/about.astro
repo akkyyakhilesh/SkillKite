@@ -10,10 +10,10 @@ const description =
 const orgJson = JSON.stringify(organizationSchema(Astro.site!));
 ---
 
-<Base title={title} description={description} path="/about">
+<Base title={title} description={description} path="/about/">
   <Breadcrumbs items={[
     { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
+    { name: 'About', path: '/about/' },
   ]} />
 
   <!-- Hero -->

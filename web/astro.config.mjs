@@ -9,6 +9,7 @@ import react from '@astrojs/react';
 export default defineConfig({
   // Canonical site URL — required for sitemap + absolute OG/canonical links.
   site: 'https://skillkite.in',
+  trailingSlash: 'always',
   integrations: [sitemap({
     // Keep noindex utility pages out of the sitemap (they carry a noindex
     // meta tag too — see Base.astro). 404 isn't emitted as a static URL.

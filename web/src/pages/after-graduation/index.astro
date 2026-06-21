@@ -15,10 +15,10 @@ const grouped = CAREER_CATEGORIES.map((cat) => ({
 })).filter((g) => g.items.length > 0);
 ---
 
-<Base title={title} description={description} path="/after-graduation">
+<Base title={title} description={description} path="/after-graduation/">
   <Breadcrumbs items={[
     { name: 'Home', path: '/' },
-    { name: 'Graduation', path: '/after-graduation' },
+    { name: 'Graduation', path: '/after-graduation/' },
   ]} />
 
   <section class="hero hero--sub">
@@ -42,7 +42,7 @@ const grouped = CAREER_CATEGORIES.map((cat) => ({
           <h2 class="sec-title">{group.emoji} {group.label}</h2>
           <div class="career-grid">
             {group.items.map((c) => (
-              <a class="career-card" href={`/after-graduation/${slugify(c.Title)}`}>
+              <a class="career-card" href={`/after-graduation/${slugify(c.Title)}/`}>
                 <span class="career-card-top">
                   <span class="career-card-body">
                     <span class="career-name">{c.Title}</span>
